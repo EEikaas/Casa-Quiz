@@ -3,182 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e0c0b">
 <title>Sotbyen</title>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#e6dcc3; --surface:#f3ebd6; --raise:#fbf5e4; --ink:#2a2226; --muted:#6b5f5a; --line:#bfae8a;
-  --brass:#8a6417; --brass-ink:#fff8e6; --brick:#8a3b2e; --teal:#2f5d62; --map:#ddd0b0; --route:#a8997a;
-  --ok:#2e7d4f; --bad:#a23a2c;
-  --display:"Alfa Slab One",Rockwell,"Roboto Slab",Georgia,serif;
-  --body:Spectral,Georgia,"Times New Roman",serif;
+  color-scheme:dark;
+  --bg:#0e0c0b; --surface:#171412; --raise:#221d19; --ink:#ece4d6; --muted:#a39684; --line:#3a312b;
+  --brass:#c8873a; --brass2:#e2a85e; --brass-ink:#140f0b; --brick:#a32e26; --teal:#5f9ea0; --ok:#7dbb72; --bad:#e0604f;
+  --display:"Bebas Neue","Oswald",Impact,"Arial Narrow",sans-serif;
+  --body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --flavor:"Playfair Display",Georgia,serif;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --bg:#211b1e; --surface:#2c2428; --raise:#382e33; --ink:#efe3c2; --muted:#a8998c; --line:#4a3d42;
-    --brass:#c9a24a; --brass-ink:#211b1e; --brick:#c0604f; --teal:#5fa3a8; --map:#2a2327; --route:#5b4d50;
-    --ok:#6fbf8a; --bad:#e07a66;
-  }
-}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --bg:#211b1e; --surface:#2c2428; --raise:#382e33; --ink:#efe3c2; --muted:#a8998c; --line:#4a3d42;
-  --brass:#c9a24a; --brass-ink:#211b1e; --brick:#c0604f; --teal:#5fa3a8; --map:#2a2327; --route:#5b4d50;
-  --ok:#6fbf8a; --bad:#e07a66;
-}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
 *,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
-#app{max-width:1180px;margin:0 auto;padding:12px 14px 40px}
-h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.1;margin:0 0 .4em}
-h1{font-size:clamp(2.6rem,11vw,5rem);letter-spacing:.01em}
-h2{font-size:1.45rem}
-h3{font-size:1.05rem}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  background:radial-gradient(ellipse at 20% -10%,#2a211b 0%,transparent 55%),radial-gradient(ellipse at 110% 110%,#26180f 0%,transparent 50%),var(--bg)}
+body::before{content:"";position:fixed;inset:-20%;pointer-events:none;z-index:0;opacity:.55;
+  background:radial-gradient(closest-side,rgba(200,190,175,.07),transparent) 10% 20%/60% 40% no-repeat,radial-gradient(closest-side,rgba(200,190,175,.06),transparent) 80% 60%/70% 45% no-repeat,radial-gradient(closest-side,rgba(200,190,175,.05),transparent) 40% 90%/80% 40% no-repeat;
+  animation:smoke 40s ease-in-out infinite alternate}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.07;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@keyframes smoke{from{transform:translate3d(-3%,0,0) scale(1)}to{transform:translate3d(3%,-2%,0) scale(1.08)}}
+#app{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:14px 14px 48px}
+h1,h2,h3{font-family:var(--display);font-weight:400;letter-spacing:.04em;line-height:1;margin:0 0 .35em}
+h1{font-size:clamp(3.6rem,17vw,7rem);letter-spacing:.06em;background:linear-gradient(180deg,#f1d3a0,#c8873a 60%,#7c4d1f);-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:1.9rem}
+h3{font-size:1.3rem;color:var(--brass2)}
 p{margin:.3em 0 .8em}
 .muted{color:var(--muted)}
-.small{font-size:.88rem}
+.small{font-size:.86rem}
+.flavor{font-family:var(--flavor);font-style:italic}
 button,input,select{font:inherit;color:inherit}
 button{touch-action:manipulation;cursor:pointer}
-:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
-.btn{display:inline-block;border:0;border-radius:4px;background:var(--brass);color:var(--brass-ink);padding:.7em 1.1em;font-family:var(--display);font-size:1rem;min-height:48px}
-.btn.wide{display:block;width:100%}
-.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);font-family:var(--body);font-weight:600}
-.btn.brick{background:var(--brick);color:#fff8e6}
-.btn:disabled{opacity:.45;cursor:default}
+:focus-visible{outline:2px solid var(--brass2);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #e9b27255;border-radius:6px;
+  background:linear-gradient(180deg,#dd9c50,#a8662a);color:var(--brass-ink);padding:.55em 1.1em;font-family:var(--display);font-size:1.25rem;letter-spacing:.07em;min-height:48px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 3px 0 #4f2d10,0 6px 18px rgba(0,0,0,.4);text-transform:uppercase}
+.btn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 0 #4f2d10}
+.btn.wide{display:flex;width:100%}
+.btn.ghost{background:rgba(255,255,255,.02);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover{border-color:var(--brass)}
+.btn.brick{background:linear-gradient(180deg,#c2402f,#7d1f18);color:#fbeee0;border-color:#e0604f55;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 3px 0 #3d0e0a,0 6px 18px rgba(0,0,0,.4)}
+.btn.sm{font-size:1rem;min-height:40px;padding:.35em .8em}
+.btn:disabled{opacity:.35;cursor:default;transform:none}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .stack>*+*{margin-top:10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px}
-input[type=text],select{background:var(--raise);border:2px solid var(--line);border-radius:4px;padding:.55em .7em;min-height:48px;min-width:0}
+.card,.panel{background:linear-gradient(180deg,rgba(38,32,28,.92),rgba(22,19,17,.94));border:1px solid var(--line);border-radius:10px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
+input[type=text],select{background:#0c0a09;border:1px solid var(--line);border-radius:6px;padding:.55em .7em;min-height:48px;min-width:0;color:var(--ink)}
 input[type=text]{flex:1}
-
-/* forside */
-.home{max-width:560px;margin:0 auto;padding-top:4vh}
-.home h1{margin-bottom:.1em}
-.smoke{font-style:italic;font-size:1.15rem;margin-bottom:1.4em}
-.choice{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:8px solid var(--brass);border-radius:4px;padding:14px 16px;min-height:48px}
-.choice b{font-family:var(--display);font-weight:400;font-size:1.15rem;display:block}
-.choice span{color:var(--muted);font-size:.95rem}
-.choice:disabled{opacity:.5}
+select{width:100%}
+.home{max-width:580px;margin:0 auto;padding-top:5vh}
+.tag{font-family:var(--flavor);font-style:italic;font-size:1.15rem;color:var(--muted);margin:-.2em 0 1.4em}
+.choice{display:block;width:100%;text-align:left;background:linear-gradient(90deg,rgba(200,135,58,.13),rgba(255,255,255,.02));border:1px solid var(--line);border-left:4px solid var(--brass);border-radius:8px;padding:14px 16px;min-height:48px}
+.choice b{font-family:var(--display);font-weight:400;font-size:1.5rem;letter-spacing:.05em;display:block;color:var(--ink)}
+.choice span{color:var(--muted);font-size:.92rem}
+.choice:hover{border-color:var(--brass)}
+.choice:disabled{opacity:.45}
 details{border-top:1px solid var(--line);padding-top:10px;margin-top:22px}
-summary{font-weight:600;cursor:pointer;min-height:44px;display:flex;align-items:center}
+summary{font-family:var(--display);font-size:1.3rem;letter-spacing:.05em;cursor:pointer;min-height:44px;display:flex;align-items:center}
 ol{padding-left:1.3em;margin:.4em 0}
 li{margin-bottom:.5em}
-
-/* lobby */
-.code{font-family:var(--display);font-size:clamp(2.6rem,12vw,4.5rem);letter-spacing:.12em;line-height:1}
+.code{font-family:var(--display);font-size:clamp(3rem,13vw,5.5rem);letter-spacing:.18em;line-height:1;color:var(--brass2)}
+.qr{width:170px;max-width:45vw;background:#f3ead8;padding:6px;border-radius:6px;flex:0 0 auto}.qr svg{display:block;width:100%;height:auto}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
-.seg button{border:2px solid var(--line);background:transparent;border-radius:4px;padding:.5em .8em;min-height:44px}
-.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg button{border:1px solid var(--line);background:transparent;border-radius:6px;padding:.45em .8em;min-height:44px;font-weight:600;font-size:.92rem}
+.seg button[aria-pressed=true]{background:var(--brass);color:var(--brass-ink);border-color:var(--brass)}
 .field{margin-bottom:14px}
-.field>label,.field>.lab{display:block;font-weight:600;margin-bottom:4px}
-.prow{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.field>label,.field>.lab{display:block;font-family:var(--display);letter-spacing:.06em;font-size:1.1rem;color:var(--muted);margin-bottom:4px}
+.prow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
 .prow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
 .x{border:0;background:transparent;font-size:1.3rem;min-width:44px;min-height:44px;color:var(--muted)}
-.dot{display:inline-block;width:.8em;height:.8em;border-radius:50%;vertical-align:baseline;border:1px solid var(--ink)}
-
-/* spill */
-.top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
-.top .brand{font-family:var(--display);font-size:1.2rem}
-.scores{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
-.sc{flex:0 0 auto;border:1px solid var(--line);border-radius:4px;padding:4px 9px;background:var(--surface);font-size:.9rem;white-space:nowrap}
-.sc.on{border-color:var(--ink);box-shadow:inset 0 -4px 0 var(--brass)}
+.dot{display:inline-block;width:.75em;height:.75em;border-radius:50%;vertical-align:baseline;box-shadow:0 0 0 2px rgba(0,0,0,.6)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.top .brand{font-family:var(--display);font-size:1.7rem;letter-spacing:.08em;color:var(--brass2)}
+.scores{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px}
+.sc{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 12px 3px 4px;background:rgba(0,0,0,.35);font-size:.88rem;white-space:nowrap}
+.sc.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass),0 0 18px rgba(200,135,58,.25)}
+.sc .pts{font-family:var(--display);font-size:1.15rem;letter-spacing:.04em;color:var(--brass2)}
 .game{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
 .game.act .mapwrap{order:-1}
-@media (min-width:900px){
-  .game{grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);align-items:start}
-  .game .mapwrap{order:-1}
-  body{font-size:19px}
-}
-.mapwrap{background:var(--map);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+@media (min-width:900px){.game{grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);align-items:start}.game .mapwrap{order:-1}}
+.mapwrap{background:radial-gradient(ellipse at 50% 40%,#211b17,#100d0b);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:inset 0 0 60px rgba(0,0,0,.7)}
+.mapwrap.mini{max-width:440px;margin-top:6px}
 .mapsvg{display:block;width:100%;height:auto}
-.canal{fill:none;stroke:var(--teal);stroke-width:26;opacity:.28;stroke-linecap:round}
-.nd{fill:var(--raise);stroke:var(--ink);stroke-width:3}
-.nd.goal{stroke:var(--brass);stroke-width:7}
-.nl{font-family:var(--body);font-weight:600;font-size:23px;fill:var(--ink);text-anchor:middle;paint-order:stroke;stroke:var(--map);stroke-width:7px;stroke-linejoin:round}
-.seg0{stroke:var(--route);stroke-width:11}
-.segb{stroke:var(--ink);stroke-width:17}
-.segc{stroke-width:11}
-.hit{stroke:transparent;stroke-width:46;cursor:pointer}
-.rt.sel .seg0{stroke:var(--ink);stroke-width:15}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px}
-.msg{font-style:italic;color:var(--muted);margin-bottom:8px;font-size:.95rem}
-.slip{background:var(--raise);border:1px solid var(--line);border-top:6px double var(--ink);padding:14px;border-radius:2px}
-.slip .cat{font-family:var(--display);font-size:.95rem;color:var(--brick)}
-.slip .qt{font-size:1.3rem;font-weight:600;line-height:1.3;margin:.3em 0 .7em}
-.opt{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:4px;padding:.65em .8em;min-height:52px;margin-top:8px;font-size:1.05rem}
-.opt i{font-family:var(--display);font-style:normal;width:1.4em;flex:0 0 auto}
+.nd{fill:#2b241f;stroke:#c8873a;stroke-width:3}
+.nd.goal{stroke:#f1d3a0;stroke-width:7}
+.nl{font-family:var(--display);letter-spacing:.06em;font-size:25px;fill:#e9dcc6;paint-order:stroke;stroke:#100d0b;stroke-width:7px;stroke-linejoin:round}
+.seg0{stroke:#4a3f37;stroke-width:12}
+.segb{stroke:#000;stroke-width:18}
+.segc{stroke-width:12}
+.hit{stroke:transparent;fill:none;cursor:pointer}
+.rt.sel .seg0{stroke:#e2a85e}
+.rt.sel .segb{stroke:#f1d3a0}
+.msg{font-family:var(--flavor);font-style:italic;color:var(--brass2);margin-bottom:10px;font-size:1.02rem}
+.slip{background:linear-gradient(180deg,#1f1a16,#151210);border:1px solid var(--line);border-top:3px solid var(--brass);padding:16px;border-radius:8px}
+.slip .cat{font-family:var(--display);font-size:1.1rem;letter-spacing:.08em;color:var(--brass2)}
+.slip .qt{font-size:1.3rem;font-weight:700;line-height:1.3;margin:.35em 0 .7em}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:#0f0d0c;border:1px solid var(--line);border-radius:8px;padding:.65em .85em;min-height:54px;margin-top:8px;font-size:1.05rem;color:var(--ink)}
+.opt i{font-family:var(--display);font-style:normal;font-size:1.3rem;width:1.3em;flex:0 0 auto;color:var(--brass2)}
+button.opt:not(:disabled):hover{border-color:var(--brass)}
 .opt.right{border-color:var(--ok);box-shadow:inset 6px 0 0 var(--ok)}
 .opt.wrong{border-color:var(--bad);box-shadow:inset 6px 0 0 var(--bad);text-decoration:line-through}
-.opt:disabled{cursor:default}
-.opt.dim{opacity:.5}
-.fuse{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:10px 0 2px}
-.fuse i{display:block;height:100%;background:var(--brick);width:100%;transform-origin:left;animation:fuse linear forwards}
-@keyframes fuse{to{transform:scaleX(0)}}
-.cats{display:grid;gap:8px}
-.catb{text-align:left;background:var(--raise);border:2px solid var(--line);border-radius:4px;padding:.7em .9em;min-height:52px;font-family:var(--display);font-size:1.1rem}
-.catb[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 8px 0 0 var(--brass)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:52px}
-.chip{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);background:var(--brass);color:var(--brass-ink);border:3px solid var(--ink)}
-.chip.pol{background:var(--brick);color:#fff8e6;font-size:.7rem}
-.pad{display:grid;place-items:center;width:100%;min-height:220px;border-radius:8px;border:4px solid var(--ink);background:var(--raise);font-family:var(--display);font-size:2rem;user-select:none;-webkit-user-select:none}
-.pad.go{background:var(--brass);color:var(--brass-ink)}
-.digits{font-family:var(--display);font-size:3rem;letter-spacing:.2em;text-align:center;min-height:1.3em}
-.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:10px auto 0}
-.keys button{min-height:56px;font-family:var(--display);font-size:1.3rem;background:var(--raise);border:2px solid var(--line);border-radius:4px}
-.qr{width:170px;max-width:45vw;background:#fff;padding:6px;border-radius:4px;flex:0 0 auto}.qr svg{display:block;width:100%;height:auto}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:right;padding:6px 4px;border-bottom:1px dashed var(--line)}
-th:first-child,td:first-child{text-align:left}
-th{font-weight:600;font-size:.85rem}
-.tw{overflow-x:auto}
-.win{font-family:var(--display);font-size:clamp(1.6rem,6vw,2.6rem);margin:.4em 0}
 .opt.mytip{border-color:var(--teal);box-shadow:inset 6px 0 0 var(--teal)}
-.tipnote{margin-top:10px;padding:8px 10px;border-left:4px solid var(--teal);background:var(--raise);font-size:.95rem}
-body.big{font-size:22px}
-body.big #app{max-width:none;padding:20px 32px 32px}
-body.big h2{font-size:2rem}
-body.big .top .brand{font-size:1.8rem}
-body.big .sc{font-size:1.15rem;padding:8px 14px}
-body.big .slip .qt{font-size:2.2rem}
-body.big .slip .cat{font-size:1.2rem}
-body.big .opt{font-size:1.45rem;min-height:66px}
-body.big .qr{width:280px;max-width:30vw}
-body.big .joincode{font-family:var(--display);font-size:1.6rem;letter-spacing:.08em}
-@media (min-width:900px){body.big .game{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-.banner{background:var(--brick);color:#fff8e6;padding:8px 12px;border-radius:4px;margin-bottom:10px}
-.foot{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
-@media (prefers-reduced-motion:reduce){.fuse i{animation:none}}
-
-.pt{display:inline-block;border-radius:50%;overflow:hidden;vertical-align:middle;flex:0 0 auto;border:2px solid var(--ink);background:var(--raise)}
+.opt.dim{opacity:.45}
+.opt.gone{visibility:hidden}
+.opt:disabled{cursor:default}
+.fuse{height:5px;background:#2a231e;border-radius:3px;overflow:hidden;margin:12px 0 4px}
+.fuse i{display:block;height:100%;background:linear-gradient(90deg,#e0604f,#e2a85e);width:100%;transform-origin:left;animation:fuse linear forwards}
+@keyframes fuse{to{transform:scaleX(0)}}
+.tipnote{margin-top:10px;padding:8px 12px;border-left:3px solid var(--teal);background:rgba(95,158,160,.08);font-size:.95rem;border-radius:0 6px 6px 0}
+.cats{display:grid;gap:8px}
+.catb{text-align:left;background:#0f0d0c;border:1px solid var(--line);border-radius:8px;padding:.6em 1em;min-height:54px;font-family:var(--display);font-size:1.45rem;letter-spacing:.05em;color:var(--ink)}
+button.catb:hover{border-color:var(--brass)}
+.pt{display:inline-block;border-radius:50%;overflow:hidden;vertical-align:middle;flex:0 0 auto;border:2px solid #c8873a;background:#000;box-shadow:0 4px 14px rgba(0,0,0,.5)}
 .pt svg{display:block;width:100%;height:100%}
-.who{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.who{display:flex;align-items:center;gap:14px;margin-bottom:8px}
 .who h2{margin:0}
 .chars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 0}
-.charb{border:2px solid var(--line);background:var(--raise);border-radius:6px;padding:5px 2px;font-size:.72rem;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:44px;min-width:0}
-.charb .pt{width:100%;max-width:58px;aspect-ratio:1/1;height:auto}
-.charb[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 -5px 0 var(--brass)}
-.charb:disabled{opacity:.3}
-.ability{font-size:.92rem;color:var(--muted);min-height:1.4em}
+.charb{border:1px solid var(--line);background:#0f0d0c;border-radius:8px;padding:6px 2px;font-size:.7rem;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:44px;min-width:0;color:var(--ink)}
+.charb span:last-child{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.charb .pt{width:100%!important;max-width:60px;aspect-ratio:1/1;height:auto!important}
+.charb[aria-pressed=true]{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass)}
+.charb:disabled{opacity:.25}
+.ability{font-size:.9rem;color:var(--muted);min-height:1.4em}
 .prog{display:flex;gap:6px;margin:4px 0 8px;align-items:center}
-.prog i{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);display:block}
+.prog i{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);display:block}
 .prog i.ok{background:var(--ok);border-color:var(--ok)}
 .prog i.no{background:var(--bad);border-color:var(--bad)}
 .vs{display:flex;align-items:center;justify-content:space-around;gap:10px;margin:8px 0;text-align:center}
 .vs b{display:block}
-.req{font-size:.88rem;color:var(--muted)}
-.req b{color:var(--ink)}
-.shady{margin-top:12px}
-.shady .row{margin-bottom:6px}
-.res{font-family:var(--display);font-size:1.25rem;margin:.3em 0}
-.opt.gone{visibility:hidden}
-.mini{max-width:420px}
+.res{font-family:var(--display);font-size:1.6rem;letter-spacing:.05em;margin:.2em 0;color:var(--brass2)}
+.req{font-size:.86rem;color:var(--muted)}
+.tok{display:inline-block;flex:0 0 auto;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))}
+.tok svg{display:block;width:100%;height:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;min-height:48px}
+.chips .x1{position:relative}
+.chips .x1::after{content:"";position:absolute;inset:-2px;background:linear-gradient(45deg,transparent 46%,#e0604f 46%,#e0604f 54%,transparent 54%)}
+.bags{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.bagc{background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:12px}
+.bagc.bust{border-color:var(--bad)}
+.bagc.ok{border-color:var(--ok)}
+.bagc h3{display:flex;align-items:center;gap:8px;color:var(--ink)}
+.inv{display:flex;flex-wrap:wrap;gap:8px}
+.invi{display:flex;align-items:center;gap:6px;background:#0f0d0c;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 3px;font-size:.88rem}
+.shop{display:grid;gap:8px}
+.shopi{display:flex;align-items:center;gap:10px;background:#0f0d0c;border:1px solid var(--line);border-radius:8px;padding:8px}
+.shopi div{flex:1;min-width:0}
+.shopi b{display:block}
+.dice{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.diec{text-align:center;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px}
+.diec .dd{display:flex;gap:6px;justify-content:center;margin:8px 0}
+.die{width:46px;height:46px}
+.die.roll{animation:roll .5s ease-out}
+@keyframes roll{from{transform:rotate(-200deg) scale(.4);opacity:0}to{transform:none;opacity:1}}
+.ansgrid{display:grid;gap:6px}
+.ansrow{display:flex;align-items:center;gap:6px}
+.ansrow .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ansrow button{min-width:44px;min-height:44px;border-radius:6px;border:1px solid var(--line);background:#0f0d0c;font-family:var(--display);font-size:1.2rem}
+.ansrow button[aria-pressed=true]{background:var(--brass);color:var(--brass-ink)}
+.teamstat{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.teamstat span{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:.85rem}
+.teamstat span.done{border-color:var(--ok);color:var(--ok)}
+.teamstat span.ok{background:rgba(125,187,114,.15);border-color:var(--ok)}
+.teamstat span.no{background:rgba(224,96,79,.12);border-color:var(--bad)}
+.cd{position:fixed;inset:0;z-index:50;display:grid;place-items:center;text-align:center;background:rgba(10,8,7,.92);animation:flash .5s steps(1) 6}
+.cd .who{justify-content:center}
+.cd .lbl{font-family:var(--display);letter-spacing:.12em;font-size:clamp(1.4rem,5vw,2.6rem);color:var(--brass2)}
+.cd .nums{position:relative;height:clamp(140px,40vw,320px);width:100%}
+.cd .nums span{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-size:clamp(140px,40vw,320px);line-height:1;color:var(--ink);opacity:0;animation:cdn 1s ease-out forwards;text-shadow:0 0 40px rgba(226,168,94,.6)}
+@keyframes cdn{0%{opacity:1;transform:scale(1.5)}80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.9)}}
+@keyframes flash{0%{background:rgba(10,8,7,.92)}50%{background:rgba(120,62,20,.85)}}
+.pad{display:grid;place-items:center;width:100%;min-height:220px;border-radius:12px;border:1px solid var(--line);background:#0f0d0c;font-family:var(--display);font-size:2.6rem;letter-spacing:.08em;user-select:none;-webkit-user-select:none;color:var(--ink)}
+.pad.go{background:linear-gradient(180deg,#dd9c50,#a8662a);color:var(--brass-ink)}
+.digits{font-family:var(--display);font-size:3.4rem;letter-spacing:.2em;text-align:center;min-height:1.2em;color:var(--brass2)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:320px;margin:10px auto 0}
+.keys button{min-height:56px;font-family:var(--display);font-size:1.6rem;background:#0f0d0c;border:1px solid var(--line);border-radius:8px}
+.notes{position:relative;width:100%;aspect-ratio:4/3;background:#0f0d0c;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.notes .tok{position:absolute}
+.oddg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:380px;margin:0 auto}
+.oddg button{aspect-ratio:1;border:0;background:transparent;padding:0}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:right;padding:7px 5px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+th{font-family:var(--display);font-weight:400;letter-spacing:.06em;font-size:1rem;color:var(--muted)}
+.tw{overflow-x:auto}
+.win{font-family:var(--display);font-size:clamp(2.2rem,8vw,3.8rem);letter-spacing:.05em;margin:.3em 0;color:var(--brass2)}
+.banner{background:var(--brick);color:#fbeee0;padding:8px 12px;border-radius:6px;margin-bottom:10px}
+.foot{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.joincode{font-family:var(--display);font-size:1.7rem;letter-spacing:.12em;color:var(--brass2)}
+body.big{font-size:21px}
+body.big #app{max-width:none;padding:22px 34px 34px}
+body.big h2{font-size:2.6rem}
+body.big .slip .qt{font-size:2.3rem}
+body.big .opt{font-size:1.45rem;min-height:68px}
+body.big .qr{width:300px;max-width:30vw}
 body.big .who .pt{width:110px!important;height:110px!important}
-body.big .vs .pt{width:110px!important;height:110px!important}
-body.big .res{font-size:1.8rem}
+body.big .vs .pt{width:120px!important;height:120px!important}
+body.big .die{width:70px;height:70px}
+@media (min-width:900px){body.big .game{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){body::before,.fuse i,.die.roll{animation:none}.cd{animation:none}}
 </style>
 </head>
 <body>
@@ -195,16 +223,22 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[
 const LS={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const rid=n=>{let s='';const ab='abcdefghjkmnpqrstuvwxyz23456789';for(let i=0;i<n;i++)s+=pick(ab);return s};
 let CID=LS.get('sot.cid'); if(!CID){CID='c'+rid(10);LS.set('sot.cid',CID)}
-const VERSION=2;
+const VERSION=3;
+let GID=0;const uid=()=>'u'+(++GID);
+function shade(hex,a){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=a<0?0:255,t=Math.abs(a);r=Math.round((f-r)*t+r);g=Math.round((f-g)*t+g);b=Math.round((f-b)*t+b);return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
 
 /* ---------- data ---------- */
 const CATS=['Historie','Geografi','Natur og vitenskap','Sport og lek','Kultur og underholdning','Smått og stort'];
 const TEAM_NAMES=['Sotluene','Kanalrottene','Jernnevene','Nattskiftet','Stålkråkene','Bryggegjengen','Fyrstikkguttene','Kullsvarte','Hesteskoene','Røykdykkerne'];
-const COLORS=['#c0392b','#2e86c1','#d4a017','#2e9e6b','#8e5bb5','#e67e22','#1aa3a3','#d65a94','#5d6d7e','#a0724a'];
-const MG={react:{name:'Rask på avtrekkeren',desc:'Vent på signalet, og trykk så fort du kan. Tjuvstart straffes.',fmt:v=>v+' ms'},
-          taps:{name:'Veddeløpet',desc:'Trykk så mange ganger du klarer på fem sekunder.',fmt:v=>v+' trykk'},
-          mem:{name:'Safekoden',desc:'Koden vises et øyeblikk. Husk den, og tast den inn.',fmt:v=>v+' riktige'}};
-const MGORDER=['react','mem','taps'];
+const COLORS=['#d0503f','#4a90c8','#d9a62a','#46a874','#9a6cc4','#e48a3a','#2fb0aa','#d86a9c','#8a9aab','#b8875a'];
+const MG={
+  react:{name:'Rask på avtrekkeren',desc:'Vent på signalet, og trykk så fort du kan. Tjuvstart straffes.',fmt:v=>v+' ms',lower:1,worst:1500},
+  count:{name:'Tell sedlene',desc:'Sedler vises et kort øyeblikk. Tell dem, og tast inn antallet.',fmt:v=>v===0?'helt riktig':v+' unna',lower:1,worst:99},
+  taps:{name:'Veddeløpet',desc:'Trykk så mange ganger du klarer på fem sekunder.',fmt:v=>v+' trykk',lower:0,worst:0},
+  clock:{name:'Stoppeklokka',desc:'Stopp klokka på nøyaktig 5,00 sekunder. Etter to sekunder blir den skjult.',fmt:v=>(v/1000).toFixed(2)+' s unna',lower:1,worst:5000},
+  mem:{name:'Safekoden',desc:'Koden vises et øyeblikk. Husk den, og tast den inn.',fmt:v=>v+' riktige',lower:0,worst:0},
+  odd:{name:'Falskmyntneren',desc:'Finn den falske mynten tre ganger så fort du kan. Feil trykk gir to sekunders straff.',fmt:v=>(v/1000).toFixed(1)+' s',lower:1,worst:30000}};
+const MGORDER=['react','count','taps','clock','mem','odd'];
 const RAW={easy:[
 [ 'Hva het skipene vikingene seilte med?|Langskip|Galeier|Dampskip|Kanoer','Hvem bygde pyramidene?|Egypterne|Vikingene|Romerne|Kineserne','Hvilken dato er Norges nasjonaldag?|17. mai|1. mai|24. desember|7. juni','Hva kaltes kongene i det gamle Egypt?|Faraoer|Keisere|Høvdinger|Sultaner','Hvilket dyr red ridderne på?|Hest|Kamel|Elefant|Okse','Hvem var det første mennesket som gikk på månen?|Neil Armstrong|Roald Amundsen|Albert Einstein|Christopher Columbus','Hvilken norsk polfarer kom først til Sydpolen?|Roald Amundsen|Fridtjof Nansen|Thor Heyerdahl|Leiv Eiriksson','Hva lyste folk opp husene med før de fikk strøm?|Stearinlys og oljelamper|Lommelykter|Lysrør|Solceller','Hva het flåten Thor Heyerdahl seilte over Stillehavet med?|Kon-Tiki|Fram|Gjøa|Titanic','I hvilken by står Colosseum?|Roma|Paris|Athen|London','Hvilket stort skip sank etter å ha truffet et isfjell i 1912?|Titanic|Fram|Vasa|Kon-Tiki','Hvilke dyr levde på jorda for mange millioner år siden og er nå utdødd?|Dinosaurer|Hester|Elefanter|Hvaler'],
 [ 'Hva er hovedstaden i Norge?|Oslo|Bergen|Trondheim|Stockholm','Hvilket land har form som en støvel?|Italia|Spania|Hellas|Frankrike','Hva heter verdens største hav?|Stillehavet|Atlanterhavet|Nordsjøen|Middelhavet','I hvilket land ligger Paris?|Frankrike|Italia|England|Tyskland','Hva heter Norges høyeste fjell?|Galdhøpiggen|Snøhetta|Gaustatoppen|Glittertind','I hvilken verdensdel ligger Egypt?|Afrika|Asia|Europa|Sør-Amerika','Hva er hovedstaden i Sverige?|Stockholm|København|Göteborg|Helsingfors','Hvilke farger har det norske flagget?|Rødt, hvitt og blått|Rødt og hvitt|Blått og gult|Rødt, gult og blått','Hvor bor isbjørnen?|I Arktis|I Antarktis|I Afrika|I Australia','Hvilket land er kjent for kenguruer?|Australia|India|Canada|Brasil','Hva heter Norges lengste elv?|Glomma|Tana|Numedalslågen|Akerselva','Hva heter verdens høyeste fjell?|Mount Everest|Mont Blanc|Kilimanjaro|Galdhøpiggen'],
@@ -220,80 +254,127 @@ const RAW={easy:[
 [ 'Hvem regisserte «Gudfaren»?|Francis Ford Coppola|Martin Scorsese|Steven Spielberg|Sergio Leone','Hvilket band ga ut albumet «Abbey Road»?|The Beatles|The Rolling Stones|Pink Floyd|The Who','Hvem komponerte «I Dovregubbens hall»?|Edvard Grieg|Johan Svendsen|Jean Sibelius|Ole Bull','Hvilken norsk gruppe slo gjennom med «Take On Me»?|a-ha|Bel Canto|DumDum Boys|Röyksopp','Hvem spilte Jack i filmen «Titanic» fra 1997?|Leonardo DiCaprio|Brad Pitt|Matt Damon|Johnny Depp','Hvem malte «Skrik»?|Edvard Munch|Christian Krohg|Harald Sohlberg|Nikolai Astrup','Hvem skrev «Et dukkehjem»?|Henrik Ibsen|Bjørnstjerne Bjørnson|Knut Hamsun|Alexander Kielland','Hvilket instrument spilte Louis Armstrong?|Trompet|Saksofon|Klarinett|Trombone','Hvilken film vant Oscar for beste film i 2020?|Parasitt|1917|Joker|Green Book','Hvor mange strenger har en fiolin?|Fire|Seks|Fem|Tre','Hvem skrev «Ringenes herre»?|J.R.R. Tolkien|C.S. Lewis|George R.R. Martin|Terry Pratchett','Hvilken musikksjanger vokste frem i New Orleans tidlig på 1900-tallet?|Jazz|Rock and roll|Country|Reggae'],
 [ 'Hvor mange nuller er det i én million?|Seks|Fem|Sju|Ni','Hva er romertallet for 50?|L|C|D|X','Hvilken valuta brukes i Japan?|Yen|Won|Yuan|Baht','Hva betyr «carpe diem»?|Grip dagen|Jeg kom, jeg så|Kunnskap er makt|Tiden flyr','Hvilket metall er flytende ved romtemperatur?|Kvikksølv|Bly|Tinn|Sink','Hvor mange minutter er det i et døgn?|1440|1240|1640|2400','Hvilken farge har «den svarte boksen» i et fly?|Oransje|Svart|Gul|Rød','Hva er hovedingrediensen i guacamole?|Avokado|Erter|Agurk|Lime','Hva er pi avrundet til to desimaler?|3,14|3,41|3,16|3,12','Hvilket år kom den første iPhone i salg?|2007|2005|2009|2003','Hva kalles frykten for trange rom?|Klaustrofobi|Agorafobi|Araknofobi|Akrofobi','Hvilket land kommer osten gouda fra?|Nederland|Belgia|Sveits|Danmark']
 ]};
-const EXTRA={"easy": [["Hva het kongen som kom til Norge i 1905?|Haakon VII|Olav V|Harald V|Oscar II", "Hva skrev vikingene med?|Runer|Hieroglyfer|Kinesiske tegn|Morsekode", "Hva kaller vi et stort hus av stein der riddere og konger bodde?|Borg|Hytte|Telt|Iglo", "Hvilket dyr trakk oftest vognene før bilene kom?|Hesten|Grisen|Sauen|Hunden", "Hva heter den gamle festningen ved havna i Oslo?|Akershus festning|Bergenhus festning|Kristiansten festning|Fredriksten festning", "I hvilket land bodde faraoene?|Egypt|Hellas|Italia|Kina", "Hvem fant ifølge sagaene Amerika lenge før Columbus?|Leiv Eiriksson|Harald Hårfagre|Olav Tryggvason|Erik Blodøks", "Hvem bodde i iglo i gamle dager?|Inuitter|Vikinger|Romere|Egyptere"], ["Hva er hovedstaden i Danmark?|København|Aarhus|Odense|Oslo", "I hvilken verdensdel ligger Norge?|Europa|Asia|Afrika|Amerika", "Hva heter øygruppen langt nord der det bor isbjørn?|Svalbard|Lofoten|Færøyene|Island", "Hvilket land har lengst grense mot Norge?|Sverige|Finland|Russland|Danmark", "Hvilken verdensdel ligger ved Sydpolen?|Antarktis|Arktis|Grønland|Island", "I hvilken by står klokketårnet Big Ben?|London|Paris|Berlin|Roma", "Hva kaller vi et stykke land med vann rundt seg?|Øy|Halvøy|Fjell|Dal", "Hvilket land har et lønneblad i flagget?|Canada|USA|Mexico|Australia"], ["Hvilket dyr sier «mø»?|Ku|Sau|Gris|Hest", "Hva puster fisker med?|Gjeller|Lunger|Nesen|Finnene", "Hvilken planet kalles den røde planeten?|Mars|Venus|Jupiter|Saturn", "Hva kalles det når vann blir til damp?|Fordamping|Frysing|Smelting|Regn", "Hvilket dyr har snabel?|Elefant|Neshorn|Flodhest|Sjiraff", "Hva kaller vi dyr som bare spiser planter?|Planteetere|Rovdyr|Altetere|Insektetere", "Hvor mange årstider har vi i Norge?|Fire|Tre|To|Seks", "Hvilket av disse dyrene legger egg?|Høne|Ku|Hund|Katt"], ["Hva kalles det når én spiller scorer tre mål i samme kamp?|Hat trick|Strike|Ess|Birdie", "Hvilken av disse ballene er størst?|Basketball|Tennisball|Golfball|Bordtennisball", "I hvilken sport hopper man ned en stor bakke på ski?|Skihopp|Slalåm|Langrenn|Skiskyting", "Hvor mange hull har en vanlig golfbane?|18|9|12|20", "I hvilket spill slår man hjem andres brikker etter terningkast?|Ludo|Sjakk|Dam|Bingo", "Hvor mange spiller i et vanlig sjakkparti?|To|Fire|Tre|Seks", "Hvilken sport spilles på is med steiner og koster?|Curling|Ishockey|Bandy|Kunstløp", "Hvor mange baller er i spill samtidig i en fotballkamp?|Én|To|Tre|Fire"], ["Hva heter kjæresten til Mikke Mus?|Minni|Dolly|Klarabella|Andersine", "Hvem er gutten som aldri vil bli voksen?|Peter Pan|Pinocchio|Aladdin|Robin Hood", "Hvem får lengre nese når han lyver?|Pinocchio|Peter Pan|Ole Brumm|Emil", "Hvilket av disse instrumentene blåser man i?|Fløyte|Piano|Gitar|Tromme", "Hvilken farge har Grinchen?|Grønn|Blå|Rød|Lilla", "Hvem hjelper Askepott så hun kan dra på ballet?|Gudmoren|Heksa|Dragen|Kongen", "Hva heter Simbas far i «Løvenes konge»?|Mufasa|Scar|Timon|Pumba", "Hvilket eventyrdyr kan spy ild?|Drage|Enhjørning|Troll|Nisse"], ["Hva er 10 minus 4?|6|5|7|4", "Hvor mange hjul har en sykkel?|To|Tre|Fire|Ett", "Hvilken dag kommer etter fredag?|Lørdag|Søndag|Torsdag|Mandag", "Hvilken farge får du når du blander rødt og hvitt?|Rosa|Lilla|Oransje|Brun", "Hva er 3 ganger 4?|12|7|10|14", "Hvor mange timer er det i et døgn?|24|12|20|48", "Hva kaller vi ungen til en ku?|Kalv|Føll|Lam|Valp", "Hvilken frukt kan være rød eller grønn og vokser på trær her i Norge?|Eple|Banan|Appelsin|Ananas"]], "hard": [["Hvilket år sank Titanic?|1912|1905|1915|1920", "Hvilken keiser grunnla Konstantinopel?|Konstantin den store|Augustus|Nero|Hadrian", "Hvilket år landet Apollo 11 på månen?|1969|1967|1971|1965", "Hvem var USAs første president?|George Washington|Thomas Jefferson|Abraham Lincoln|John Adams", "Hvilket slag i 1066 ga normannerne makten i England?|Slaget ved Hastings|Slaget ved Stamford Bridge|Slaget ved Waterloo|Slaget ved Agincourt", "Hvilket år ble FN grunnlagt?|1945|1919|1948|1950", "Hvilket land ga Frihetsgudinnen til USA?|Frankrike|Storbritannia|Spania|Nederland", "Hvilket år trådte alkoholforbudet i USA i kraft?|1920|1912|1929|1933"], ["Hva heter Afrikas høyeste fjell?|Kilimanjaro|Mount Kenya|Mont Blanc|Aconcagua", "Hva er hovedstaden i Brasil?|Brasília|Rio de Janeiro|São Paulo|Salvador", "Hva heter verdens dypeste innsjø?|Bajkalsjøen|Tanganyikasjøen|Victoriasjøen|Lake Superior", "Hvilket lite land ligger i Pyreneene mellom Spania og Frankrike?|Andorra|Monaco|Liechtenstein|San Marino", "Hva er Norges lengste fjord?|Sognefjorden|Hardangerfjorden|Oslofjorden|Trondheimsfjorden", "Hva er hovedstaden i Skottland?|Edinburgh|Glasgow|Aberdeen|Dundee", "Hvilken elv renner gjennom London?|Themsen|Severn|Mersey|Tyne", "Hva er hovedstaden på Island?|Reykjavík|Akureyri|Tórshavn|Nuuk"], ["Hvilket grunnstoff har symbolet Fe?|Jern|Fluor|Fosfor|Bly", "Hvor mange hjerter har en blekksprut?|Tre|Ett|To|Fire", "Hvilken planet bruker kortest tid rundt sola?|Merkur|Venus|Mars|Jorda", "Hva er kokepunktet for vann ved havnivå i Fahrenheit?|212|100|180|232", "Hva kalles blodårene som fører blod bort fra hjertet?|Arterier|Vener|Kapillærer|Lymfeårer", "Hvem formulerte gravitasjonsloven på 1600-tallet?|Isaac Newton|Galileo Galilei|Johannes Kepler|René Descartes", "Hva heter stjernen nærmest sola?|Proxima Centauri|Sirius|Betelgeuse|Vega", "Hvor mange tenner har et voksent menneske vanligvis, med visdomstenner?|32|28|30|36"], ["Hvor mange minutter varer en håndballkamp for voksne?|60|70|80|90", "Hvilken norsk langrennsløper har vunnet åtte OL-gull?|Marit Bjørgen|Therese Johaug|Bente Skari|Kristin Størmer Steira", "Hvilken by arrangerte sommer-OL i 2012?|London|Beijing|Rio de Janeiro|Athen", "Hvor mange spillere har et volleyballag på banen?|Seks|Fem|Sju|Fire", "Hvor mange runder har en VM-tittelkamp i proffboksing i dag?|12|10|15|8", "Hvor langt er et olympisk svømmebasseng?|50 meter|25 meter|100 meter|33 meter", "Hvilken sport forbindes med Tour de France?|Sykling|Løping|Bilsport|Ridning", "Hvor mange tallfelt er det rundt en dartskive?|20|18|24|12"], ["Hvem malte «Mona Lisa»?|Leonardo da Vinci|Michelangelo|Rafael|Rembrandt", "Hvem skrev romanen «Sult» fra 1890?|Knut Hamsun|Henrik Ibsen|Sigrid Undset|Arne Garborg", "Hvilken norsk forfatter fikk Nobelprisen i litteratur i 1928?|Sigrid Undset|Knut Hamsun|Bjørnstjerne Bjørnson|Cora Sandel", "Hvem komponerte «Måneskinnssonaten»?|Ludwig van Beethoven|Wolfgang Amadeus Mozart|Frédéric Chopin|Johann Sebastian Bach", "Hvilket band hadde Freddie Mercury som vokalist?|Queen|Genesis|Deep Purple|The Police", "Hvem skrev «Peer Gynt»?|Henrik Ibsen|Bjørnstjerne Bjørnson|Ludvig Holberg|Henrik Wergeland", "Hvilken dans forbindes mest med 1920-tallet?|Charleston|Twist|Disco|Lambada", "Hvem skapte detektiven Hercule Poirot?|Agatha Christie|Arthur Conan Doyle|Dorothy L. Sayers|Raymond Chandler"], ["Hva er kvadratroten av 144?|12|14|11|16", "Hvilket år var det første i det 21. århundre?|2001|2000|1999|2010", "Hvor mange sekunder er det i en time?|3600|360|6000|1440", "Hvilket språk har flest morsmålsbrukere i verden?|Mandarin|Engelsk|Spansk|Hindi", "Hva betyr forkortelsen «bl.a.»?|Blant annet|Bare litt av|Blant alle|Blir antatt", "Hva kalles en mangekant med åtte sider?|Oktogon|Heksagon|Pentagon|Dekagon", "Hvilket år kom euro i omløp som sedler og mynter?|2002|1999|2000|2004", "Hva er 15 prosent av 200?|30|15|20|35"]]};
-['easy','hard'].forEach(l=>EXTRA[l].forEach((c,i)=>{RAW[l][i]=RAW[l][i].concat(c)}));
+const EXTRA=[{"easy": [["Hva het kongen som kom til Norge i 1905?|Haakon VII|Olav V|Harald V|Oscar II", "Hva skrev vikingene med?|Runer|Hieroglyfer|Kinesiske tegn|Morsekode", "Hva kaller vi et stort hus av stein der riddere og konger bodde?|Borg|Hytte|Telt|Iglo", "Hvilket dyr trakk oftest vognene før bilene kom?|Hesten|Grisen|Sauen|Hunden", "Hva heter den gamle festningen ved havna i Oslo?|Akershus festning|Bergenhus festning|Kristiansten festning|Fredriksten festning", "I hvilket land bodde faraoene?|Egypt|Hellas|Italia|Kina", "Hvem fant ifølge sagaene Amerika lenge før Columbus?|Leiv Eiriksson|Harald Hårfagre|Olav Tryggvason|Erik Blodøks", "Hvem bodde i iglo i gamle dager?|Inuitter|Vikinger|Romere|Egyptere"], ["Hva er hovedstaden i Danmark?|København|Aarhus|Odense|Oslo", "I hvilken verdensdel ligger Norge?|Europa|Asia|Afrika|Amerika", "Hva heter øygruppen langt nord der det bor isbjørn?|Svalbard|Lofoten|Færøyene|Island", "Hvilket land har lengst grense mot Norge?|Sverige|Finland|Russland|Danmark", "Hvilken verdensdel ligger ved Sydpolen?|Antarktis|Arktis|Grønland|Island", "I hvilken by står klokketårnet Big Ben?|London|Paris|Berlin|Roma", "Hva kaller vi et stykke land med vann rundt seg?|Øy|Halvøy|Fjell|Dal", "Hvilket land har et lønneblad i flagget?|Canada|USA|Mexico|Australia"], ["Hvilket dyr sier «mø»?|Ku|Sau|Gris|Hest", "Hva puster fisker med?|Gjeller|Lunger|Nesen|Finnene", "Hvilken planet kalles den røde planeten?|Mars|Venus|Jupiter|Saturn", "Hva kalles det når vann blir til damp?|Fordamping|Frysing|Smelting|Regn", "Hvilket dyr har snabel?|Elefant|Neshorn|Flodhest|Sjiraff", "Hva kaller vi dyr som bare spiser planter?|Planteetere|Rovdyr|Altetere|Insektetere", "Hvor mange årstider har vi i Norge?|Fire|Tre|To|Seks", "Hvilket av disse dyrene legger egg?|Høne|Ku|Hund|Katt"], ["Hva kalles det når én spiller scorer tre mål i samme kamp?|Hat trick|Strike|Ess|Birdie", "Hvilken av disse ballene er størst?|Basketball|Tennisball|Golfball|Bordtennisball", "I hvilken sport hopper man ned en stor bakke på ski?|Skihopp|Slalåm|Langrenn|Skiskyting", "Hvor mange hull har en vanlig golfbane?|18|9|12|20", "I hvilket spill slår man hjem andres brikker etter terningkast?|Ludo|Sjakk|Dam|Bingo", "Hvor mange spiller i et vanlig sjakkparti?|To|Fire|Tre|Seks", "Hvilken sport spilles på is med steiner og koster?|Curling|Ishockey|Bandy|Kunstløp", "Hvor mange baller er i spill samtidig i en fotballkamp?|Én|To|Tre|Fire"], ["Hva heter kjæresten til Mikke Mus?|Minni|Dolly|Klarabella|Andersine", "Hvem er gutten som aldri vil bli voksen?|Peter Pan|Pinocchio|Aladdin|Robin Hood", "Hvem får lengre nese når han lyver?|Pinocchio|Peter Pan|Ole Brumm|Emil", "Hvilket av disse instrumentene blåser man i?|Fløyte|Piano|Gitar|Tromme", "Hvilken farge har Grinchen?|Grønn|Blå|Rød|Lilla", "Hvem hjelper Askepott så hun kan dra på ballet?|Gudmoren|Heksa|Dragen|Kongen", "Hva heter Simbas far i «Løvenes konge»?|Mufasa|Scar|Timon|Pumba", "Hvilket eventyrdyr kan spy ild?|Drage|Enhjørning|Troll|Nisse"], ["Hva er 10 minus 4?|6|5|7|4", "Hvor mange hjul har en sykkel?|To|Tre|Fire|Ett", "Hvilken dag kommer etter fredag?|Lørdag|Søndag|Torsdag|Mandag", "Hvilken farge får du når du blander rødt og hvitt?|Rosa|Lilla|Oransje|Brun", "Hva er 3 ganger 4?|12|7|10|14", "Hvor mange timer er det i et døgn?|24|12|20|48", "Hva kaller vi ungen til en ku?|Kalv|Føll|Lam|Valp", "Hvilken frukt kan være rød eller grønn og vokser på trær her i Norge?|Eple|Banan|Appelsin|Ananas"]], "hard": [["Hvilket år sank Titanic?|1912|1905|1915|1920", "Hvilken keiser grunnla Konstantinopel?|Konstantin den store|Augustus|Nero|Hadrian", "Hvilket år landet Apollo 11 på månen?|1969|1967|1971|1965", "Hvem var USAs første president?|George Washington|Thomas Jefferson|Abraham Lincoln|John Adams", "Hvilket slag i 1066 ga normannerne makten i England?|Slaget ved Hastings|Slaget ved Stamford Bridge|Slaget ved Waterloo|Slaget ved Agincourt", "Hvilket år ble FN grunnlagt?|1945|1919|1948|1950", "Hvilket land ga Frihetsgudinnen til USA?|Frankrike|Storbritannia|Spania|Nederland", "Hvilket år trådte alkoholforbudet i USA i kraft?|1920|1912|1929|1933"], ["Hva heter Afrikas høyeste fjell?|Kilimanjaro|Mount Kenya|Mont Blanc|Aconcagua", "Hva er hovedstaden i Brasil?|Brasília|Rio de Janeiro|São Paulo|Salvador", "Hva heter verdens dypeste innsjø?|Bajkalsjøen|Tanganyikasjøen|Victoriasjøen|Lake Superior", "Hvilket lite land ligger i Pyreneene mellom Spania og Frankrike?|Andorra|Monaco|Liechtenstein|San Marino", "Hva er Norges lengste fjord?|Sognefjorden|Hardangerfjorden|Oslofjorden|Trondheimsfjorden", "Hva er hovedstaden i Skottland?|Edinburgh|Glasgow|Aberdeen|Dundee", "Hvilken elv renner gjennom London?|Themsen|Severn|Mersey|Tyne", "Hva er hovedstaden på Island?|Reykjavík|Akureyri|Tórshavn|Nuuk"], ["Hvilket grunnstoff har symbolet Fe?|Jern|Fluor|Fosfor|Bly", "Hvor mange hjerter har en blekksprut?|Tre|Ett|To|Fire", "Hvilken planet bruker kortest tid rundt sola?|Merkur|Venus|Mars|Jorda", "Hva er kokepunktet for vann ved havnivå i Fahrenheit?|212|100|180|232", "Hva kalles blodårene som fører blod bort fra hjertet?|Arterier|Vener|Kapillærer|Lymfeårer", "Hvem formulerte gravitasjonsloven på 1600-tallet?|Isaac Newton|Galileo Galilei|Johannes Kepler|René Descartes", "Hva heter stjernen nærmest sola?|Proxima Centauri|Sirius|Betelgeuse|Vega", "Hvor mange tenner har et voksent menneske vanligvis, med visdomstenner?|32|28|30|36"], ["Hvor mange minutter varer en håndballkamp for voksne?|60|70|80|90", "Hvilken norsk langrennsløper har vunnet åtte OL-gull?|Marit Bjørgen|Therese Johaug|Bente Skari|Kristin Størmer Steira", "Hvilken by arrangerte sommer-OL i 2012?|London|Beijing|Rio de Janeiro|Athen", "Hvor mange spillere har et volleyballag på banen?|Seks|Fem|Sju|Fire", "Hvor mange runder har en VM-tittelkamp i proffboksing i dag?|12|10|15|8", "Hvor langt er et olympisk svømmebasseng?|50 meter|25 meter|100 meter|33 meter", "Hvilken sport forbindes med Tour de France?|Sykling|Løping|Bilsport|Ridning", "Hvor mange tallfelt er det rundt en dartskive?|20|18|24|12"], ["Hvem malte «Mona Lisa»?|Leonardo da Vinci|Michelangelo|Rafael|Rembrandt", "Hvem skrev romanen «Sult» fra 1890?|Knut Hamsun|Henrik Ibsen|Sigrid Undset|Arne Garborg", "Hvilken norsk forfatter fikk Nobelprisen i litteratur i 1928?|Sigrid Undset|Knut Hamsun|Bjørnstjerne Bjørnson|Cora Sandel", "Hvem komponerte «Måneskinnssonaten»?|Ludwig van Beethoven|Wolfgang Amadeus Mozart|Frédéric Chopin|Johann Sebastian Bach", "Hvilket band hadde Freddie Mercury som vokalist?|Queen|Genesis|Deep Purple|The Police", "Hvem skrev «Peer Gynt»?|Henrik Ibsen|Bjørnstjerne Bjørnson|Ludvig Holberg|Henrik Wergeland", "Hvilken dans forbindes mest med 1920-tallet?|Charleston|Twist|Disco|Lambada", "Hvem skapte detektiven Hercule Poirot?|Agatha Christie|Arthur Conan Doyle|Dorothy L. Sayers|Raymond Chandler"], ["Hva er kvadratroten av 144?|12|14|11|16", "Hvilket år var det første i det 21. århundre?|2001|2000|1999|2010", "Hvor mange sekunder er det i en time?|3600|360|6000|1440", "Hvilket språk har flest morsmålsbrukere i verden?|Mandarin|Engelsk|Spansk|Hindi", "Hva betyr forkortelsen «bl.a.»?|Blant annet|Bare litt av|Blant alle|Blir antatt", "Hva kalles en mangekant med åtte sider?|Oktogon|Heksagon|Pentagon|Dekagon", "Hvilket år kom euro i omløp som sedler og mynter?|2002|1999|2000|2004", "Hva er 15 prosent av 200?|30|15|20|35"]]},{"easy": [["Hva kaller vi sønnen til en konge?|Prins|Hertug|Ridder|Greve", "Hva kaller vi kona til en konge?|Dronning|Prinsesse|Hertuginne|Keiserinne", "Hvor bodde mange mennesker i steinalderen?|I huler|I slott|I blokker|I glasshus", "Hva brukte ridderne for å beskytte kroppen i kamp?|Rustning|Regnfrakk|Badedrakt|Kappe", "Hva er en mumie fra det gamle Egypt?|En balsamert død person|En gammel konge som levde lenge|En statue av gull|Et dyr i bur", "Hva var Roald Amundsen?|Polfarer|Konge|Maler|Fotballspiller", "Hvilke fugler ble brukt til å frakte brev før i tiden?|Brevduer|Måker|Ender|Ugler", "Hva lagde egypterne papir av?|Papyrus|Plast|Gull|Ull", "Hvilket år fikk Norge sin grunnlov?|1814|1905|1945|1700", "Hva er en sjørøver?|En pirat|En fisker|En prest|En bonde", "Hvilket byggverk i Kina er tusenvis av kilometer langt?|Den kinesiske mur|Eiffeltårnet|Pyramiden|Colosseum", "Hva vasket folk klær på før vaskemaskinen fantes?|Vaskebrett|Oppvaskmaskin|Støvsuger|Mikrobølgeovn", "Hvem var det første mennesket i verdensrommet?|Jurij Gagarin|Neil Armstrong|Buzz Aldrin|Thor Heyerdahl", "Hvilket dyr var Laika, som ble sendt ut i verdensrommet i 1957?|Hund|Katt|Ape|Mus", "Hva kaller vi de lange husene vikingene bodde i?|Langhus|Iglo|Skyskraper|Telt"], ["Hva er hovedstaden i Finland?|Helsingfors|Stockholm|Tallinn|Oslo", "Hva er hovedstaden i Tyskland?|Berlin|München|Wien|Hamburg", "I hvilket land ligger byen Roma?|Italia|Spania|Hellas|Frankrike", "Hva heter havet mellom Sør-Norge og Danmark?|Skagerrak|Middelhavet|Rødehavet|Svartehavet", "Hva kaller vi et fjell som kan spy ut lava?|Vulkan|Isbre|Fjord|Ørken", "Hva kaller vi en stor elv av is som sakte flytter seg?|Isbre|Vulkan|Bekk|Innsjø", "Hva er en ørken?|Et tørt område med lite regn|Et stort hav|En høy fjelltopp|En tett skog", "I hvilket land ligger New York?|USA|England|Canada|Australia", "Hvor lever de fleste pingvinene?|På den sørlige halvkule|På Nordpolen|I Sahara|I Norge", "Hvilket land er kjent for tulipaner og vindmøller?|Nederland|Sveits|Polen|Hellas", "Hvilket land har et rødt flagg med et hvitt kors i midten og er kjent for sjokolade?|Sveits|Danmark|Østerrike|Norge", "Hva er hovedstaden i Japan?|Tokyo|Beijing|Seoul|Bangkok", "Hvilke farger har det svenske flagget?|Blått og gult|Rødt og hvitt|Grønt og gult|Blått og hvitt", "Hva kaller vi vann som faller rett ned fra en fjellkant?|Foss|Fjord|Bekk|Sjø", "I hvilken by ligger Bryggen med de gamle trehusene?|Bergen|Oslo|Tromsø|Stavanger"], ["Hvilket dyr kalles ofte skogens konge i Norge?|Elgen|Ulven|Reven|Haren", "Hvilket dyr kan skifte farge for å gjemme seg?|Kameleon|Hest|Ku|Gris", "Hvor mange bein har en hund?|Fire|To|Seks|Åtte", "Hvilket dyr sover gjennom vinteren i et hi?|Bjørnen|Reven|Elgen|Haren", "Hva er verdens største dyr på land?|Elefanten|Sjiraffen|Bjørnen|Hesten", "Hva kaller vi lys og smell fra himmelen i et uvær?|Lyn og torden|Nordlys|Regnbue|Snøstorm", "Hva er nordlys?|Farget lys på nattehimmelen|En lampe i Nord-Norge|En type stjerne|Lys fra månen", "Hvilket organ pumper blodet rundt i kroppen?|Hjertet|Lungene|Magen|Hjernen", "Hva trenger kroppen at vi puster inn?|Oksygen|Karbondioksid|Røyk|Salt", "I hvilken årstid faller bladene av trærne?|Høsten|Våren|Sommeren|Vinteren", "Hvilket dyr har svarte og hvite striper og ligner en hest?|Sebra|Tiger|Okapi|Esel", "Hva lager edderkoppen for å fange insekter?|Nett|Reir|Hule|Tunnel", "Hvilken planet har store ringer rundt seg?|Saturn|Mars|Merkur|Jorda", "Hvor mange armer har en sjøstjerne vanligvis?|Fem|Tre|Åtte|Ti", "Hva bruker fuglene for å fly?|Vingene|Finnene|Halen|Nebbet"], ["Hvilken farge har kortet som betyr advarsel i fotball?|Gult|Rødt|Grønt|Blått", "Hva slår man ballen med i tennis?|Racket|Kølle|Balltre|Kø", "Hvor mange spillere har et basketballag på banen?|Fem|Seks|Sju|Elleve", "I hvilket spill triller man en tung kule mot kjegler?|Bowling|Golf|Curling|Biljard", "Hvilken idrett driver man med i et basseng?|Svømming|Ski|Turn|Golf", "Hvilken medalje får vinneren i OL?|Gullmedalje|Sølvmedalje|Bronsemedalje|Kobbermedalje", "Hvor mange sider har en vanlig terning?|Seks|Fire|Åtte|Tolv", "I hvilken idrett bruker man både ski og gevær?|Skiskyting|Skihopp|Alpint|Kombinert", "Hva heter leken der én teller og de andre gjemmer seg?|Gjemsel|Sisten|Paradis|Hoppetau", "Hvor mange spillere er med i en tenniskamp i single?|To|Fire|Seks|Én", "Hvilken sjakkbrikke må man beskytte for ikke å tape?|Kongen|Dronningen|Tårnet|Bonden", "Hvilken idrett forbinder vi mest med Holmenkollbakken?|Skihopp|Fotball|Tennis|Svømming", "Hvilken farge har brikkene til spilleren som begynner i sjakk?|Hvit|Svart|Rød|Blå", "Hva heter kortspillet der man roper navnet på spillet når man har ett kort igjen?|Uno|Poker|Bridge|Kabal", "Hva kaller vi et løp som er litt over 42 kilometer langt?|Maraton|Sprint|Stafett|Hekkeløp"], ["Hva heter den lille havfruen i Disney-filmen?|Ariel|Elsa|Belle|Moana", "Hvem bor i en ananas på havets bunn?|SvampeBob|Nemo|Ariel|Olaf", "Hva slags dyr er Pluto i Disney?|Hund|Katt|Mus|And", "Hva heter tigeren som er venn med Ole Brumm?|Tigergutt|Nasse Nøff|Ior|Kanin", "Hvem bor på gården Katthult i Lønneberget?|Emil|Pippi|Ronja|Karlsson", "Hvilket instrument spiller man med trommestikker?|Tromme|Fiolin|Fløyte|Harpe", "Hva heter piratkapteinen med krok i stedet for hånd i «Peter Pan»?|Kaptein Krok|Kaptein Sabeltann|Kaptein Haddock|Sortskjegg", "Hvem er kaptein på skipet Den sorte dame?|Kaptein Sabeltann|Kaptein Krok|Kaptein Haddock|Sortskjegg", "Hvilken farge har smurfene?|Blå|Grønn|Gul|Rød", "Hvem gir Snøhvit det forgiftede eplet?|Den onde dronningen|Ulven|Kaptein Krok|Askepott", "Hva heter gutten som vokser opp blant ulver i «Jungelboken»?|Mowgli|Tarzan|Simba|Aladdin", "Hva slags dyr er Nasse Nøff?|Gris|Bjørn|Tiger|Esel", "Hva heter den lille rosa grisen i tegneserien for små barn som elsker å hoppe i sølepytter?|Peppa Gris|Nasse Nøff|Miss Piggy|Babe", "I hvilken høytid synger vi «Musevisa»?|Jul|Påske|17. mai|Halloween", "Hva heter reinsdyret med rød nese?|Rudolf|Sven|Bambi|Komet"], ["Hva er 5 pluss 6?|11|10|12|13", "Hva er 20 minus 7?|13|12|14|17", "Hvor mange sekunder er det i ett minutt?|60|100|30|10", "Hva er den første måneden i året?|Januar|Desember|Mars|Februar", "Hva er 2 ganger 8?|16|10|18|14", "Hvor mange hjørner har en firkant?|Fire|Tre|Fem|Seks", "Hvilken farge får du når du blander rødt og gult?|Oransje|Lilla|Grønn|Brun", "Hva kaller vi ungen til en hest?|Føll|Kalv|Lam|Kje", "Hvilket dyr får vi ull fra?|Sau|Ku|Gris|Høne", "Hvor mange dager har februar i et vanlig år?|28|30|31|29", "Hva er halvparten av 10?|5|2|4|6", "Hvilken form har en fotball?|Kule|Terning|Trekant|Sylinder", "Hva er det motsatte av varm?|Kald|Våt|Tung|Lys", "I hvilken høytid maler vi egg?|Påske|Jul|Nyttår|Sankthans", "Hvor mange bein har en fugl?|To|Fire|Seks|Tre"]], "hard": [["Hvem var Romerrikets første keiser?|Augustus|Julius Cæsar|Nero|Caligula", "Hvilket år begynte den franske revolusjon?|1789|1776|1815|1799", "Hvilket år ble USAs uavhengighetserklæring vedtatt?|1776|1789|1812|1754", "Hvem ledet Sovjetunionen under andre verdenskrig?|Josef Stalin|Vladimir Lenin|Nikita Khrusjtsjov|Leonid Bresjnev", "Hvilket år sluttet andre verdenskrig?|1945|1944|1946|1943", "Hvilket år ble Norge med i NATO?|1949|1945|1952|1960", "Hvilket år fikk kvinner alminnelig stemmerett i Norge?|1913|1905|1898|1920", "Hvilken britisk monark satt lengst på tronen?|Elizabeth II|Victoria|Elizabeth I|Georg III", "Hvilket land ble Napoleon Bonaparte keiser av?|Frankrike|Italia|Spania|Østerrike", "Hvilket år kom svartedauden til Norge?|1349|1249|1449|1549", "Hvem utviklet boktrykkerkunsten i Europa rundt 1450?|Johannes Gutenberg|Leonardo da Vinci|Martin Luther|Galileo Galilei", "Hvilket år krakket børsen på Wall Street og utløste den store depresjonen?|1929|1919|1933|1939", "Hvilket år ble Berlinmuren bygget?|1961|1949|1953|1968", "Hvilket skip brukte Roald Amundsen gjennom Nordvestpassasjen?|Gjøa|Fram|Maud|Kon-Tiki", "Hva het luftskipet som brant ved landing i USA i 1937?|Hindenburg|Graf Zeppelin|Bismarck|Norge"], ["Hva er hovedstaden i Spania?|Madrid|Barcelona|Sevilla|Valencia", "Hva er hovedstaden i Portugal?|Lisboa|Porto|Coimbra|Faro", "Hva er hovedstaden i Argentina?|Buenos Aires|Santiago|Montevideo|Lima", "Hva er hovedstaden i Egypt?|Kairo|Alexandria|Luxor|Giza", "Hva er Europas lengste elv?|Volga|Donau|Rhinen|Dnepr", "I hvilket land ligger Timbuktu?|Mali|Niger|Marokko|Sudan", "Hvilken havstrøm gir Norge et mildere klima?|Golfstrømmen|Humboldtstrømmen|Kuroshio|Labradorstrømmen", "Hva er hovedstaden i Polen?|Warszawa|Kraków|Gdańsk|Wrocław", "Hva er verdens største øy?|Grønland|Borneo|Madagaskar|Sumatra", "Hvilket hav ligger mellom Europa og Afrika?|Middelhavet|Rødehavet|Svartehavet|Kaspihavet", "I hvilket land ligger tempelanlegget Angkor Wat?|Kambodsja|Thailand|Vietnam|Laos", "Hva er hovedstaden i Kenya?|Nairobi|Mombasa|Kampala|Addis Abeba", "Hvilken fjellkjede regnes som grensen mellom Europa og Asia?|Uralfjellene|Kaukasus|Alpene|Altai", "Hva heter verdens største korallrev?|Great Barrier Reef|Belize-revet|Ningaloo-revet|Florida-revet", "Hva er hovedstaden i Hellas?|Athen|Thessaloniki|Sparta|Korint"], ["Hva er det kjemiske symbolet for sølv?|Ag|Au|Si|Sv", "Hvilken gass tar plantene opp under fotosyntesen?|Karbondioksid|Oksygen|Nitrogen|Helium", "Hva er H₂O?|Vann|Hydrogenperoksid|Salt|Ozon", "Hvor mange planeter er det i solsystemet?|Åtte|Ni|Sju|Ti", "Hva heter kroppens største pulsåre?|Aorta|Halspulsåren|Lårpulsåren|Lungearterien", "Hvilket vitamin lager kroppen ved hjelp av sollys?|Vitamin D|Vitamin C|Vitamin A|Vitamin B12", "Hvilket dyr er raskest på land?|Gepard|Løve|Antilope|Struts", "Hva er verdens største fugl?|Struts|Emu|Albatross|Kondor", "Hva kalles tiden det tar før halvparten av et radioaktivt stoff har omdannet seg?|Halveringstid|Levetid|Reaksjonstid|Spaltetid", "Hva er pH-verdien til rent vann?|7|0|14|5", "Omtrent hvor mye blod har et voksent menneske?|5 liter|2 liter|9 liter|12 liter", "Hvilket organ renser blodet og lager urin?|Nyrene|Leveren|Milten|Galleblæren", "Hvem oppdaget penicillinet i 1928?|Alexander Fleming|Louis Pasteur|Marie Curie|Robert Koch", "Hva kalles den minste enheten av et grunnstoff?|Atom|Molekyl|Celle|Krystall", "Omtrent hvor lang tid bruker lyset fra sola til jorda?|8 minutter|8 sekunder|8 timer|1 minutt"], ["Hvor mange poeng gir en kurv fra utenfor trepoengslinjen i basketball?|Tre|To|Fire|Én", "Hvilket land arrangerte fotball-VM for menn i 2014?|Brasil|Russland|Sør-Afrika|Tyskland", "Hvor mange minutter varer en ordinær fotballkamp uten tillegg?|90|80|100|120", "Hvilken by arrangerte vinter-OL i 1952?|Oslo|Cortina d’Ampezzo|St. Moritz|Lillehammer", "Hvor mange spillere har et rugby union-lag på banen?|15|13|11|12", "Hva kalles de fire største tennisturneringene samlet?|Grand Slam|Masters|Majors|Davis Cup", "Hvor mange perioder har en ishockeykamp?|Tre|To|Fire|Fem", "I hvilken idrett ble Grete Waitz verdensberømt?|Maratonløping|Svømming|Skøyter|Langrenn", "Hvilket land vant fotball-VM for menn i 2022?|Argentina|Frankrike|Kroatia|Marokko", "Hvor mange øvelser er det i tikamp?|Ti|Sju|Åtte|Tolv", "Hvilket land kommer judo fra?|Japan|Kina|Korea|Thailand", "Hvor mange spillere har et cricketlag på banen?|Elleve|Ni|Tolv|Femten", "Hva kalles det når kongen i sjakk er truet og ikke kan unnslippe?|Sjakkmatt|Patt|Rokade|Gambit", "Hvilken norsk skøyteløper hadde kallenavnet «Kuppern»?|Knut Johannesen|Oscar Mathisen|Hjalmar Andersen|Johann Olav Koss", "Hvilken svømmer har vunnet flest olympiske gullmedaljer?|Michael Phelps|Mark Spitz|Ian Thorpe|Ryan Lochte"], ["Hvem skrev «Romeo og Julie»?|William Shakespeare|Charles Dickens|Oscar Wilde|Christopher Marlowe", "Hvem malte «Stjernenatt»?|Vincent van Gogh|Claude Monet|Paul Cézanne|Edvard Munch", "Hvem regisserte filmen «Psycho» fra 1960?|Alfred Hitchcock|Orson Welles|Stanley Kubrick|Billy Wilder", "Hvem komponerte «Boléro»?|Maurice Ravel|Claude Debussy|Igor Stravinskij|Erik Satie", "Hvem skrev «Krig og fred»?|Lev Tolstoj|Fjodor Dostojevskij|Anton Tsjekhov|Ivan Turgenjev", "Hvilket band ga ut albumet «The Dark Side of the Moon»?|Pink Floyd|Led Zeppelin|The Doors|Genesis", "Hvem ble kalt «popens konge»?|Michael Jackson|Elvis Presley|Prince|Freddie Mercury", "Hvem skrev «Den store Gatsby», som foregår på 1920-tallet?|F. Scott Fitzgerald|Ernest Hemingway|John Steinbeck|William Faulkner", "Hvem malte «Brudeferden i Hardanger» sammen med Hans Gude?|Adolph Tidemand|Edvard Munch|J.C. Dahl|Harriet Backer", "Hvilken stumfilmstjerne er kjent som «Vagabonden» med stokk og bowlerhatt?|Charlie Chaplin|Buster Keaton|Harold Lloyd|Stan Laurel", "Hvem skrev romanen «Kristin Lavransdatter»?|Sigrid Undset|Camilla Collett|Amalie Skram|Cora Sandel", "Hvem komponerte operaen «Carmen»?|Georges Bizet|Giuseppe Verdi|Giacomo Puccini|Richard Wagner", "På hvilket museum henger «Mona Lisa»?|Louvre|Prado|Uffizi|British Museum", "Hvem skrev «Brødrene Løvehjerte»?|Astrid Lindgren|Thorbjørn Egner|Roald Dahl|Anne-Cath. Vestly", "Hvilken jazzmusiker hadde kallenavnet «Satchmo»?|Louis Armstrong|Duke Ellington|Miles Davis|Charlie Parker"], ["Hva er romertallet for 100?|C|M|D|L", "Hva er 12 ganger 12?|144|124|132|154", "Hvor mange gram er ett kilo?|1000|100|10 000|500", "Hva kaller vi et år med 366 dager?|Skuddår|Jubelår|Fullår|Langår", "Hva er hovedingrediensen i hummus?|Kikerter|Linser|Bønner|Erter", "Hvilken valuta brukes i Storbritannia?|Pund|Euro|Dollar|Krone", "Hva betyr forkortelsen «osv.»?|Og så videre|Om så vil|Ofte sett vanlig|Ord som vanlig", "Hvilket år sto Eiffeltårnet ferdig?|1889|1900|1876|1912", "Hva kalles en mangekant med seks sider?|Heksagon|Pentagon|Oktogon|Heptagon", "Hvor mange nuller har én milliard?|Ni|Seks|Tolv|Åtte", "Hvilket av disse metallene leder strøm best?|Sølv|Jern|Bly|Tinn", "Hva er 25 prosent av 80?|20|25|16|40", "Hvor mange timer er det i en uke?|168|144|160|172", "Hva kalles dagen med kortest dagslys i året hos oss?|Vintersolverv|Jevndøgn|Sommersolverv|Kyndelsmesse", "Hvilken tidssone bruker Norge om vinteren?|Sentraleuropeisk tid|Greenwich-tid|Østeuropeisk tid|Atlantisk tid"]]}];
+EXTRA.forEach(X=>['easy','hard'].forEach(l=>X[l].forEach((c,i)=>{RAW[l][i]=RAW[l][i].concat(c)})));
 const BANK={easy:RAW.easy.map(c=>c.map(s=>s.split('|'))),hard:RAW.hard.map(c=>c.map(s=>s.split('|')))};
 
 const CHARS=[
- {n:'Bokseren',k:'bokser',a:'Vinner uavgjorte dueller og ruteutfordringer.',bg:'#8a3b2e',coat:'#3b3236',skin:'#c68642',hair:'short',hc:'#1d1a1c',x:['glove']},
- {n:'Bookmakeren',k:'bookie',a:'Riktige tips gir laget 2 kr i stedet for 1.',bg:'#2f5d62',coat:'#4a3d42',skin:'#f1c9a5',hat:'bowler',hc:'#1d1a1c',x:['mustache']},
- {n:'Smuglersken',k:'smugler',a:'Blir hun tatt under et ran, betaler hun bare 1 kr i bot.',bg:'#6b4f8a',coat:'#2a2226',skin:'#e0ac69',hair:'bob',hc:'#3a2418',hat:'cloche',hat2:'#7a1f2b',x:['earring']},
- {n:'Sjåføren',k:'sjafor',a:'Ruter på lengde 3 og 4 koster 1 kr mindre.',bg:'#3d6b45',coat:'#22303a',skin:'#8d5524',hat:'chauffeur',hc:'#1d1a1c',x:['goggles']},
- {n:'Professoren',k:'prof',a:'Én gang per tur kan hun fjerne to feil svar.',bg:'#8a6417',coat:'#5b4a3a',skin:'#f6d7b8',hair:'bun',hc:'#9a9a9a',x:['glasses']},
- {n:'Kortspilleren',k:'kort',a:'Én gang per tur kan han bytte ut et spørsmål.',bg:'#1f4e5a',coat:'#3b3236',skin:'#e0ac69',hair:'short',hc:'#4a2c1a',hat:'eyeshade',x:['card']},
- {n:'Kjøpmannsdatteren',k:'kjopmann',a:'Starter spillet med 3 kr ekstra.',bg:'#a0522d',coat:'#4b5a3a',skin:'#c68642',hair:'braid',hc:'#2a1a12',hat:'scarf',hat2:'#d4a017',x:['purse']},
- {n:'Smeden',k:'smed',a:'Rutene til laget hans koster 2 kr ekstra å utfordre.',bg:'#5d6d7e',coat:'#3a2e28',skin:'#f1c9a5',hc:'#6b3a1f',x:['beard','hammer']},
- {n:'Jockeyen',k:'jockey',a:'Laget hans får 1 kr ekstra i hvert minispill.',bg:'#b8860b',coat:'#7a1f2b',skin:'#8d5524',hat:'jockey',hat2:'#2e86c1',hc:'#1d1a1c',x:[]},
- {n:'Avisgutten',k:'avis',a:'Nye oppdrag koster ham 1 kr i stedet for 2.',bg:'#4a5f8a',coat:'#5b4a3a',skin:'#f6d7b8',hair:'short',hc:'#b5651d',hat:'newsboy',hat2:'#6b5f5a',x:['freckles','paper']}
+ {n:'Bokseren',k:'bokser',a:'Vinner uavgjorte dueller og ruteutfordringer.',al:'Ranene hans lykkes to av tre ganger.',bg:'#7a2f25',coat:'#2b2427',tie:'#8a1c1c',skin:'#b97a45',hair:'short',hc:'#141112',x:['glove','scar']},
+ {n:'Bookmakeren',k:'bookie',a:'Riktige tips gir laget 2 kr i stedet for 1.',al:'Laget får 1 kr ekstra med minst tre riktige i en runde.',bg:'#2c4f52',coat:'#3a3236',tie:'#c8873a',skin:'#eec4a0',hat:'bowler',hat2:'#1d1a1c',hc:'#2a1d14',x:['mustache']},
+ {n:'Smuglersken',k:'smugler',a:'Blir hun tatt under et ran, betaler hun bare 1 kr i bot.',bg:'#4f3a6b',coat:'#1e1a1c',tie:'#6b1f2b',skin:'#d9a06a',hair:'bob',hc:'#2e1c12',hat:'cloche',hat2:'#6b1f2b',x:['earring','lips']},
+ {n:'Sjåføren',k:'sjafor',a:'Ruter på lengde 3 eller lenger koster 1 kr mindre.',bg:'#2f5537',coat:'#1f2a33',tie:'#c8873a',skin:'#8a5228',hat:'chauffeur',hat2:'#1c2026',hc:'#141112',x:['goggles']},
+ {n:'Professoren',k:'prof',a:'Én gang per tur kan hun fjerne to feil svar.',al:'Én gang per runde kan hun fjerne to feil svar for laget.',bg:'#6e5218',coat:'#4a3c30',tie:'#2c4f52',skin:'#f2d2b4',hair:'bun',hc:'#a8a29a',x:['glasses','lips']},
+ {n:'Kortspilleren',k:'kort',a:'Én gang per tur kan han bytte ut et spørsmål.',al:'Én gang per runde kan laget endre et svar.',bg:'#173e48',coat:'#2b2427',tie:'#1d4d2a',skin:'#d9a06a',hair:'short',hc:'#3b2416',hat:'eyeshade',x:['card']},
+ {n:'Kjøpmannsdatteren',k:'kjopmann',a:'Starter spillet med 3 kr ekstra.',bg:'#7f4325',coat:'#3c4a2e',tie:'#d9a62a',skin:'#b97a45',hair:'braid',hc:'#1f130c',hat:'scarf',hat2:'#b8862a',x:['purse','lips']},
+ {n:'Smeden',k:'smed',a:'Rutene til laget hans koster 2 kr ekstra å utfordre.',al:'Laget får 1 kr tilbake hver gang det kjøper en rute.',bg:'#46525e',coat:'#33281f',tie:'#5a4a3a',skin:'#eec4a0',hc:'#5e3219',x:['beard','hammer']},
+ {n:'Jockeyen',k:'jockey',a:'Laget hans får 1 kr ekstra i hvert minispill.',bg:'#8d6a12',coat:'#6b1f2b',tie:'#f1d3a0',skin:'#8a5228',hat:'jockey',hat2:'#2e6f9e',hc:'#141112',x:[]},
+ {n:'Avisgutten',k:'avis',a:'Nye oppdrag koster ham 1 kr i stedet for 2.',bg:'#3c4d70',coat:'#4a3c30',tie:'#8a1c1c',skin:'#f2d2b4',hair:'short',hc:'#a5561f',hat:'newsboy',hat2:'#5d554f',x:['freckles','paper']}
 ];
-function portrait(ci,px){const c=CHARS[ci];if(!c)return '';const sk=c.skin,ink='#2a2226',hc=c.hc,h2=c.hat2||'#2a2226';
-  let h='<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="'+c.bg+'"/>';
-  h+='<path d="M14 100 C 16 74, 84 74, 86 100 Z" fill="'+c.coat+'"/><rect x="44" y="60" width="12" height="14" fill="'+sk+'"/><path d="M41 74 L50 86 L59 74 Z" fill="#f3ebd6"/>';
-  if(c.hair==='bob')h+='<path d="M29 54 Q27 24 50 24 Q73 24 71 54 L66 54 Q66 34 50 34 Q34 34 34 54 Z" fill="'+hc+'"/>';
-  if(c.hair==='braid')h+='<path d="M67 50 Q76 64 71 80" stroke="'+hc+'" stroke-width="6" fill="none" stroke-linecap="round"/>';
-  h+='<ellipse cx="50" cy="48" rx="17" ry="20" fill="'+sk+'"/>';
-  if(c.hair==='short')h+='<path d="M33 44 Q32 26 50 26 Q68 26 67 44 Q62 34 50 34 Q38 34 33 44 Z" fill="'+hc+'"/>';
-  if(c.hair==='bun')h+='<circle cx="50" cy="25" r="7" fill="'+hc+'"/><path d="M33 44 Q33 28 50 28 Q67 28 67 44 Q60 35 50 35 Q40 35 33 44 Z" fill="'+hc+'"/>';
-  if(c.hair==='bob')h+='<path d="M33 42 Q36 30 50 30 Q64 30 67 42 Q58 36 50 37 Q42 36 33 42 Z" fill="'+hc+'"/>';
-  if(c.x.includes('beard'))h+='<path d="M33 50 Q34 73 50 74 Q66 73 67 50 Q62 61 50 61 Q38 61 33 50 Z" fill="'+hc+'"/>';
-  h+='<circle cx="43" cy="47" r="2" fill="'+ink+'"/><circle cx="57" cy="47" r="2" fill="'+ink+'"/><path d="M45 58 Q50 61 55 58" stroke="'+ink+'" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-  if(c.x.includes('mustache'))h+='<path d="M42 55 Q46 52 50 54 Q54 52 58 55 Q54 57 50 55.5 Q46 57 42 55 Z" fill="'+hc+'"/>';
-  if(c.x.includes('glasses'))h+='<g fill="none" stroke="'+ink+'" stroke-width="1.6"><circle cx="43" cy="47" r="5"/><circle cx="57" cy="47" r="5"/><path d="M48 47 L52 47"/></g>';
-  if(c.x.includes('freckles'))h+='<g fill="#a0623a"><circle cx="40" cy="53" r="1"/><circle cx="43" cy="55" r="1"/><circle cx="57" cy="55" r="1"/><circle cx="60" cy="53" r="1"/></g>';
-  if(c.x.includes('earring'))h+='<circle cx="33.5" cy="55" r="2.2" fill="#d4a017"/>';
+const abText=(ci,mode)=>{const c=CHARS[ci];return mode==='lyn'&&c.al?c.al:c.a};
+function portrait(ci,px){const c=CHARS[ci];if(!c)return '';const id=uid(),sk=c.skin,ink='#1a1414',hc=c.hc,h2=c.hat2||'#1d1a1c';
+  let h='<svg viewBox="0 0 100 100" aria-hidden="true"><defs>'
+   +'<radialGradient id="'+id+'b" cx="50%" cy="38%" r="70%"><stop offset="0" stop-color="'+shade(c.bg,.25)+'"/><stop offset="1" stop-color="'+shade(c.bg,-.65)+'"/></radialGradient>'
+   +'<radialGradient id="'+id+'f" cx="42%" cy="38%" r="68%"><stop offset="0" stop-color="'+shade(sk,.18)+'"/><stop offset=".7" stop-color="'+sk+'"/><stop offset="1" stop-color="'+shade(sk,-.35)+'"/></radialGradient>'
+   +'<linearGradient id="'+id+'c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+shade(c.coat,.15)+'"/><stop offset="1" stop-color="'+shade(c.coat,-.5)+'"/></linearGradient>'
+   +'<linearGradient id="'+id+'h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+shade(h2,.22)+'"/><stop offset="1" stop-color="'+shade(h2,-.4)+'"/></linearGradient>'
+   +'<linearGradient id="'+id+'r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+shade(hc,.18)+'"/><stop offset="1" stop-color="'+shade(hc,-.3)+'"/></linearGradient>'
+   +'<radialGradient id="'+id+'v" cx="50%" cy="45%" r="62%"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></radialGradient></defs>';
+  h+='<rect width="100" height="100" fill="url(#'+id+'b)"/><path d="M-5 30 Q20 18 40 28 T85 22 T110 30" stroke="#fff" stroke-opacity=".05" stroke-width="10" fill="none"/>';
+  if(c.hair==='bob')h+='<path d="M29 56 Q26 23 50 23 Q74 23 71 56 L66 56 Q66 34 50 34 Q34 34 34 56 Z" fill="url(#'+id+'r)"/>';
+  if(c.hair==='braid')h+='<path d="M67 50 Q77 64 71 82" stroke="'+hc+'" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M68 56l5 3M69 63l5 2M70 70l5 1" stroke="'+shade(hc,-.4)+'" stroke-width="1.2"/>';
+  h+='<path d="M12 100 C 14 76, 30 70, 50 70 C 70 70, 86 76, 88 100 Z" fill="url(#'+id+'c)"/>';
+  h+='<path d="M41 70 L50 92 L59 70 Z" fill="#e8dfd0"/><path d="M47 76 L50 90 L53 76 L50 73 Z" fill="'+c.tie+'"/>';
+  h+='<path d="M30 74 L41 70 L50 92 L40 90 Z" fill="'+shade(c.coat,-.25)+'"/><path d="M70 74 L59 70 L50 92 L60 90 Z" fill="'+shade(c.coat,-.25)+'"/>';
+  h+='<rect x="43.5" y="59" width="13" height="14" rx="3" fill="'+shade(sk,-.18)+'"/><path d="M43.5 66 Q50 70 56.5 66" stroke="'+shade(sk,-.45)+'" stroke-opacity=".5" fill="none"/>';
+  h+='<ellipse cx="32.5" cy="49" rx="3.2" ry="5" fill="'+shade(sk,-.15)+'"/><ellipse cx="67.5" cy="49" rx="3.2" ry="5" fill="'+shade(sk,-.15)+'"/>';
+  h+='<path d="M33 46 Q33 27 50 27 Q67 27 67 46 Q67 60 58 66 Q50 71 42 66 Q33 60 33 46 Z" fill="url(#'+id+'f)"/>';
+  h+='<path d="M36 55 Q40 66 50 68 Q60 66 64 55 Q60 63 50 64 Q40 63 36 55 Z" fill="#000" opacity=".12"/>';
+  if(c.hair==='short')h+='<path d="M32.5 45 Q31 25 50 25 Q69 25 67.5 45 Q63 33 50 33.5 Q37 33 32.5 45 Z" fill="url(#'+id+'r)"/>';
+  if(c.hair==='bun')h+='<circle cx="50" cy="24" r="7" fill="url(#'+id+'r)"/><path d="M33 45 Q33 27 50 27 Q67 27 67 45 Q60 34 50 34.5 Q40 34 33 45 Z" fill="url(#'+id+'r)"/>';
+  if(c.hair==='bob')h+='<path d="M33 43 Q36 29 50 29 Q64 29 67 43 Q58 35 50 36 Q42 35 33 43 Z" fill="url(#'+id+'r)"/>';
+  if(c.x.includes('beard'))h+='<path d="M33 50 Q34 75 50 76 Q66 75 67 50 Q63 62 50 62 Q37 62 33 50 Z" fill="url(#'+id+'r)"/>';
+  h+='<path d="M39 42 Q43 40 47 42" stroke="'+shade(hc,-.2)+'" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M53 42 Q57 40 61 42" stroke="'+shade(hc,-.2)+'" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+  h+='<ellipse cx="43" cy="47" rx="3" ry="2" fill="#efe7da"/><ellipse cx="57" cy="47" rx="3" ry="2" fill="#efe7da"/><circle cx="43.4" cy="47" r="1.5" fill="'+ink+'"/><circle cx="57.4" cy="47" r="1.5" fill="'+ink+'"/>';
+  h+='<path d="M50 48 Q48.5 54 47.5 55.5 Q50 57 52.5 55.5" stroke="'+shade(sk,-.4)+'" stroke-width="1.3" fill="none" stroke-linecap="round"/>';
+  h+=c.x.includes('lips')?'<path d="M45.5 60 Q50 58.5 54.5 60 Q50 63 45.5 60 Z" fill="#8e2f2f"/>':'<path d="M45.5 60.5 Q50 62 54.5 60.5" stroke="'+shade(sk,-.5)+'" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+  if(c.x.includes('scar'))h+='<path d="M58 40 L62 46" stroke="#7a3a2a" stroke-width="1.2"/>';
+  if(c.x.includes('mustache'))h+='<path d="M42 57 Q46 54 50 56 Q54 54 58 57 Q54 59 50 57.5 Q46 59 42 57 Z" fill="url(#'+id+'r)"/>';
+  if(c.x.includes('glasses'))h+='<g fill="rgba(200,220,230,.12)" stroke="#d9b56a" stroke-width="1.3"><circle cx="43" cy="47" r="5"/><circle cx="57" cy="47" r="5"/></g><path d="M48 47 L52 47" stroke="#d9b56a" stroke-width="1.3"/>';
+  if(c.x.includes('freckles'))h+='<g fill="#9a5a35" opacity=".8"><circle cx="40" cy="52.5" r=".9"/><circle cx="43" cy="54" r=".9"/><circle cx="57" cy="54" r=".9"/><circle cx="60" cy="52.5" r=".9"/></g>';
+  if(c.x.includes('earring'))h+='<circle cx="32.5" cy="56" r="2" fill="#e2b04a"/>';
   const hat=c.hat;
-  if(hat==='bowler')h+='<ellipse cx="50" cy="35" rx="25" ry="4.5" fill="'+h2+'"/><path d="M35 35 Q35 16 50 16 Q65 16 65 35 Z" fill="'+h2+'"/><rect x="35" y="30" width="30" height="3" fill="#000" opacity=".35"/>';
-  if(hat==='cloche')h+='<path d="M30 46 Q28 21 50 20 Q72 21 70 46 Q50 37 30 46 Z" fill="'+h2+'"/><path d="M31 40 Q50 32 69 40" stroke="#d4a017" stroke-width="3" fill="none"/>';
-  if(hat==='chauffeur')h+='<rect x="32" y="23" width="36" height="12" rx="4" fill="'+h2+'"/><path d="M32 35 L68 35 L74 41 L32 40 Z" fill="#1d1a1c"/><rect x="32" y="31" width="36" height="3" fill="#c9a24a"/>';
-  if(c.x.includes('goggles'))h+='<g stroke="#1d1a1c" stroke-width="1.5" fill="#9fc3c9"><circle cx="43" cy="27" r="4"/><circle cx="57" cy="27" r="4"/></g>';
-  if(hat==='eyeshade')h+='<path d="M29 37 L71 37 L79 45 L29 42 Z" fill="#2e7d4f" opacity=".92"/><rect x="31" y="35" width="38" height="3" fill="#1d1a1c"/>';
-  if(hat==='scarf')h+='<path d="M30 52 Q28 20 50 21 Q72 20 70 52 Q68 36 50 33 Q32 36 30 52 Z" fill="'+h2+'"/><circle cx="69" cy="54" r="4" fill="'+h2+'"/>';
-  if(hat==='jockey')h+='<path d="M33 39 Q33 20 50 20 Q67 20 67 39 Z" fill="'+h2+'"/><path d="M50 20 L50 39" stroke="#fff8e6" stroke-width="5"/><path d="M60 38 L81 41 L66 35 Z" fill="'+h2+'"/>';
-  if(hat==='newsboy')h+='<ellipse cx="49" cy="31" rx="23" ry="10" fill="'+h2+'"/><path d="M32 37 L66 37 L73 42 L32 41 Z" fill="#1d1a1c" opacity=".75"/><circle cx="49" cy="22" r="2" fill="#1d1a1c"/>';
-  if(c.x.includes('glove'))h+='<circle cx="78" cy="84" r="11" fill="#b3261e"/><ellipse cx="68" cy="80" rx="4" ry="6" fill="#b3261e"/><rect x="72" y="93" width="12" height="7" fill="#f3ebd6"/>';
-  if(c.x.includes('card'))h+='<g transform="rotate(-12 76 83)"><rect x="68" y="72" width="16" height="22" rx="2" fill="#fbf5e4" stroke="#2a2226"/><path d="M76 79 l3 3 -3 4 -3 -4 z" fill="#b3261e"/></g>';
-  if(c.x.includes('purse'))h+='<path d="M68 82 Q68 74 78 74 Q88 74 88 82 L88 92 L68 92 Z" fill="#8a6417" stroke="#2a2226"/><circle cx="78" cy="78" r="2" fill="#d4a017"/>';
-  if(c.x.includes('hammer'))h+='<g transform="rotate(25 74 84)"><rect x="72" y="72" width="5" height="26" fill="#6b4a2a"/><rect x="65" y="67" width="19" height="8" fill="#555"/></g>';
-  if(c.x.includes('paper'))h+='<g transform="rotate(-8 78 84)"><rect x="66" y="74" width="24" height="20" fill="#fbf5e4" stroke="#2a2226"/><path d="M69 79h18M69 83h18M69 87h12" stroke="#2a2226" stroke-width="1.2"/></g>';
+  if(hat==='bowler')h+='<ellipse cx="50" cy="35" rx="25" ry="4.5" fill="url(#'+id+'h)"/><path d="M35 35 Q35 15 50 15 Q65 15 65 35 Z" fill="url(#'+id+'h)"/><rect x="35" y="30" width="30" height="3" fill="#000" opacity=".45"/><path d="M41 20 Q46 17 52 17" stroke="#fff" stroke-opacity=".2" stroke-width="2" fill="none"/>';
+  if(hat==='cloche')h+='<path d="M30 47 Q27 20 50 19 Q73 20 70 47 Q50 37 30 47 Z" fill="url(#'+id+'h)"/><path d="M31 40 Q50 32 69 40" stroke="#d9b56a" stroke-width="2.5" fill="none"/>';
+  if(hat==='chauffeur')h+='<rect x="31" y="22" width="38" height="13" rx="5" fill="url(#'+id+'h)"/><path d="M32 35 L68 35 L75 42 L32 41 Z" fill="#0d0c0c"/><rect x="31" y="31" width="38" height="3" fill="#c8873a"/>';
+  if(c.x.includes('goggles'))h+='<g stroke="#2a2420" stroke-width="1.5" fill="#7fa6ad"><circle cx="43" cy="26.5" r="4"/><circle cx="57" cy="26.5" r="4"/></g><g fill="#fff" opacity=".5"><circle cx="41.8" cy="25.3" r="1"/><circle cx="55.8" cy="25.3" r="1"/></g>';
+  if(hat==='eyeshade')h+='<path d="M29 37 L71 37 L79 45 L29 42 Z" fill="#2c7a4a" opacity=".9"/><rect x="31" y="35" width="38" height="3" fill="#0d0c0c"/>';
+  if(hat==='scarf')h+='<path d="M30 54 Q27 19 50 20 Q73 19 70 54 Q68 35 50 32 Q32 35 30 54 Z" fill="url(#'+id+'h)"/><circle cx="69" cy="56" r="4" fill="url(#'+id+'h)"/><path d="M35 30 Q50 24 65 30" stroke="#000" stroke-opacity=".2" fill="none"/>';
+  if(hat==='jockey')h+='<path d="M33 40 Q33 19 50 19 Q67 19 67 40 Z" fill="url(#'+id+'h)"/><path d="M50 19 L50 40" stroke="#f1e6d0" stroke-width="5"/><path d="M60 39 L82 42 L66 35 Z" fill="'+shade(h2,-.3)+'"/>';
+  if(hat==='newsboy')h+='<ellipse cx="49" cy="31" rx="24" ry="10.5" fill="url(#'+id+'h)"/><path d="M32 37 L66 37 L74 43 L32 41 Z" fill="#0d0c0c" opacity=".8"/><circle cx="49" cy="21.5" r="2" fill="#0d0c0c"/><path d="M30 31 Q49 25 68 31" stroke="#000" stroke-opacity=".25" fill="none"/>';
+  if(c.x.includes('glove'))h+='<g><circle cx="79" cy="85" r="11" fill="#a3221c"/><ellipse cx="69" cy="81" rx="4" ry="6" fill="#8c1c17"/><path d="M73 79 Q79 75 85 79" stroke="#fff" stroke-opacity=".25" stroke-width="2" fill="none"/><rect x="73" y="94" width="13" height="7" fill="#e8dfd0"/></g>';
+  if(c.x.includes('card'))h+='<g transform="rotate(-12 77 83)"><rect x="68" y="72" width="17" height="23" rx="2" fill="#f4ecdc" stroke="#1a1414"/><path d="M76.5 79 l3.2 3.2 -3.2 4.2 -3.2 -4.2 z" fill="#a3221c"/></g>';
+  if(c.x.includes('purse'))h+='<path d="M68 83 Q68 74 78 74 Q88 74 88 83 L88 93 L68 93 Z" fill="#7a5418" stroke="#1a1414"/><circle cx="78" cy="78.5" r="2" fill="#e2b04a"/>';
+  if(c.x.includes('hammer'))h+='<g transform="rotate(25 74 84)"><rect x="72" y="72" width="5" height="26" fill="#5e3e22"/><rect x="65" y="67" width="19" height="8" rx="1" fill="#6c6c6c"/><rect x="65" y="67" width="19" height="2.5" fill="#9a9a9a"/></g>';
+  if(c.x.includes('paper'))h+='<g transform="rotate(-8 78 84)"><rect x="66" y="74" width="24" height="20" fill="#e9e0cc" stroke="#1a1414"/><path d="M69 79h18M69 83h18M69 87h12" stroke="#1a1414" stroke-width="1.2"/></g>';
+  h+='<rect width="100" height="100" fill="#7a5a3a" opacity=".1"/><rect width="100" height="100" fill="url(#'+id+'v)"/>';
   return '<span class="pt" style="width:'+px+'px;height:'+px+'px">'+h+'</svg></span>';
 }
+const ITEMS={
+  pistol:{n:'Pistol',d:'Neste ran lykkes alltid, med mindre offeret har vest.',price:4},
+  vest:{n:'Skuddsikker vest',d:'Stopper ett ran mot laget.',price:4},
+  cop:{n:'Korrupt politi',d:'Fjerner en politibrikke når dere trekker fra smuglerposen.',price:5},
+  dyn:{n:'Dynamitt',d:'Sprenger bort en rute som et annet lag eier.',price:12}};
+const CODE2={X:'pol',G:'pistol',V:'vest',D:'dyn',C:'cop',K:'kid'};
+function token(k,px,v){const id=uid();let h='<svg viewBox="0 0 100 100" aria-hidden="true"><defs>'
+  +'<radialGradient id="'+id+'g" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".55" stop-color="#d4a23c"/><stop offset="1" stop-color="#6e4a12"/></radialGradient>'
+  +'<linearGradient id="'+id+'m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfd4da"/><stop offset=".5" stop-color="#6c737c"/><stop offset="1" stop-color="#2a2e33"/></linearGradient>'
+  +'<radialGradient id="'+id+'d" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#3a302a"/><stop offset="1" stop-color="#120e0c"/></radialGradient></defs>';
+  if(k==='coin')h+='<circle cx="50" cy="50" r="44" fill="url(#'+id+'g)" stroke="#5a3c0e" stroke-width="3"/><circle cx="50" cy="50" r="34" fill="none" stroke="#7a5418" stroke-width="2" stroke-dasharray="3 3"/><text x="50" y="58" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="34" fill="#4a300a">'+(v||'')+'</text><text x="50" y="78" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="14" fill="#4a300a">KR</text>';
+  else if(k==='note')h+='<rect x="6" y="26" width="88" height="48" rx="4" fill="#4e6b4a" stroke="#1d2a1b" stroke-width="2"/><rect x="12" y="32" width="76" height="36" rx="2" fill="none" stroke="#a9c49b" stroke-width="1.5"/><circle cx="50" cy="50" r="11" fill="#a9c49b" opacity=".5"/><text x="50" y="56" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="18" fill="#1d2a1b">10</text>';
+  else if(k==='fake')h+='<circle cx="50" cy="50" r="44" fill="url(#'+id+'g)" stroke="#5a3c0e" stroke-width="3"/><circle cx="50" cy="50" r="34" fill="none" stroke="#7a5418" stroke-width="2" stroke-dasharray="3 3"/><text x="50" y="62" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="34" fill="#4a300a">'+(v?'KR':'RK')+'</text>';
+  else h+='<circle cx="50" cy="50" r="46" fill="url(#'+id+'d)" stroke="'+(k==='pol'?'#4a7fb5':k==='kid'?'#a3221c':'#c8873a')+'" stroke-width="3"/>';
+  if(k==='pol')h+='<path d="M50 14 L59 34 L81 36 L64 50 L70 72 L50 60 L30 72 L36 50 L19 36 L41 34 Z" fill="url(#'+id+'m)" stroke="#1b2430" stroke-width="2"/><circle cx="50" cy="47" r="10" fill="#1f3d63"/><text x="50" y="52" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="15" fill="#e6eef6">P</text>';
+  if(k==='pistol')h+='<path d="M18 38 L74 38 L80 34 L84 38 L84 46 L54 46 L52 52 L46 52 L44 48 L40 48 L36 76 L22 76 L28 48 L18 48 Z" fill="url(#'+id+'m)" stroke="#111" stroke-width="2"/><path d="M28 48 L40 48 L36 76 L22 76 Z" fill="#5e3a1e" stroke="#111" stroke-width="2"/><circle cx="50" cy="42" r="5" fill="#2a2e33"/><path d="M44 52 Q46 60 52 52" fill="none" stroke="#111" stroke-width="2"/>';
+  if(k==='vest')h+='<path d="M30 20 L42 20 Q50 30 58 20 L70 20 L78 36 L76 80 L24 80 L22 36 Z" fill="#4c5a43" stroke="#151a12" stroke-width="2"/><path d="M50 30 L50 80" stroke="#151a12" stroke-width="2"/><rect x="30" y="44" width="16" height="12" rx="2" fill="#3a4633" stroke="#151a12"/><rect x="54" y="44" width="16" height="12" rx="2" fill="#3a4633" stroke="#151a12"/><path d="M26 64 H74" stroke="#151a12" stroke-width="3"/>';
+  if(k==='dyn')h+='<g stroke="#2a0b08" stroke-width="2"><rect x="24" y="36" width="14" height="44" rx="4" fill="#b0281f"/><rect x="43" y="32" width="14" height="48" rx="4" fill="#c4352a"/><rect x="62" y="36" width="14" height="44" rx="4" fill="#b0281f"/></g><rect x="20" y="58" width="60" height="6" fill="#2a2420"/><path d="M50 32 Q52 20 62 16" stroke="#ccb" stroke-width="2" fill="none"/><circle cx="63" cy="15" r="5" fill="#ffd36b"/><circle cx="63" cy="15" r="9" fill="#ffb03b" opacity=".35"/>';
+  if(k==='cop')h+='<path d="M24 46 Q26 24 50 22 Q74 24 76 46 Z" fill="#1f3d63" stroke="#0e1a2b" stroke-width="2"/><rect x="20" y="44" width="60" height="9" rx="3" fill="#0e1a2b"/><path d="M44 30 L50 24 L56 30 L50 36 Z" fill="url(#'+id+'m)"/><circle cx="62" cy="68" r="15" fill="url(#'+id+'g)" stroke="#5a3c0e" stroke-width="2"/><text x="62" y="73" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="13" fill="#4a300a">KR</text><path d="M30 64 Q40 58 46 66" stroke="#d9a06a" stroke-width="6" fill="none" stroke-linecap="round"/>';
+  if(k==='kid')h+='<ellipse cx="50" cy="48" rx="34" ry="7" fill="#151212"/><path d="M30 48 Q30 24 50 22 Q70 24 70 48 Z" fill="#221c1c"/><path d="M31 41 H69" stroke="#a3221c" stroke-width="4"/><path d="M26 62 Q50 78 74 62 M28 70 Q50 84 72 70" stroke="#b89a6a" stroke-width="3" fill="none"/><path d="M30 60 l4 6 M40 66 l3 6 M50 68 l1 6 M60 66 l-2 6 M70 61 l-4 6" stroke="#8a6f45" stroke-width="2"/>';
+  return '<span class="tok" style="width:'+px+'px;height:'+px+'px">'+h+'</svg></span>';
+}
+function dieSVG(n,roll){const P={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[28,28],[72,28],[50,50],[28,72],[72,72]],6:[[28,26],[72,26],[28,50],[72,50],[28,74],[72,74]]};
+  return '<svg class="die'+(roll?' roll':'')+'" viewBox="0 0 100 100" aria-label="'+n+'"><rect x="6" y="6" width="88" height="88" rx="18" fill="#efe6d2" stroke="#6e5a3c" stroke-width="3"/><rect x="6" y="6" width="88" height="44" rx="18" fill="#fff" opacity=".25"/>'+(P[n]||[]).map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="8" fill="'+(n===1?'#a3221c':'#1a1414')+'"/>').join('')+'</svg>'}
 
-const MAPS={"sot": {"nodes": [["Havna", 110, 95], ["Fiskebrygga", 360, 70], ["Tollboden", 650, 95], ["Kullgruva", 90, 320], ["Jernverket", 300, 245], ["Markedet", 520, 265], ["Stasjonen", 715, 310], ["Bryggeriet", 190, 470], ["Hesteskoen", 410, 425], ["Rådhuset", 615, 475], ["Slakteriet", 105, 670], ["Veddeløpsbanen", 340, 640], ["Kirkebakken", 555, 670], ["Politikammeret", 700, 600]], "edges": [[0, 1, 2], [1, 2, 3], [0, 3, 2], [0, 4, 2], [1, 4, 1], [1, 5, 2], [2, 5, 2], [2, 6, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [3, 7, 1], [4, 7, 2], [4, 8, 2], [5, 8, 1], [5, 9, 2], [6, 9, 1], [7, 8, 2], [8, 9, 2], [3, 10, 4], [7, 10, 2], [7, 11, 2], [8, 11, 2], [8, 12, 3], [9, 12, 2], [9, 13, 1], [6, 13, 3], [10, 11, 3], [11, 12, 2], [12, 13, 1], [4, 5, 2], [5, 8, 1], [5, 6, 2], [8, 9, 2], [0, 3, 2], [11, 12, 2], [1, 5, 2], [7, 11, 2]]}, "havn": {"nodes": [["Fyret", 90, 110], ["Moloen", 300, 95], ["Fiskehallen", 520, 120], ["Tollboden", 715, 105], ["Ferjeleiet", 120, 310], ["Lagerskur 7", 330, 275], ["Kranene", 555, 300], ["Tørrdokka", 720, 345], ["Røykeriet", 95, 525], ["Pakkhuset", 300, 480], ["Sluseporten", 505, 505], ["Sjømannskirka", 710, 565], ["Kanalbroa", 240, 685], ["Verftet", 520, 690]], "edges": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [0, 4, 2], [1, 5, 1], [2, 5, 2], [2, 6, 1], [3, 6, 2], [3, 7, 2], [4, 5, 2], [5, 6, 2], [6, 7, 1], [4, 8, 2], [4, 9, 2], [5, 9, 2], [5, 10, 3], [6, 10, 2], [7, 11, 2], [8, 9, 2], [9, 10, 2], [10, 11, 2], [8, 12, 2], [9, 12, 2], [10, 13, 1], [11, 13, 2], [12, 13, 2], [12, 10, 3], [0, 5, 3], [11, 6, 3], [1, 5, 1], [5, 6, 2], [9, 10, 2], [6, 7, 1], [4, 9, 2], [10, 13, 1], [2, 3, 2], [8, 12, 2]]}, "hei": {"nodes": [["Nordstasjonen", 400, 80], ["Steinbruddet", 120, 130], ["Sølvdalen", 690, 140], ["Gruvebyen", 250, 290], ["Kirkebygda", 540, 280], ["Sagbruket", 90, 430], ["Elvekrysset", 400, 410], ["Kraftverket", 715, 400], ["Gården", 220, 570], ["Markedsbyen", 565, 555], ["Fjellstua", 740, 690], ["Tunnelen", 90, 690], ["Vannstasjonen", 390, 690], ["Sørhavna", 600, 705]], "edges": [[0, 1, 2], [0, 2, 3], [0, 3, 2], [0, 4, 2], [1, 3, 2], [1, 5, 3], [2, 4, 2], [2, 7, 2], [3, 4, 3], [3, 5, 2], [3, 6, 2], [4, 6, 2], [4, 7, 2], [5, 8, 2], [5, 11, 2], [6, 8, 2], [6, 9, 2], [7, 9, 2], [7, 10, 3], [8, 11, 1], [8, 12, 2], [9, 12, 2], [9, 13, 1], [10, 13, 1], [11, 12, 3], [12, 13, 2], [6, 12, 2], [0, 3, 2], [3, 6, 2], [6, 9, 2], [9, 13, 1], [4, 7, 2], [8, 12, 2], [0, 4, 2], [5, 8, 2]]}};
-const MAPINFO={sot:{name:'Sotbyen',desc:'Industribyen ved kanalen',deco:'<path d="M-20 200 C 160 250, 230 130, 430 185 S 650 420, 820 400" fill="none" stroke="var(--teal)" stroke-width="26" opacity=".28" stroke-linecap="round"/>'},
-  havn:{name:'Havnebyen',desc:'Kaier, sluser og verft',deco:'<path d="M-10 -10 L810 -10 L810 50 Q600 70 400 45 Q200 25 -10 55 Z" fill="var(--teal)" opacity=".28"/><path d="M380 330 C 420 420, 470 430, 600 450 S 760 470, 820 480" fill="none" stroke="var(--teal)" stroke-width="22" opacity=".25" stroke-linecap="round"/>'},
-  hei:{name:'Heibanen',desc:'Jernbane over fjell og dal',deco:'<path d="M500 -20 C 470 120, 330 200, 330 330 S 470 480, 470 600 S 420 720, 470 780" fill="none" stroke="var(--teal)" stroke-width="20" opacity=".28" stroke-linecap="round"/><path d="M600 220 l40 -60 l40 60 z M650 230 l30 -45 l30 45 z M60 250 l35 -50 l35 50 z" fill="var(--route)" opacity=".45"/>'}};
-let NODES,EDGES,PAIR,DIST,MPAIRS,MAPID=null;
+const MAPS={"sot": {"nodes": [["Havna", 110, 95], ["Fiskebrygga", 360, 70], ["Tollboden", 650, 95], ["Kullgruva", 90, 320], ["Jernverket", 300, 245], ["Markedet", 520, 265], ["Stasjonen", 715, 310], ["Bryggeriet", 190, 470], ["Hesteskoen", 410, 425], ["Rådhuset", 615, 475], ["Slakteriet", 105, 670], ["Veddeløpsbanen", 340, 640], ["Kirkebakken", 555, 650, 1], ["Politikammeret", 700, 600]], "edges": [[0, 1, 2], [1, 2, 3], [0, 3, 2], [0, 4, 2], [1, 4, 1], [1, 5, 2], [2, 5, 2], [2, 6, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [3, 7, 1], [4, 7, 2], [4, 8, 2], [5, 8, 1], [5, 9, 2], [6, 9, 1], [7, 8, 2], [8, 9, 2], [3, 10, 4], [7, 10, 2], [7, 11, 2], [8, 11, 2], [8, 12, 3], [9, 12, 2], [9, 13, 1], [6, 13, 4], [10, 11, 3], [11, 12, 2], [12, 13, 1], [0, 2, 4, 380, -45], [2, 13, 5, 905, 330], [10, 13, 5, 420, 850], [4, 5, 2], [5, 8, 1], [5, 6, 2], [8, 9, 2], [0, 3, 2], [11, 12, 2], [1, 5, 2], [7, 11, 2]]}, "havn": {"nodes": [["Fyret", 90, 110], ["Moloen", 300, 95], ["Fiskehallen", 520, 120], ["Tollboden", 715, 105], ["Ferjeleiet", 120, 310], ["Lagerskur 7", 330, 275], ["Kranene", 555, 300], ["Tørrdokka", 720, 345], ["Røykeriet", 95, 525], ["Pakkhuset", 300, 480], ["Sluseporten", 505, 505], ["Sjømannskirka", 710, 565], ["Kanalbroa", 240, 685], ["Verftet", 520, 690]], "edges": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [0, 4, 2], [1, 5, 2], [2, 5, 2], [2, 6, 2], [3, 6, 2], [3, 7, 2], [4, 5, 2], [5, 6, 2], [6, 7, 1], [4, 8, 2], [4, 9, 2], [5, 9, 2], [5, 10, 2], [6, 10, 2], [7, 11, 2], [8, 9, 2], [9, 10, 2], [10, 11, 2], [8, 12, 2], [9, 12, 2], [10, 13, 1], [11, 13, 2], [12, 13, 3], [12, 10, 4], [0, 5, 4], [11, 6, 4], [0, 8, 4, -40, 320], [0, 3, 5, 400, -35], [3, 11, 5, 920, 335], [1, 5, 2], [5, 6, 2], [9, 10, 2], [6, 7, 1], [4, 9, 2], [10, 13, 1], [2, 3, 2], [8, 12, 2]]}, "hei": {"nodes": [["Nordstasjonen", 400, 80], ["Steinbruddet", 120, 130], ["Sølvdalen", 690, 140], ["Gruvebyen", 250, 290], ["Kirkebygda", 540, 280], ["Sagbruket", 90, 430, 3], ["Elvekrysset", 400, 410], ["Kraftverket", 715, 400, 2], ["Gården", 220, 570], ["Markedsbyen", 565, 555], ["Fjellstua", 740, 690], ["Tunnelen", 90, 690], ["Vannstasjonen", 390, 690], ["Sørhavna", 600, 705]], "edges": [[0, 1, 2], [0, 2, 2], [0, 3, 2], [0, 4, 2], [1, 3, 2], [1, 5, 4], [2, 4, 2], [2, 7, 2], [3, 4, 4], [3, 5, 2], [3, 6, 1], [4, 6, 2], [4, 7, 2], [5, 8, 2], [5, 11, 3], [6, 8, 2], [6, 9, 2], [7, 9, 2], [7, 10, 4], [8, 11, 2], [8, 12, 2], [9, 12, 2], [9, 13, 2], [10, 13, 1], [11, 12, 4], [12, 13, 2], [6, 12, 3], [1, 11, 5, -55, 410], [2, 10, 5, 900, 415], [0, 3, 2], [3, 6, 1], [6, 9, 2], [9, 13, 2], [4, 7, 2], [8, 12, 2], [0, 4, 2], [5, 8, 2]]}};
+const MAPINFO={sot:{name:'Sotbyen',desc:'Industribyen ved kanalen',deco:'<path d="M-20 200 C 160 250, 230 130, 430 185 S 650 420, 860 400" fill="none" stroke="#2c4446" stroke-width="30" opacity=".7" stroke-linecap="round"/><g fill="#1d1815" opacity=".9"><rect x="250" y="320" width="22" height="70"/><rect x="560" y="360" width="18" height="60"/><rect x="40" y="520" width="20" height="60"/></g>'},
+  havn:{name:'Havnebyen',desc:'Kaier, sluser og verft',deco:'<path d="M-10 -10 L850 -10 L850 50 Q600 72 400 46 Q200 26 -10 56 Z" fill="#203234"/><path d="M380 330 C 420 420, 470 430, 600 450 S 760 470, 860 480" fill="none" stroke="#2c4446" stroke-width="24" opacity=".7" stroke-linecap="round"/>'},
+  hei:{name:'Heibanen',desc:'Jernbane over fjell og dal',deco:'<path d="M500 -20 C 470 120, 330 200, 330 330 S 470 480, 470 600 S 420 720, 470 800" fill="none" stroke="#2c4446" stroke-width="22" opacity=".7" stroke-linecap="round"/><path d="M600 230 l40 -60 l40 60 z M650 240 l30 -45 l30 45 z M150 250 l35 -50 l35 50 z" fill="#2a231e"/>'}};
+let NODES,EDGES,PAIR,DIST,MPAIRS,GEO,MAPID=null;
+function edgePts(e){const A=NODES[e[0]],B=NODES[e[1]];if(e.length<=3)return [[A[1],A[2]],[B[1],B[2]]];
+  const r=[];for(let i=0;i<=40;i++){const t=i/40;r.push([(1-t)*(1-t)*A[1]+2*t*(1-t)*e[3]+t*t*B[1],(1-t)*(1-t)*A[2]+2*t*(1-t)*e[4]+t*t*B[2]])}return r}
 function setMap(id){if(!MAPS[id])id='sot';if(id===MAPID)return;MAPID=id;NODES=MAPS[id].nodes;EDGES=MAPS[id].edges;
   PAIR=EDGES.map((e,i)=>EDGES.findIndex((f,j)=>j!==i&&((f[0]===e[0]&&f[1]===e[1])||(f[0]===e[1]&&f[1]===e[0]))));
+  GEO=EDGES.map((e,i)=>{let P=edgePts(e);if(PAIR[i]>=0){const sg=i<PAIR[i]?-1:1;P=P.map((p,k)=>{const a=P[Math.max(0,k-1)],b=P[Math.min(P.length-1,k+1)],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;return [p[0]-dy/L*10*sg,p[1]+dx/L*10*sg]})}
+    const cum=[0];for(let k=1;k<P.length;k++)cum.push(cum[k-1]+Math.hypot(P[k][0]-P[k-1][0],P[k][1]-P[k-1][1]));return {P,cum,L:cum[cum.length-1]}});
   const n=NODES.length,d=[];for(let i=0;i<n;i++){d.push(Array(n).fill(99));d[i][i]=0}
   EDGES.forEach(([a,b,l])=>{if(l<d[a][b])d[a][b]=d[b][a]=l});
   for(let k=0;k<n;k++)for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(d[i][k]+d[k][j]<d[i][j])d[i][j]=d[i][k]+d[k][j];DIST=d;
   MPAIRS=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(d[i][j]>=3)MPAIRS.push([i,j]);}
+function polySub(g,s0,s1){const P=g.P,c=g.cum,out=[];const at=s=>{let k=1;while(k<c.length-1&&c[k]<s)k++;const t=(s-c[k-1])/((c[k]-c[k-1])||1);return [P[k-1][0]+(P[k][0]-P[k-1][0])*t,P[k-1][1]+(P[k][1]-P[k-1][1])*t]};
+  out.push(at(s0));for(let k=1;k<c.length-1;k++)if(c[k]>s0&&c[k]<s1)out.push(P[k]);out.push(at(s1));return out.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}
 setMap('sot');
-const PTS=[0,1,2,4,7];
-const REQ=[0,1,2,3,4];
-const est=(r,n)=>Math.max(5,Math.round((r*Math.max(1,n)*2.5+Math.floor(r/3)*2)/5)*5);
+const PTS=[0,1,2,4,7,10];
+const REQ=[0,1,2,3,4,5];
+const est=(r,n,mode)=>{const m=mode==='lyn'?r*4.5+Math.floor(r/3)*2:r*Math.max(1,n)*2.5+r*1+Math.floor(r/3)*2;return Math.max(5,Math.round(m/5)*5)};
 
 /* ---------- tilstand ---------- */
 let S=null, role=null;
-const ui={big:false,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:'',char:null,chFor:null,shady:false};
+const ui={big:false,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:'',char:null,chFor:null,shady:false,shop:false,lt:null,gun:false};
 let timer=null;
-
 function newState(mode,code){
   return {v:VERSION,gid:rid(8),code:code||'',mode,host:CID,rev:0,pn:0,phase:'lobby',
-    cfg:{level:'hard',rounds:6,teams:0,map:'sot'},
+    cfg:{level:'hard',rounds:4,teams:0,map:'sot',mode:'normal'},
     players:[],teams:[],own:[],order:[],ti:0,round:1,rounds:0,mgEvery:3,mgN:0,
-    turn:{},duel:{},mg:{},used:LS.get('sot.used')||{},seq:{},fin:0,msg:'',pc:0};
+    turn:{},duel:{},mg:{},lyn:{},bags:{},dice:{},used:LS.get('sot.used')||{},seq:{},fin:0,msg:'',pc:0,after:'',bagAll:0};
 }
 const T=id=>S.teams.find(t=>t.id===id);
 const PL=id=>S.players.find(p=>p.id===id);
@@ -301,9 +382,10 @@ const members=tid=>S.players.filter(p=>p.team===tid);
 const mine=pid=>{const p=PL(pid);return !!p&&p.owner===CID};
 const isHost=()=>role==='local'||role==='host';
 const owns=(cid,pid)=>{const p=PL(pid);return !!p&&(p.owner===cid||cid===S.host)};
+const ownsTeam=(cid,tid)=>members(tid).some(p=>p.owner===cid)||cid===S.host;
 const ab=(pid,k)=>{const p=PL(pid);return !!p&&!!CHARS[p.ch]&&CHARS[p.ch].k===k};
 const teamHas=(tid,k)=>members(tid).some(p=>CHARS[p.ch]&&CHARS[p.ch].k===k);
-const catName=c=>CATS[c];
+const LYN=()=>S.cfg.mode==='lyn';
 const tname=t=>esc(t.name);
 function teamCount(){if(!S.cfg.teams)return Math.max(1,S.players.length);return Math.max(1,new Set(S.players.map(p=>p.team)).size)}
 const freeChars=except=>{const used=S.players.filter(p=>p.id!==except).map(p=>p.ch);return CHARS.map((_,i)=>i).filter(i=>!used.includes(i))};
@@ -311,6 +393,9 @@ const routeCost=(e,pid)=>{const l=EDGES[e][2];return l+1-((l>=3&&ab(pid,'sjafor'
 const challengeFee=e=>2+(teamHas(S.own[e],'smed')?2:0);
 const defender=tid=>{const t=T(tid),ms=members(tid);return ms[t.pi%ms.length].id};
 const turnTeam=()=>T(PL(S.turn.pid).team);
+const myTeams=()=>Array.from(new Set(S.players.filter(p=>p.owner===CID).map(p=>p.team))).map(T).filter(Boolean);
+const actorOf=tid=>{const m=members(tid);return (m.find(p=>p.owner===CID)||m[0]).id};
+const rname=e=>NODES[EDGES[e][0]][0]+'–'+NODES[EDGES[e][1]][0];
 
 /* graf */
 function connected(t,a,b){const adj={};t.routes.forEach(e=>{const[x,y]=EDGES[e];(adj[x]=adj[x]||[]).push(y);(adj[y]=adj[y]||[]).push(x)});
@@ -319,42 +404,69 @@ function netLen(t){const par={};const f=x=>par[x]===undefined||par[x]===x?x:(par
   t.routes.forEach(e=>{const[a,b]=EDGES[e];par[f(a)]=f(b)});const sum={};let mx=0;
   t.routes.forEach(e=>{const r=f(EDGES[e][0]);sum[r]=(sum[r]||0)+EDGES[e][2];if(sum[r]>mx)mx=sum[r]});return mx}
 function newMission(t){const have=t.missions.map(m=>m.a+'-'+m.b);const short=S.rounds<=4;
-  const c=MPAIRS.filter(([a,b])=>(short?DIST[a][b]<=5:DIST[a][b]>=5)&&!have.includes(a+'-'+b)&&!connected(t,a,b));
+  let c=MPAIRS.filter(([a,b])=>(short?DIST[a][b]<=6:DIST[a][b]>=5)&&!have.includes(a+'-'+b)&&!connected(t,a,b));
+  if(!c.length)c=MPAIRS.filter(([a,b])=>!have.includes(a+'-'+b)&&!connected(t,a,b));
   if(!c.length)return null;const[a,b]=pick(c);return {a,b,v:DIST[a][b]+2}}
 const mDone=(t,m)=>connected(t,m.a,m.b);
 const routePts=t=>t.routes.reduce((s,e)=>s+PTS[EDGES[e][2]],0);
+function newBag(){let s='';const add=(c,n)=>{s+=c.repeat(n)};add('X',33);add('G',5);add('V',5);add('D',1);add('C',4);add('K',3);add('1',20);add('2',17);add('3',8);add('5',4);return shuffle(s.split('')).join('')}
 
 /* ---------- spillregler (kjører hos verten) ---------- */
 function newCats(){return shuffle([0,1,2,3,4,5]).slice(0,3)}
-function startTurn(){
-  const t=T(S.order[S.ti]),ms=members(t.id),p=ms[t.pi%ms.length];t.pi++;
-  S.turn={pid:p.id,n:0,ok:0,hist:[],cats:newCats(),cat:-1,q:{},picked:-2,tips:{},tipWin:[],hide:[],u5050:0,uSwap:0,bought:0,gotM:0,bag:{},shady:0,rob:null};
-  S.phase='cat';S.pn++;
-}
 function pickQ(cat){
   const lv=S.cfg.level,pool=BANK[lv][cat],key=lv+cat;let used=S.used[key]||[];let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
   if(!free.length){used=[];free=pool.map((_,i)=>i)}const i=pick(free);used.push(i);S.used[key]=used;const src=pool[i];
   const o=shuffle(src.slice(1,5));return {t:src[0],o,r:o.indexOf(src[1]),c:cat};
 }
+function goCount(after,label){S.phase='count';S.after=after;S.cdLabel=label;S.pn++}
+function startRound(){if(LYN())startLyn();else{S.ti=0;startTurn()}}
+function startTurn(){
+  let note='';
+  while(S.ti<S.order.length){const t=T(S.order[S.ti]);
+    if(t.skip){t.skip=0;note+=t.name+' er kidnappet av mafiabossen og står over. ';S.ti++;continue}
+    const ms=members(t.id),p=ms[t.pi%ms.length];t.pi++;
+    S.turn={pid:p.id,n:0,ok:0,hist:[],cats:newCats(),cat:-1,q:{},picked:-2,tips:{},tipWin:[],hide:[],u5050:0,uSwap:0,bought:0,gotM:0,shady:0,rob:null};
+    S.msg=note;goCount('cat','Spørsmålsrunde for '+p.name);return}
+  S.msg=note;endRound();
+}
+function endRound(){startBag()}
+function startBag(){S.bags={};S.teams.forEach(t=>{S.bags[t.id]={pool:newBag(),drawn:[],xs:[],arm:0,done:0,bust:0,kid:0,sum:0}});S.bagAll=0;S.phase='bag';S.pn++}
+function bagCheckAll(){if(S.teams.every(t=>S.bags[t.id].done)){S.bagAll=1;S.pn++}}
+function bagBank(t,b){let sum=0;b.drawn.forEach(c=>{if(c>='1'&&c<='9')sum+=+c;else if(CODE2[c]&&ITEMS[CODE2[c]])t.inv[CODE2[c]]++});b.sum=sum;t.coins+=sum;t.bag+=sum;b.done=1}
+function bagEnd(){S.msg='';if(S.round>=S.rounds){S.phase='final';S.fin=0;S.pn++;return}
+  if(S.round%S.mgEvery===0){startMg();return}S.round++;startRound()}
+function startLyn(){
+  let note='';const tt={};S.teams.forEach(t=>{tt[t.id]={ok:0,hist:[],bought:0,gotM:0,shady:0,rob:null,done:0,out:0,u5050:0,uSwap:0,hide:[],hideK:-1};if(t.skip){t.skip=0;tt[t.id].out=1;tt[t.id].done=1;note+=t.name+' er kidnappet og står over runden. '}});
+  S.lyn={k:-1,q:{},ans:{},tt,cats:shuffle([0,1,2,3,4,5])};S.msg=note;goCount('lq','Lynrunde '+S.round);
+}
+const activeTeams=()=>S.teams.filter(t=>!S.lyn.tt[t.id].out);
+function newLq(){const L=S.lyn;L.k++;if(!activeTeams().length){toBuy();return}L.q=pickQ(L.cats[L.k%6]);L.ans={};S.phase='lq';S.pn++;S.msg=''}
+function resolveLq(){const L=S.lyn,r=L.q.r;let n=0;
+  activeTeams().forEach(t=>{const st=L.tt[t.id],ok=L.ans[t.id]===r;st.hist.push(ok?1:0);if(ok){st.ok++;t.coins++;t.right++;n++}});
+  S.msg=n+' av '+activeTeams().length+' lag svarte riktig.';S.phase='lqres';S.pn++}
+function toBuy(){const L=S.lyn;activeTeams().forEach(t=>{const st=L.tt[t.id];if(st.ok===5)t.coins+=2;if(st.ok>=3&&teamHas(t.id,'bookie'))t.coins+=1});
+  S.msg='Handelstid! Alle handler samtidig.';S.phase='lbuy';S.pn++;if(S.teams.every(t=>L.tt[t.id].done))endRound()}
 function startMg(){
   const type=MGORDER[S.mgN%MGORDER.length];S.mgN++;const n=S.cfg.level==='easy'?4:6;let code='';for(let i=0;i<n;i++)code+=rnd(10);
-  S.mg={type,code,sc:{},res:[]};S.phase='mg';S.pn++;S.msg='';
+  const cnt=S.cfg.level==='easy'?5+rnd(7):9+rnd(10);const pos=[];for(let i=0;i<cnt;i++)pos.push([4+rnd(76),4+rnd(78),rnd(50)-25]);
+  S.mg={type,code,cnt,pos,odd:[rnd(25),rnd(25),rnd(25)],sc:{},res:[]};S.phase='mg';S.pn++;S.msg='';
 }
 function mgFinish(){
-  const g=S.mg,lower=g.type==='react',worst=lower?1500:0;
+  const g=S.mg,M=MG[g.type],lower=!!M.lower,worst=M.worst;
   const rows=S.teams.map(t=>{const ms=members(t.id);const v=ms.reduce((s,p)=>s+(g.sc[p.id]==null?worst:g.sc[p.id]),0)/ms.length;return {id:t.id,v:Math.round(v*10)/10,p:0,j:0}});
   rows.sort((a,b)=>lower?a.v-b.v:b.v-a.v);const PR=[4,2,1];let rank=0;
   rows.forEach((r,i)=>{if(i>0&&r.v!==rows[i-1].v)rank=i;r.p=rows.length===1?2:(PR[rank]||0);if(teamHas(r.id,'jockey'))r.j=1;const t=T(r.id);t.coins+=r.p+r.j;t.mg+=r.p+r.j});
   g.res=rows;S.phase='mgres';S.pn++;
 }
 function finalScores(){
-  const res=S.teams.map(t=>({id:t.id,rp:routePts(t),mp:t.missions.filter(m=>mDone(t,m)).reduce((s,m)=>s+m.v,0),cp:Math.floor(t.coins/3),net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,tips:t.tips||0,heist:t.heist||0,bon:[],bp:0,tot:0}));
+  const res=S.teams.map(t=>{const done=t.missions.filter(m=>mDone(t,m)),miss=t.missions.filter(m=>!mDone(t,m));
+    return {id:t.id,rp:routePts(t),mp:done.reduce((s,m)=>s+m.v,0)-miss.reduce((s,m)=>s+m.v,0),coins:t.coins,net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,tips:t.tips||0,heist:t.heist||0,bon:[],bp:0,tot:0}});
   const award=(k,name,pts)=>{const mx=Math.max.apply(null,res.map(r=>r[k]));if(mx<=0)return;res.filter(r=>r[k]===mx).forEach(r=>{r.bon.push(name);r.bp+=pts})};
-  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);award('tips','Beste tippere',3);award('heist','Mesterbanditten',3);
-  res.forEach(r=>r.tot=r.rp+r.mp+r.cp+r.bp);res.sort((a,b)=>b.tot-a.tot);return res;
+  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);if(!LYN())award('tips','Beste tippere',3);award('heist','Mesterbanditten',3);
+  res.forEach(r=>r.tot=r.rp+r.mp+r.bp);res.sort((a,b)=>b.tot-a.tot||b.coins-a.coins);return res;
 }
 function awardTips(){const t=S.turn,win=[],teams={};
-  Object.keys(t.tips||{}).forEach(pid=>{const pl=PL(pid);if(pl&&t.tips[pid]===t.q.r){win.push(pid);pl.tips=(pl.tips||0)+1;teams[pl.team]=(teams[pl.team]||0)||1;if(ab(pid,'bookie'))teams[pl.team]=2}});
+  Object.keys(t.tips||{}).forEach(pid=>{const pl=PL(pid);if(pl&&t.tips[pid]===t.q.r){win.push(pid);pl.tips=(pl.tips||0)+1;teams[pl.team]=teams[pl.team]||1;if(ab(pid,'bookie'))teams[pl.team]=2}});
   Object.keys(teams).forEach(id=>{const tm=T(+id);if(tm){tm.coins+=teams[id];tm.tips=(tm.tips||0)+1}});t.tipWin=win;
   if(win.length)S.msg+=' Riktig tips: '+win.map(id=>PL(id).name).join(', ')+'.'}
 function resolveQ(i){const t=S.turn,tm=turnTeam();t.picked=i;const ok=i===t.q.r;t.hist.push(ok?1:0);t.n++;
@@ -367,12 +479,17 @@ function resolveDuel(){const d=S.duel,r=d.q.r,ca=d.ans[d.a]===r,cd=d.ans[d.d]===
   const A=T(d.ta),D=T(d.td);d.win=win;
   if(d.kind==='coins'){if(win){const w=win==='a'?A:D,l=win==='a'?D:A,amt=Math.min(d.stake,l.coins);l.coins-=amt;w.coins+=amt;d.amt=amt;if(win==='a')A.heist=(A.heist||0)+1;
       S.msg=w.name+' vant duellen og tok '+amt+' kr fra '+l.name+'.'}else S.msg='Uavgjort. Ingen penger skifter eier.'}
-  else{const e=d.e;if(win==='a'){S.own[e]=A.id;D.routes=D.routes.filter(x=>x!==e);A.routes.push(e);A.heist=(A.heist||0)+1;S.msg=A.name+' tok over ruta '+NODES[EDGES[e][0]][0]+'–'+NODES[EDGES[e][1]][0]+'.'}
+  else{const e=d.e;if(win==='a'){S.own[e]=A.id;D.routes=D.routes.filter(x=>x!==e);A.routes.push(e);A.heist=(A.heist||0)+1;S.msg=A.name+' tok over ruta '+rname(e)+'.'}
       else S.msg=D.name+' forsvarte ruta.'}
   S.phase='duelres';S.pn++}
+function ctx(p,cid){
+  if(S.phase==='act'){const t=S.turn;if(!owns(cid,t.pid))return null;return {pid:t.pid,tm:turnTeam(),st:t}}
+  if(S.phase==='lbuy'){const pl=PL(p.pid);if(!pl||!owns(cid,pl.id))return null;const tm=T(pl.team),st=S.lyn.tt[tm.id];if(!st||st.out||st.done)return null;return {pid:pl.id,tm,st}}
+  return null}
 const H={
   cfg(p,cid){if(cid!==S.host||S.phase!=='lobby')return;const c=S.cfg;
     if(p.k==='level'&&(p.v==='easy'||p.v==='hard'))c.level=p.v;
+    if(p.k==='mode'&&(p.v==='normal'||p.v==='lyn')){c.mode=p.v;c.rounds=p.v==='lyn'?6:4}
     if(p.k==='rounds'&&+p.v>=3&&+p.v<=15)c.rounds=+p.v;
     if(p.k==='map'&&MAPS[p.v])c.map=p.v;
     if(p.k==='teams'&&[0,2,3,4,5].includes(+p.v)){c.teams=+p.v;S.players.forEach((pl,i)=>{pl.team=c.teams?(i%c.teams)+1:0})}},
@@ -384,43 +501,51 @@ const H={
   delP(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;S.players=S.players.filter(x=>x.id!==p.id)},
   setTeam(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;const t=+p.team;if(t>=1&&t<=S.cfg.teams)PL(p.id).team=t},
   start(p,cid){if(cid!==S.host||S.phase!=='lobby'||!S.players.length)return;setMap(S.cfg.map);
-    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,tips:0,heist:0,pi:0});
+    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,tips:0,heist:0,pi:0,skip:0,inv:{pistol:0,vest:0,cop:0,dyn:0}});
     S.teams=[];S.players.forEach(pl=>pl.tips=0);
     if(!S.cfg.teams)S.players.forEach((pl,i)=>{pl.team=i+1;S.teams.push(mk(i+1,pl.name))});
     else Array.from(new Set(S.players.map(x=>x.team))).sort((a,b)=>a-b).forEach(t=>S.teams.push(mk(t,TEAM_NAMES[t-1])));
     S.teams.forEach(t=>{members(t.id).forEach(m=>{if(ab(m.id,'kjopmann'))t.coins+=3})});
     S.rounds=S.cfg.rounds;S.mgEvery=3;
     S.teams.forEach(t=>{for(let i=0;i<2;i++){const m=newMission(t);if(m)t.missions.push(m)}});
-    S.own=EDGES.map(()=>0);S.order=shuffle(S.teams.map(t=>t.id));S.ti=0;S.round=1;S.mgN=0;S.fin=0;
-    S.msg='Byen ligger åpen. Lykke til.';startTurn()},
+    S.own=EDGES.map(()=>0);S.round=1;S.mgN=0;S.fin=0;S.dice={r:{},tb:{},done:0};S.order=[];
+    S.msg='Kast terningen. Høyest sum starter.';S.phase='dice';S.pn++},
+  roll(p,cid){if(S.phase!=='dice'||S.dice.done)return;const tid=+p.tid;if(!T(tid)||S.dice.r[tid]||!ownsTeam(cid,tid))return;
+    S.dice.r[tid]=[1+rnd(6),1+rnd(6)];S.dice.tb[tid]=Math.random();if(S.teams.every(t=>S.dice.r[t.id]))diceDone()},
+  rollAll(p,cid){if(S.phase!=='dice'||S.dice.done||cid!==S.host)return;S.teams.forEach(t=>{if(!S.dice.r[t.id]){S.dice.r[t.id]=[1+rnd(6),1+rnd(6)];S.dice.tb[t.id]=Math.random()}});diceDone()},
+  diceGo(p,cid){if(S.phase!=='dice'||!S.dice.done||cid!==S.host)return;S.msg='';startRound()},
+  countDone(p,cid){if(S.phase!=='count'||cid!==S.host||+p.pn!==S.pn)return;if(S.after==='lq')newLq();else{S.phase='cat';S.pn++}},
   pickCat(p,cid){const t=S.turn;if(S.phase!=='cat'||!owns(cid,t.pid))return;const c=+p.cat;if(!t.cats.includes(c))return;
     t.cat=c;t.q=pickQ(c);t.tips={};t.tipWin=[];t.hide=[];t.picked=-2;S.phase='q';S.pn++;S.msg=''},
   answer(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid))return;const i=+p.i;if(!(i>=0&&i<4)||t.hide.includes(i))return;resolveQ(i)},
-  half(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid)||!ab(t.pid,'prof')||t.u5050)return;t.u5050=1;t.hide=shuffle([0,1,2,3].filter(i=>i!==t.q.r)).slice(0,2)},
+  half(p,cid){if(S.phase==='q'){const t=S.turn;if(!owns(cid,t.pid)||!ab(t.pid,'prof')||t.u5050)return;t.u5050=1;t.hide=shuffle([0,1,2,3].filter(i=>i!==t.q.r)).slice(0,2)}
+    else if(S.phase==='lq'){const pl=PL(p.pid);if(!pl||!owns(cid,pl.id))return;const st=S.lyn.tt[pl.team];if(!st||st.out||st.u5050||!teamHas(pl.team,'prof'))return;st.u5050=1;st.hideK=S.lyn.k;st.hide=shuffle([0,1,2,3].filter(i=>i!==S.lyn.q.r)).slice(0,2)}},
   swap(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid)||!ab(t.pid,'kort')||t.uSwap)return;t.uSwap=1;t.q=pickQ(t.cat);t.tips={};t.hide=[];S.pn++},
   tip(p,cid){const t=S.turn;if(S.phase!=='q'||S.mode!=='net')return;const i=+p.i;if(!(i>=0&&i<4))return;const at=PL(t.pid).team;
     S.players.forEach(pl=>{if(pl.owner===cid&&pl.team!==at&&t.tips[pl.id]==null)t.tips[pl.id]=i})},
-  timeout(p,cid){if(cid!==S.host||+p.pn!==S.pn)return;if(S.phase==='q')resolveQ(-1);else if(S.phase==='duel')resolveDuel()},
+  lyAns(p,cid){if(S.phase!=='lq')return;const tid=+p.tid,i=+p.i;if(!T(tid)||!ownsTeam(cid,tid)||!(i>=0&&i<4))return;const L=S.lyn,st=L.tt[tid];if(st.out)return;
+    if(st.hideK===L.k&&st.hide.includes(i))return;
+    if(L.ans[tid]!=null){if(L.ans[tid]===i||st.uSwap||!teamHas(tid,'kort'))return;st.uSwap=1}
+    L.ans[tid]=i;if(activeTeams().every(t=>L.ans[t.id]!=null))resolveLq()},
+  lqNext(p,cid){if(S.phase!=='lqres'||cid!==S.host)return;if(S.lyn.k>=4)toBuy();else newLq()},
+  timeout(p,cid){if(cid!==S.host||+p.pn!==S.pn)return;if(S.phase==='q')resolveQ(-1);else if(S.phase==='duel')resolveDuel();else if(S.phase==='lq')resolveLq();else if(S.phase==='lbuy')endRound()},
   next(p,cid){const t=S.turn;if(S.phase!=='qres'||!owns(cid,t.pid))return;S.msg='';
     if(t.n>=5){S.phase='act';S.msg=PL(t.pid).name+' fikk '+t.ok+' av 5 riktige.'}else{t.cats=newCats();S.phase='cat'}S.pn++},
-  buy(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.bought)return;const e=+p.e;if(!(e>=0&&e<EDGES.length)||S.own[e])return;
-    const tm=turnTeam(),len=EDGES[e][2],c=routeCost(e,t.pid);if(t.ok<REQ[len]||tm.coins<c)return;if(PAIR[e]>=0&&S.own[PAIR[e]]===tm.id)return;
-    const before=tm.missions.map(m=>mDone(tm,m));tm.coins-=c;S.own[e]=tm.id;tm.routes.push(e);t.bought=1;
-    S.msg=tm.name+' tok ruta '+NODES[EDGES[e][0]][0]+'–'+NODES[EDGES[e][1]][0]+'.';
-    if(tm.missions.some((m,i)=>!before[i]&&mDone(tm,m)))S.msg+=' Et oppdrag er fullført!'},
-  mission(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.gotM)return;const tm=turnTeam(),c=ab(t.pid,'avis')?1:2;if(tm.coins<c||tm.missions.length>=4)return;
-    const m=newMission(tm);if(!m)return;tm.coins-=c;tm.missions.push(m);t.gotM=1;S.msg=tm.name+' tok et nytt oppdrag.'},
-  bagOpen(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.ok<3||t.bag.pool)return;const tm=turnTeam();
-    const pool=[1,1,1,1,2,2,2,4,0,0,0,0];tm.routes.forEach(()=>pool.push(2));t.bag={pool:shuffle(pool),drawn:[],bust:0,done:0,lim:S.cfg.level==='easy'?3:2}},
-  bagDraw(p,cid){const t=S.turn,b=t.bag;if(S.phase!=='act'||!owns(cid,t.pid)||!b.pool||b.done||!b.pool.length)return;
-    b.drawn.push(b.pool.pop());if(b.drawn.filter(x=>x===0).length>=b.lim){b.bust=1;b.done=1;S.msg='Razzia! Politiet tok hele lasten.'}
-    else if(!b.pool.length)H.bagStop(p,cid)},
-  bagStop(p,cid){const t=S.turn,b=t.bag;if(S.phase!=='act'||!owns(cid,t.pid)||!b.pool||b.done)return;const sum=b.drawn.reduce((s,x)=>s+x,0);
-    const tm=turnTeam();tm.coins+=sum;tm.bag+=sum;b.done=1;S.msg=tm.name+' smuglet varer for '+sum+' kr.'},
-  rob(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.shady)return;const tm=turnTeam(),vt=T(+p.tid);if(!vt||vt===tm||vt.coins<1)return;
-    t.shady=1;const ok=Math.random()<0.5;
-    if(ok){const amt=Math.min(3,vt.coins);vt.coins-=amt;tm.coins+=amt;tm.heist=(tm.heist||0)+1;t.rob={tid:vt.id,ok:1,amt};S.msg='Ranet lyktes! '+tm.name+' stakk av med '+amt+' kr fra '+vt.name+'.'}
-    else{const amt=Math.min(ab(t.pid,'smugler')?1:2,tm.coins);tm.coins-=amt;vt.coins+=amt;t.rob={tid:vt.id,ok:0,amt};S.msg='Tatt på fersk gjerning! '+tm.name+' betaler '+amt+' kr i bot til '+vt.name+'.'}},
+  buy(p,cid){const c=ctx(p,cid);if(!c||c.st.bought)return;const e=+p.e;if(!(e>=0&&e<EDGES.length)||S.own[e])return;
+    const tm=c.tm,len=EDGES[e][2],cost=routeCost(e,c.pid);if(c.st.ok<REQ[len]||tm.coins<cost)return;if(PAIR[e]>=0&&S.own[PAIR[e]]===tm.id)return;
+    const before=tm.missions.map(m=>mDone(tm,m));tm.coins-=cost;S.own[e]=tm.id;tm.routes.push(e);c.st.bought=1;if(LYN()&&teamHas(tm.id,'smed'))tm.coins+=1;
+    S.msg=tm.name+' tok ruta '+rname(e)+'.';if(tm.missions.some((m,i)=>!before[i]&&mDone(tm,m)))S.msg+=' Et oppdrag er fullført!'},
+  mission(p,cid){const c=ctx(p,cid);if(!c||c.st.gotM)return;const tm=c.tm,cost=ab(c.pid,'avis')?1:2;if(tm.coins<cost||tm.missions.length>=4)return;
+    const m=newMission(tm);if(!m)return;tm.coins-=cost;tm.missions.push(m);c.st.gotM=1},
+  shop(p,cid){const c=ctx(p,cid);if(!c)return;const it=ITEMS[p.item];if(!it||c.tm.coins<it.price)return;c.tm.coins-=it.price;c.tm.inv[p.item]++},
+  rob(p,cid){const c=ctx(p,cid);if(!c||c.st.shady)return;const tm=c.tm,vt=T(+p.tid);if(!vt||vt===tm||vt.coins<1)return;
+    c.st.shady=1;const gun=!!p.gun&&tm.inv.pistol>0;if(gun)tm.inv.pistol--;
+    if(vt.inv.vest>0){vt.inv.vest--;c.st.rob={tid:vt.id,ok:0,amt:0,vest:1,gun};S.msg=tm.name+' prøvde å rane '+vt.name+', men ble stoppet av en skuddsikker vest.';return}
+    const chance=gun?1:(LYN()&&ab(c.pid,'bokser')?2/3:.5);
+    if(Math.random()<chance){const amt=Math.min(3,vt.coins);vt.coins-=amt;tm.coins+=amt;tm.heist=(tm.heist||0)+1;c.st.rob={tid:vt.id,ok:1,amt,gun};S.msg='Ranet lyktes! '+tm.name+' stakk av med '+amt+' kr fra '+vt.name+'.'}
+    else{const amt=Math.min(ab(c.pid,'smugler')?1:2,tm.coins);tm.coins-=amt;vt.coins+=amt;c.st.rob={tid:vt.id,ok:0,amt};S.msg='Tatt på fersk gjerning! '+tm.name+' betaler '+amt+' kr i bot til '+vt.name+'.'}},
+  dyn(p,cid){const c=ctx(p,cid);if(!c)return;const e=+p.e,tm=c.tm;if(!(e>=0&&e<EDGES.length))return;const ow=S.own[e];if(!ow||ow===tm.id||tm.inv.dyn<1)return;
+    const vt=T(ow);tm.inv.dyn--;S.own[e]=0;vt.routes=vt.routes.filter(x=>x!==e);tm.heist=(tm.heist||0)+1;S.msg='BOM! '+tm.name+' sprengte ruta '+rname(e)+' til '+vt.name+'.'},
   duel(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.shady)return;const tm=turnTeam(),vt=T(+p.tid);if(!vt||vt===tm)return;
     const stake=Math.min(3,tm.coins,vt.coins);if(stake<1)return;t.shady=1;
     S.duel={kind:'coins',a:t.pid,d:defender(vt.id),ta:tm.id,td:vt.id,stake,e:-1,q:pickQ(rnd(6)),ans:{},win:null};S.phase='duel';S.pn++;S.msg=''},
@@ -432,19 +557,32 @@ const H={
   duelAns(p,cid){const d=S.duel;if(S.phase!=='duel')return;const pid=p.pid,i=+p.i;if((pid!==d.a&&pid!==d.d)||!owns(cid,pid)||d.ans[pid]!=null||!(i>=0&&i<4))return;
     d.ans[pid]=i;if(d.ans[d.a]!=null&&d.ans[d.d]!=null)resolveDuel()},
   duelNext(p,cid){if(S.phase!=='duelres'||!owns(cid,S.turn.pid))return;S.phase='act';S.pn++},
-  endTurn(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid))return;if(t.bag.pool&&!t.bag.done)return;
-    S.msg='';S.ti++;if(S.ti<S.order.length){startTurn();return}
-    S.ti=0;if(S.round>=S.rounds){S.phase='final';S.fin=0;S.pn++;return}
-    if(S.round%S.mgEvery===0){startMg();return}
-    S.round++;startTurn()},
-  mgScore(p,cid){const g=S.mg;if(S.phase!=='mg'||!owns(cid,p.pid)||g.sc[p.pid]!=null)return;let v=+p.v;if(!(v>=0))v=0;g.sc[p.pid]=Math.min(v,9999);
+  endTurn(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid))return;S.msg='';S.ti++;startTurn()},
+  lyDone(p,cid){if(S.phase!=='lbuy')return;const tid=+p.tid;const st=S.lyn.tt[tid];if(!st||!ownsTeam(cid,tid))return;st.done=1;if(S.teams.every(t=>S.lyn.tt[t.id].done))endRound()},
+  lyEnd(p,cid){if(S.phase!=='lbuy'||cid!==S.host)return;endRound()},
+  bagDraw(p,cid){if(S.phase!=='bag')return;const tid=+p.tid,b=S.bags[tid],t=T(tid);if(!b||b.done||!ownsTeam(cid,tid)||!b.pool.length)return;
+    const c=b.pool.slice(-1);b.pool=b.pool.slice(0,-1);b.drawn.push(c);const idx=b.drawn.length-1;const lim=S.cfg.level==='easy'?3:2;
+    if(c==='X'&&b.arm>0){b.arm--;b.xs.push(idx)}
+    if(c==='C'){const j=b.drawn.findIndex((x,k)=>x==='X'&&!b.xs.includes(k));if(j>=0)b.xs.push(j);else b.arm++}
+    if(c==='K'){bagBank(t,b);b.kid=1;t.skip=1}
+    else if(b.drawn.filter((x,k)=>x==='X'&&!b.xs.includes(k)).length>=lim){b.bust=1;b.done=1}
+    else if(!b.pool.length)bagBank(t,b);
+    bagCheckAll()},
+  bagCop(p,cid){if(S.phase!=='bag')return;const tid=+p.tid,b=S.bags[tid],t=T(tid);if(!b||b.done||!ownsTeam(cid,tid)||t.inv.cop<1)return;
+    const j=b.drawn.findIndex((x,k)=>x==='X'&&!b.xs.includes(k));if(j<0)return;t.inv.cop--;b.xs.push(j)},
+  bagStop(p,cid){if(S.phase!=='bag')return;const tid=+p.tid,b=S.bags[tid];if(!b||b.done||!ownsTeam(cid,tid))return;bagBank(T(tid),b);bagCheckAll()},
+  bagSkip(p,cid){if(S.phase!=='bag'||cid!==S.host)return;S.teams.forEach(t=>{const b=S.bags[t.id];if(!b.done)bagBank(t,b)});bagCheckAll()},
+  bagGo(p,cid){if(S.phase!=='bag'||!S.bagAll||cid!==S.host)return;bagEnd()},
+  mgScore(p,cid){const g=S.mg;if(S.phase!=='mg'||!owns(cid,p.pid)||g.sc[p.pid]!=null)return;let v=+p.v;if(!(v>=0))v=0;g.sc[p.pid]=Math.min(v,99999);
     if(S.players.every(x=>g.sc[x.id]!=null))mgFinish()},
   mgSkip(p,cid){if(S.phase!=='mg'||cid!==S.host)return;mgFinish()},
-  mgNext(p,cid){if(S.phase!=='mgres')return;S.round++;startTurn()},
-  finNext(p,cid){if(S.phase!=='final'||S.fin>=4)return;S.fin++},
-  again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.duel={};S.mg={};S.msg='';S.pn++},
+  mgNext(p,cid){if(S.phase!=='mgres')return;S.round++;startRound()},
+  finNext(p,cid){if(S.phase!=='final'||S.fin>=3)return;S.fin++},
+  again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.duel={};S.mg={};S.lyn={};S.bags={};S.msg='';S.pn++},
   takeover(p,cid){if(cid!==S.host)return;const ids=S.phase==='duel'?[S.duel.a,S.duel.d]:[S.turn.pid];ids.forEach(id=>{const pl=PL(id);if(pl)pl.owner=S.host})}
 };
+function diceDone(){const D=S.dice;D.done=1;S.order=S.teams.map(t=>t.id).sort((a,b)=>(D.r[b][0]+D.r[b][1])-(D.r[a][0]+D.r[a][1])||D.tb[b]-D.tb[a]);
+  S.msg=T(S.order[0]).name+' starter.';S.pn++}
 function apply(a,cid){try{if(!S)return;setMap(S.cfg.map);const h=H[a&&a.t];if(h)h(a.p||{},cid)}catch(e){console.error(e)}}
 
 /* ---------- lagring og nett (PeerJS, direkte mellom enheter) ---------- */
@@ -514,19 +652,28 @@ function act(t,p){
   if(role==='guest'){sendAct(t,p);ui.pending=true;const k=++pendTok;setTimeout(()=>{if(k===pendTok&&ui.pending){ui.pending=false;render()}},4000);render()}
   else{apply({t,p:p||{}},CID);commit()}
 }
-const qDur=()=>{const b=S.cfg.level==='easy'?40:30;if(S.phase==='duel'){const d=S.duel;return (PL(d.a)&&PL(d.d)&&PL(d.a).owner===PL(d.d).owner)?b*2:b}return b};
+const qDur=()=>{const b=S.cfg.level==='easy'?40:30;if(S.phase==='duel'){const d=S.duel;return (PL(d.a)&&PL(d.d)&&PL(d.a).owner===PL(d.d).owner)?b*2:b}if(S.phase==='lq'&&S.mode!=='net')return b+5*S.teams.length;return b};
+function hostTimer(){
+  if(!isHost()||ui.timerPn===S.pn)return;ui.timerPn=S.pn;clearTimeout(timer);const pn=S.pn,slack=role==='host'?1500:0;let ms=0,t=null;
+  const ph=S.phase;
+  if(ph==='count'){ms=3200;t='countDone'}
+  else if(ph==='q'||ph==='duel'||ph==='lq'){ms=qDur()*1000+slack;t='timeout'}
+  else if(ph==='lqres'){ms=3500;t='lqNext'}
+  else if(ph==='lbuy'){ms=120000+slack;t='timeout'}
+  else if(ph==='dice'&&S.dice.done){ms=3500;t='diceGo'}
+  else if(ph==='bag'&&S.bagAll){ms=4000;t='bagGo'}
+  if(t)timer=setTimeout(()=>{if(S&&S.pn===pn&&isHost()){apply({t,p:{pn}},CID);commit()}},ms);
+}
 function onState(){
   setMap(S.cfg.map);
-  if(S.pn!==ui.pn){ui.pn=S.pn;ui.pnAt=Date.now();ui.cat=null;ui.sel=null;ui.menu=false;ui.shady=false;if(role==='local')ui.showM=false;if(S.phase!=='mg')ui.mg=null}
-  if(isHost()&&(S.phase==='q'||S.phase==='duel')&&ui.timerPn!==S.pn){ui.timerPn=S.pn;clearTimeout(timer);const pn=S.pn;
-    timer=setTimeout(()=>{if(S&&S.pn===pn&&isHost()){apply({t:'timeout',p:{pn}},CID);commit()}},qDur()*1000+(role==='host'?1500:0))}
-  render();
+  if(S.pn!==ui.pn){ui.pn=S.pn;ui.pnAt=Date.now();ui.cat=null;ui.sel=null;ui.menu=false;ui.shady=false;ui.shop=false;ui.gun=false;if(role==='local')ui.showM=false;if(S.phase!=='mg')ui.mg=null}
+  hostTimer();render();
 }
 
 /* ---------- visning ---------- */
 function render(){
   document.body.classList.toggle('big',!!(ui.big&&S&&role==='host'));keepAwake();
-  if(S)setMap(S.cfg.map);
+  if(S)setMap(S.cfg.map);GID=0;
   const app=$('#app');const ae=document.activeElement,fid=ae&&ae.id,pos=ae&&ae.selectionStart;
   app.innerHTML=!S?homeHTML():S.phase==='lobby'?lobbyHTML():gameHTML();
   if(fid){const el=document.getElementById(fid);if(el&&el.tagName==='INPUT'){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
@@ -535,95 +682,102 @@ function banner(){return (ui.net?'<div class="banner" role="alert">'+esc(ui.net)
 function homeHTML(){
   const sl=LS.get('sot.local'),sn=LS.get('sot.net');const netOk=NET_OK();
   const netNote=netOk?'':'Nettverksdelen lastet ikke. Sjekk nettet og last siden på nytt.';
-  return '<div class="home">'+banner()+'<h1>Sotbyen</h1><p class="smoke">Året er 1922. Røyken ligger tung over byen, og gatene skal fordeles. Den som vet mest, tar mest.</p>'
+  return '<div class="home">'+banner()+'<h1>Sotbyen</h1><p class="tag">Birmingham-røyk, 1922. Gatene skal fordeles. Den som vet mest, tar mest.</p>'
   +(ui.busy?'<p>'+esc(ui.busy)+'</p>':'')
   +'<div class="stack">'
   +(sl&&sl.v===VERSION&&sl.phase&&sl.phase!=='lobby'?'<button class="choice" data-a="resumeLocal"><b>Fortsett spillet på denne enheten</b><span>Runde '+sl.round+' av '+sl.rounds+'</span></button>':'')
   +(sn&&netOk?'<button class="choice" data-a="resumeNet"><b>Tilbake til spill '+esc(sn.code)+'</b><span>'+(sn.role==='host'?'Du er vert':'Du er med som spiller')+'</span></button>':'')
-  +'<button class="choice" data-a="newBig" '+(netOk?'':'disabled')+'><b>Storskjerm som spillbrett</b><span>'+(netNote||'Denne skjermen viser kart, spørsmål og poeng. Alle spiller, følger med og tipper fra egen telefon.')+'</span></button>'
+  +'<button class="choice" data-a="newBig" '+(netOk?'':'disabled')+'><b>Storskjerm som spillbrett</b><span>'+(netNote||'Denne skjermen viser kart, spørsmål og poeng. Alle spiller fra egen telefon.')+'</span></button>'
   +'<button class="choice" data-a="newHost" '+(netOk?'':'disabled')+'><b>Mobil mot mobil</b><span>'+(netNote||'Denne telefonen blir vert og spiller selv. De andre blir med med en kode.')+'</span></button>'
-  +'<button class="choice" data-a="newLocal"><b>Spill på denne enheten</b><span>Send telefonen rundt, eller vis spillet på en skjerm uten egne telefoner.</span></button>'
+  +'<button class="choice" data-a="newLocal"><b>Spill på denne enheten</b><span>Send telefonen rundt, eller spill på én skjerm.</span></button>'
   +'<div class="card"><h3>Bli med i et spill</h3><div class="row"><input type="text" id="code" inputmode="text" autocapitalize="characters" autocomplete="off" maxlength="4" placeholder="Kode på fire bokstaver" value="'+esc(ui.codeDraft)+'" aria-label="Spillkode"><button class="btn" data-a="join" '+(netOk?'':'disabled')+'>Bli med</button></div>'
   +(netNote?'<p class="small muted">'+netNote+'</p>':'')+'</div>'
   +'</div><details><summary>Slik spiller dere</summary><ol>'
-  +'<li>Hver tur består av fem spørsmål. Du velger kategori før hvert spørsmål, og hvert riktige svar gir 1 kr. Fem av fem gir 2 kr ekstra.</li>'
-  +'<li>Etter spørsmålene kan du kjøpe én rute. Ruta krever like mange riktige svar som lengden sin (1–4), og koster lengden pluss én krone. Lange ruter gir mest poeng.</li>'
-  +'<li>Hvert lag har hemmelige oppdrag: knytt to steder sammen med egne ruter. Noen strekninger har doble spor, slik at to lag kan eie hvert sitt.</li>'
-  +'<li>Én gang per tur kan du gjøre noe lyssky: utfordre et lag til duell om kroner, rane dem, eller utfordre dem om en rute.</li>'
-  +'<li>Med egne telefoner kan alle på de andre lagene tippe hvert spørsmål. Riktig tips gir laget 1 kr.</li>'
-  +'<li>Hver tredje runde møtes alle i et minispill. Til slutt telles ruter, oppdrag, kroner og bonuspriser.</li></ol></details></div>';
+  +'<li>Terningkast avgjør hvem som starter.</li>'
+  +'<li><b>Vanlig modus:</b> hver tur har fem spørsmål. Du velger kategori før hvert, og de andre tipper for bonus. <b>Lynmodus:</b> alle lag svarer på de samme fem spørsmålene samtidig, og handler samtidig etterpå.</li>'
+  +'<li>Hvert riktige svar gir 1 kr. En rute krever like mange riktige som lengden sin (1–5), og koster lengden pluss 1 kr.</li>'
+  +'<li>I butikken kan du kjøpe pistol, skuddsikker vest, korrupt politi og dynamitt. Bare du ser butikken og det du eier.</li>'
+  +'<li>Én gang per tur kan du gjøre noe lyssky: ran, duell om kroner eller utfordring om en rute. Lynmodus har bare ran.</li>'
+  +'<li>På slutten av hver runde trekker alle fra smuglerposen samtidig: kroner, gjenstander, politi og mafiabossen.</li>'
+  +'<li>Til slutt teller ruter, oppdrag og bonuser. Uløste oppdrag gir minuspoeng. Kroner teller ikke, men avgjør uavgjort.</li></ol></details></div>';
 }
 function seg(k,cur,opts,dis){return '<div class="seg" role="group">'+opts.map(o=>'<button data-a="cfg" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(cur)===String(o[0]))+'" '+(dis?'disabled':'')+'>'+o[1]+'</button>').join('')+'</div>'}
 function charGrid(forPid){const free=freeChars(forPid);const cur=forPid?PL(forPid).ch:ui.char;
-  let s='<div class="chars" role="group" aria-label="Velg figur">'+CHARS.map((c,i)=>'<button class="charb" data-a="'+(forPid?'setChar':'pickChar')+'" data-c="'+i+'" aria-pressed="'+(cur===i)+'" '+(free.includes(i)?'':'disabled')+'>'+portrait(i,52)+'<span>'+c.n+'</span></button>').join('')+'</div>';
+  let s='<div class="chars" role="group" aria-label="Velg figur">'+CHARS.map((c,i)=>'<button class="charb" data-a="'+(forPid?'setChar':'pickChar')+'" data-c="'+i+'" aria-pressed="'+(cur===i)+'" '+(free.includes(i)?'':'disabled')+'>'+portrait(i,56)+'<span>'+c.n+'</span></button>').join('')+'</div>';
   const show=cur!=null&&CHARS[cur]?cur:null;
-  return s+'<div class="ability">'+(show!=null?'<b>'+CHARS[show].n+':</b> '+CHARS[show].a:'Velg en figur. Hver figur har en liten evne.')+'</div>';
+  return s+'<div class="ability">'+(show!=null?'<b>'+CHARS[show].n+':</b> '+abText(show,S.cfg.mode):'Velg en figur. Hver figur har en liten evne.')+'</div>';
 }
 function lobbyHTML(){
   const c=S.cfg,h=isHost(),net=S.mode==='net';const n=teamCount();
-  let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><button class="btn ghost" data-a="quit">Forlat</button></div>';
+  let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><button class="btn ghost sm" data-a="quit">Forlat</button></div>';
   if(net){const link=location.href.split('#')[0]+'#'+S.code;let qr='';try{if(typeof window.qrcode==='function'){const q=window.qrcode(0,'M');q.addData(link);q.make();qr=q.createSvgTag({cellSize:4,margin:2,scalable:true})}}catch(e){}
-    s+='<div class="card row" style="margin-bottom:12px;align-items:center;gap:16px">'+(qr?'<div class="qr" aria-label="QR-kode for å bli med">'+qr+'</div>':'')+'<div style="flex:1;min-width:200px"><div class="small muted">Spillkode</div><div class="code">'+esc(S.code)+'</div><p class="small">Skann koden med telefonen, eller åpne '+esc(link.split('#')[0])+' og skriv inn koden.</p>'+(role==='guest'?'':'<p class="small muted">Hold denne skjermen åpen gjennom hele spillet. Den styrer spillet.</p>')+'</div></div>'}
+    s+='<div class="card row" style="margin-bottom:12px;align-items:center;gap:18px">'+(qr?'<div class="qr" aria-label="QR-kode for å bli med">'+qr+'</div>':'')+'<div style="flex:1;min-width:200px"><div class="small muted">Spillkode</div><div class="code">'+esc(S.code)+'</div><p class="small">Skann koden, eller åpne '+esc(link.split('#')[0])+' og skriv inn koden.</p>'+(role==='guest'?'':'<p class="small muted">Hold denne skjermen åpen hele spillet. Den styrer spillet.</p>')+'</div></div>'}
   s+='<div class="game"><div class="card"><h2>Oppsett</h2>';
   if(!h)s+='<p class="small muted">Verten velger oppsettet.</p>';
-  s+='<div class="field"><div class="lab">Nivå</div>'+seg('level',c.level,[['easy','Barn (lett)'],['hard','Voksen (vanskelig)']],!h)+'</div>'
-   +'<div class="field"><label for="rounds">Antall runder</label><select id="rounds" data-ch="rounds" '+(h?'':'disabled')+'>'+Array.from({length:13},(_,i)=>i+3).map(r=>'<option value="'+r+'" '+(r===c.rounds?'selected':'')+'>'+r+' runder (ca. '+est(r,n)+' min)</option>').join('')+'</select><div class="small muted">Tiden er beregnet for '+n+' '+(c.teams?'lag':(n===1?'spiller':'spillere'))+', og endrer seg når flere blir med.</div></div>'
-   +'<div class="field"><div class="lab">Lag</div>'+seg('teams',c.teams,[[0,'Alle mot alle'],[2,'2 lag'],[3,'3 lag'],[4,'4 lag'],[5,'5 lag']],!h)+'<div class="small muted">Lagene kan være ulike store.</div></div>'
-   +'<div class="field"><div class="lab">Kart</div>'+seg('map',c.map,Object.keys(MAPINFO).map(k=>[k,MAPINFO[k].name]),!h)+'<div class="small muted">'+MAPINFO[c.map].desc+'</div></div>'
-   +'<div class="mapwrap mini">'+mapSVG(null)+'</div>'
-   +(h&&ui.big?'<button class="btn ghost wide" style="margin-top:12px" data-a="fs">Fullskjerm</button>':'')
+  s+='<div class="field"><div class="lab">Modus</div>'+seg('mode',c.mode,[['normal','Vanlig (tur for tur)'],['lyn','Lyn (alle samtidig)']],!h)+'<div class="small muted">'+(c.mode==='lyn'?'Alle lag svarer på de samme spørsmålene og handler samtidig. Spilletiden er nesten den samme uansett antall spillere.':'Én spiller har tur om gangen, og de andre tipper svarene.')+'</div></div>'
+   +'<div class="field"><div class="lab">Nivå</div>'+seg('level',c.level,[['easy','Barn (lett)'],['hard','Voksen (vanskelig)']],!h)+'</div>'
+   +'<div class="field"><label for="rounds">Antall runder</label><select id="rounds" data-ch="rounds" '+(h?'':'disabled')+'>'+Array.from({length:13},(_,i)=>i+3).map(r=>'<option value="'+r+'" '+(r===c.rounds?'selected':'')+'>'+r+' runder (ca. '+est(r,n,c.mode)+' min)</option>').join('')+'</select><div class="small muted">Beregnet for '+n+' '+(c.teams?'lag':(n===1?'spiller':'spillere'))+'.</div></div>'
+   +'<div class="field"><div class="lab">Lag</div>'+seg('teams',c.teams,[[0,'Alle mot alle'],[2,'2 lag'],[3,'3 lag'],[4,'4 lag'],[5,'5 lag']],!h)+'</div>'
+   +'<div class="field"><div class="lab">Kart</div>'+seg('map',c.map,Object.keys(MAPINFO).map(k=>[k,MAPINFO[k].name]),!h)+'<div class="small muted">'+MAPINFO[c.map].desc+'</div><div class="mapwrap mini">'+mapSVG(null)+'</div></div>'
+   +(h&&ui.big?'<button class="btn ghost wide" data-a="fs">Fullskjerm</button>':'')
    +'</div>';
   s+='<div class="card"><h2>Spillere</h2>';
-  if(!S.players.length)s+='<p class="muted">Ingen har satt seg ved bordet ennå. Legg til den første spilleren.</p>';
+  if(!S.players.length)s+='<p class="muted">Ingen har satt seg ved bordet ennå.</p>';
   S.players.forEach(p=>{const can=p.owner===CID||h;
-    s+='<div class="prow">'+portrait(p.ch,40)+'<span class="nm">'+(c.teams?'<span class="dot" style="background:'+COLORS[(p.team-1)%10]+'"></span> ':'')+esc(p.name)+' <span class="small muted">'+CHARS[p.ch].n+'</span>'+(net&&p.owner===CID?' <span class="small muted">(denne enheten)</span>':'')+'</span>'
-     +(c.teams?(can?'<select data-ch="team" data-id="'+p.id+'" aria-label="Lag for '+esc(p.name)+'">'+Array.from({length:c.teams},(_,i)=>'<option value="'+(i+1)+'" '+(p.team===i+1?'selected':'')+'>'+TEAM_NAMES[i]+'</option>').join('')+'</select>':'<span class="small">'+TEAM_NAMES[p.team-1]+'</span>'):'')
+    s+='<div class="prow">'+portrait(p.ch,42)+'<span class="nm">'+(c.teams?'<span class="dot" style="background:'+COLORS[(p.team-1)%10]+'"></span> ':'')+esc(p.name)+' <span class="small muted">'+CHARS[p.ch].n+'</span>'+(net&&p.owner===CID?' <span class="small muted">(denne enheten)</span>':'')+'</span>'
+     +(c.teams?(can?'<select style="width:auto" data-ch="team" data-id="'+p.id+'" aria-label="Lag for '+esc(p.name)+'">'+Array.from({length:c.teams},(_,i)=>'<option value="'+(i+1)+'" '+(p.team===i+1?'selected':'')+'>'+TEAM_NAMES[i]+'</option>').join('')+'</select>':'<span class="small">'+TEAM_NAMES[p.team-1]+'</span>'):'')
      +(can?'<button class="x" data-a="chFor" data-id="'+p.id+'" aria-label="Bytt figur for '+esc(p.name)+'" title="Bytt figur">↻</button><button class="x" data-a="delP" data-id="'+p.id+'" aria-label="Fjern '+esc(p.name)+'">×</button>':'')+'</div>'});
-  if(ui.chFor&&PL(ui.chFor))s+='<div class="card" style="margin-top:12px"><h3>Ny figur for '+esc(PL(ui.chFor).name)+'</h3>'+charGrid(ui.chFor)+'<button class="btn ghost" data-a="chDone">Ferdig</button></div>';
-  else if(S.players.length<10){s+='<div style="margin-top:14px"><h3>Ny spiller</h3>'+charGrid(null)+'<div class="row" style="margin-top:8px"><input type="text" id="pname" maxlength="16" placeholder="'+(ui.big&&role==='host'?'Navn (spiller uten telefon)':'Navn')+'" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til spiller</button></div></div>'}
+  if(ui.chFor&&PL(ui.chFor))s+='<div style="margin-top:12px"><h3>Ny figur for '+esc(PL(ui.chFor).name)+'</h3>'+charGrid(ui.chFor)+'<button class="btn ghost sm" data-a="chDone">Ferdig</button></div>';
+  else if(S.players.length<10){s+='<div style="margin-top:14px"><h3>Ny spiller</h3>'+charGrid(null)+'<div class="row" style="margin-top:8px"><input type="text" id="pname" maxlength="16" placeholder="'+(ui.big&&role==='host'?'Navn (spiller uten telefon)':'Navn')+'" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til</button></div></div>'}
   else s+='<p class="small muted">Bordet er fullt: ti spillere.</p>';
   if(h)s+='<button class="btn wide" style="margin-top:16px" data-a="start" '+(S.players.length?'':'disabled')+'>Start spillet</button>';
   else s+='<p class="muted" style="margin-top:14px">Venter på at verten starter spillet.</p>';
   return s+'</div></div>';
 }
-function mapSVG(mt){
-  const t=S.turn||{},act=S.phase==='act'&&mine(t.pid)&&!t.bought,own=S.own&&S.own.length===EDGES.length?S.own:EDGES.map(()=>0);
-  const myTeam=act?PL(t.pid).team:0;
+function mapSVG(mt,ctxTeam,canAct,stt){
+  const own=S.own&&S.own.length===EDGES.length?S.own:EDGES.map(()=>0);
   const goals={};if(ui.showM&&mt)mt.missions.forEach(m=>{goals[m.a]=1;goals[m.b]=1});
-  let s='<svg viewBox="0 0 800 750" class="mapsvg" role="img" aria-label="Kart over '+MAPINFO[MAPID].name+'">'+MAPINFO[MAPID].deco;
-  EDGES.forEach((e,i)=>{const A=NODES[e[0]],B=NODES[e[1]];let ax=A[1],ay=A[2],bx=B[1],by=B[2];const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
-    if(PAIR[i]>=0){const sg=i<PAIR[i]?-1:1,o=10*sg;ax+=-uy*o;ay+=ux*o;bx+=-uy*o;by+=ux*o}
-    const pad=24,gap=7,len=e[2],tot=L-2*pad,sl=(tot-gap*(len-1))/len,ow=own[i],col=ow&&T(ow)?T(ow).color:null;
-    const clickable=act&&(!ow||(ow!==myTeam&&!t.shady))&&!(PAIR[i]>=0&&own[PAIR[i]]===myTeam);
+  let s='<svg viewBox="0 0 840 790" class="mapsvg" role="img" aria-label="Kart over '+MAPINFO[MAPID].name+'"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".025"/></pattern></defs><rect width="840" height="790" fill="url(#grid)"/>'+MAPINFO[MAPID].deco;
+  EDGES.forEach((e,i)=>{const g=GEO[i],len=e[2],pad=24,gap=7,tot=g.L-2*pad,sl=(tot-gap*(len-1))/len,ow=own[i],col=ow&&T(ow)?T(ow).color:null;
+    let clickable=false;
+    if(canAct&&ctxTeam&&!(PAIR[i]>=0&&own[PAIR[i]]===ctxTeam.id)){if(!ow)clickable=!stt.bought;else if(ow!==ctxTeam.id)clickable=(!LYN()&&!stt.shady&&!stt.bought)||ctxTeam.inv.dyn>0}
     s+='<g class="rt'+(ui.sel===i?' sel':'')+'"'+(clickable?' data-a="sel" data-e="'+i+'"':'')+'>';
-    for(let k=0;k<len;k++){const a=pad+k*(sl+gap),b=a+sl;const c='x1="'+(ax+ux*a).toFixed(1)+'" y1="'+(ay+uy*a).toFixed(1)+'" x2="'+(ax+ux*b).toFixed(1)+'" y2="'+(ay+uy*b).toFixed(1)+'"';
-      s+=col?'<line class="segb" '+c+'/><line class="segc" stroke="'+col+'" '+c+'/>':'<line class="seg0" '+c+'/>'}
-    if(clickable)s+='<line class="hit" style="stroke-width:'+(PAIR[i]>=0?20:46)+'px" x1="'+ax.toFixed(1)+'" y1="'+ay.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'"/>';
+    for(let k=0;k<len;k++){const a=pad+k*(sl+gap),b=a+sl;const pts='points="'+polySub(g,a,b)+'"';
+      s+=col?'<polyline class="segb" fill="none" '+pts+'/><polyline class="segc" fill="none" stroke="'+col+'" '+pts+'/>':'<polyline class="seg0" fill="none" '+pts+'/>'}
+    if(clickable)s+='<polyline class="hit" style="stroke-width:'+(PAIR[i]>=0?20:46)+'px" points="'+polySub(g,0,g.L)+'"/>';
     s+='</g>'});
-  NODES.forEach((n,i)=>{s+='<circle class="nd'+(goals[i]?' goal':'')+'" cx="'+n[1]+'" cy="'+n[2]+'" r="15"/><text class="nl" x="'+n[1]+'" y="'+(n[2]+42)+'">'+n[0]+'</text>'});
+  NODES.forEach((n,i)=>{const lp=n[3]||0,lx=lp===2?n[1]-24:lp===3?n[1]+24:n[1],ly=lp===1?n[2]-26:lp>=2?n[2]+8:n[2]+44,an=lp===2?'end':lp===3?'start':'middle';
+    s+='<circle class="nd'+(goals[i]?' goal':'')+'" cx="'+n[1]+'" cy="'+n[2]+'" r="15"/><circle cx="'+n[1]+'" cy="'+n[2]+'" r="5" fill="#c8873a"/><text class="nl" text-anchor="'+an+'" x="'+lx+'" y="'+ly+'">'+n[0]+'</text>'});
   return s+'</svg>';
 }
-function missionTeam(){const t=S.turn;if(t&&t.pid&&['cat','q','qres','act','duel','duelres'].includes(S.phase)&&mine(t.pid))return turnTeam();
-  const mt=Array.from(new Set(S.players.filter(p=>p.owner===CID).map(p=>p.team)));return mt.length===1?T(mt[0]):null}
+function missionTeam(){const t=S.turn;if(!LYN()&&t&&t.pid&&['count','cat','q','qres','act','duel','duelres'].includes(S.phase)&&mine(t.pid))return turnTeam();
+  const mt=myTeams();if(mt.length===1)return mt[0];if(mt.length>1&&ui.lt&&T(ui.lt))return T(ui.lt);return null}
 function missionsHTML(mt){if(!mt)return '';
-  return '<div class="card" style="margin-top:10px"><h3>Hemmelige oppdrag for '+tname(mt)+'</h3>'+mt.missions.map(m=>'<div>'+(mDone(mt,m)?'✓ ':'')+NODES[m.a][0]+' til '+NODES[m.b][0]+' <span class="muted">('+m.v+' poeng)</span></div>').join('')+'</div>'}
+  return '<div class="card" style="margin-top:10px"><h3>Hemmelige oppdrag for '+tname(mt)+'</h3>'+mt.missions.map(m=>'<div>'+(mDone(mt,m)?'✓ ':'○ ')+NODES[m.a][0]+' til '+NODES[m.b][0]+' <span class="muted">('+(mDone(mt,m)?'+':'±')+m.v+' poeng)</span></div>').join('')+'<p class="small muted">Uløste oppdrag trekker like mye som de gir.</p></div>'}
 function fuse(){const d=qDur(),el=Math.min(d,(Date.now()-ui.pnAt)/1000);return '<div class="fuse" aria-hidden="true"><i style="animation-duration:'+d+'s;animation-delay:-'+el.toFixed(1)+'s"></i></div>'}
-function whoHTML(pid,extra){const p=PL(pid),tm=T(p.team);return '<div class="who">'+portrait(p.ch,56)+'<div><h2>'+esc(p.name)+(extra||'')+'</h2><div class="small muted">'+(S.cfg.teams?tname(tm)+'. ':'')+CHARS[p.ch].n+'</div></div></div>'}
-function progHTML(){const t=S.turn;let s='<div class="prog" aria-label="'+t.ok+' riktige av '+t.n+'">';for(let i=0;i<5;i++)s+='<i class="'+(i<t.hist.length?(t.hist[i]?'ok':'no'):'')+'"></i>';
-  return s+'<span class="small">'+t.ok+' riktige</span></div>'}
-const reqHTML=()=>'<div class="req">Rute på lengde 1, 2, 3 eller 4 krever like mange riktige svar.</div>';
+function whoHTML(pid,extra){const p=PL(pid),tm=T(p.team);return '<div class="who">'+portrait(p.ch,60)+'<div><h2>'+esc(p.name)+(extra||'')+'</h2><div class="small muted">'+(S.cfg.teams&&tm?tname(tm)+'. ':'')+CHARS[p.ch].n+'</div></div></div>'}
+function progHTML(hist,ok){let s='<div class="prog" aria-label="'+ok+' riktige">';for(let i=0;i<5;i++)s+='<i class="'+(i<hist.length?(hist[i]?'ok':'no'):'')+'"></i>';return s+'<span class="small">'+ok+' riktige</span></div>'}
+const reqHTML=()=>'<div class="req">En rute krever like mange riktige svar som lengden sin (1–5).</div>';
+function invHTML(t){const ks=Object.keys(ITEMS).filter(k=>t.inv[k]>0);if(!ks.length)return '<p class="small muted">Ingen gjenstander ennå.</p>';
+  return '<div class="inv">'+ks.map(k=>'<span class="invi">'+token(k,30)+ITEMS[k].n+' × '+t.inv[k]+'</span>').join('')+'</div>'}
+function shopHTML(t,pid){return '<div class="card" style="margin-top:12px"><h3>Butikken</h3><p class="small muted">Bare du ser butikken og det dere eier. Kassa: '+t.coins+' kr.</p><div class="shop">'
+  +Object.keys(ITEMS).map(k=>'<div class="shopi">'+token(k,44)+'<div><b>'+ITEMS[k].n+'</b><span class="small muted">'+ITEMS[k].d+'</span></div><button class="btn sm" data-a="shopBuy" data-item="'+k+'" data-p="'+pid+'" '+(t.coins>=ITEMS[k].price&&!ui.pending?'':'disabled')+'>'+ITEMS[k].price+' kr</button></div>').join('')
+  +'</div><h3 style="margin-top:12px">Dere eier</h3>'+invHTML(t)+'</div>'}
+function countHTML(){const el=(Date.now()-ui.pnAt)/1000;const lbl=S.cdLabel||'';
+  let who='';if(!LYN()&&S.turn&&S.turn.pid)who=whoHTML(S.turn.pid);
+  return '<div class="cd" role="alert" style="animation-delay:-'+el.toFixed(2)+'s"><div style="width:100%">'+who+'<div class="lbl">'+esc(lbl)+'</div><div class="nums">'+[3,2,1].map((n,i)=>'<span style="animation-delay:'+(i-el).toFixed(2)+'s">'+n+'</span>').join('')+'</div></div></div>'}
 function catHTML(){
   const t=S.turn,p=PL(t.pid);
-  let s=whoHTML(t.pid,' sin tur')+progHTML()+'<p class="small muted">Spørsmål '+(t.n+1)+' av 5</p>';
-  if(!mine(p.id))return s+'<p>'+esc(p.name)+' velger kategori.</p><div class="cats">'+t.cats.map(c=>'<div class="catb">'+esc(catName(c))+'</div>').join('')+'</div>'+reqHTML();
-  return s+'<div class="cats" role="group" aria-label="Kategori">'+t.cats.map(c=>'<button class="catb" data-a="cat" data-c="'+c+'" '+(ui.pending?'disabled':'')+'>'+esc(catName(c))+'</button>').join('')+'</div>'+reqHTML();
+  let s=whoHTML(t.pid,' har tur')+progHTML(t.hist,t.ok)+'<p class="small muted">Spørsmål '+(t.n+1)+' av 5</p>';
+  if(!mine(p.id))return s+'<p>'+esc(p.name)+' velger kategori.</p><div class="cats">'+t.cats.map(c=>'<div class="catb">'+esc(CATS[c])+'</div>').join('')+'</div>'+reqHTML();
+  return s+'<div class="cats" role="group" aria-label="Kategori">'+t.cats.map(c=>'<button class="catb" data-a="cat" data-c="'+c+'" '+(ui.pending?'disabled':'')+'>'+esc(CATS[c])+'</button>').join('')+'</div>'+reqHTML();
 }
 function qHTML(){
   const t=S.turn,q=t.q,ph=S.phase,rev=ph==='qres',who=PL(t.pid),can=!rev&&mine(who.id)&&!ui.pending;
   const at=who.team,tips=t.tips||{},net=S.mode==='net';
   const elig=net?S.players.filter(pl=>pl.team!==at):[],myElig=elig.filter(pl=>pl.owner===CID);
   const myTip=myElig.length?tips[myElig[0].id]:undefined,tipMode=!rev&&!mine(t.pid)&&myElig.length>0;
-  let s=whoHTML(t.pid)+progHTML()+'<div class="slip"><div class="cat">'+esc(catName(t.cat))+' <span class="muted">spørsmål '+(rev?t.n:t.n+1)+' av 5</span></div><div class="qt">'+esc(q.t)+'</div>';
+  let s=whoHTML(t.pid)+progHTML(t.hist,t.ok)+'<div class="slip"><div class="cat">'+esc(CATS[t.cat])+' · spørsmål '+(rev?t.n:t.n+1)+' av 5</div><div class="qt">'+esc(q.t)+'</div>';
   q.o.forEach((o,i)=>{let cls='opt',dis=!can,a='ans';
     if(rev){if(i===q.r)cls+=' right';else if(i===t.picked)cls+=' wrong';else cls+=' dim'}
     else if(t.hide.includes(i)){cls+=' gone';dis=true}
@@ -634,60 +788,58 @@ function qHTML(){
   if(elig.length&&!rev)s+='<div class="small muted">Tips inne: '+elig.filter(pl=>tips[pl.id]!=null).length+' av '+elig.length+'</div>';
   s+='</div>';
   if(can&&(ab(t.pid,'prof')&&!t.u5050||ab(t.pid,'kort')&&!t.uSwap)){s+='<div class="row" style="margin-top:10px">';
-    if(ab(t.pid,'prof')&&!t.u5050)s+='<button class="btn ghost" data-a="half">Fjern to feil svar</button>';
-    if(ab(t.pid,'kort')&&!t.uSwap)s+='<button class="btn ghost" data-a="swap">Bytt spørsmål</button>';s+='</div>'}
+    if(ab(t.pid,'prof')&&!t.u5050)s+='<button class="btn ghost sm" data-a="half">Fjern to feil svar</button>';
+    if(ab(t.pid,'kort')&&!t.uSwap)s+='<button class="btn ghost sm" data-a="swap">Bytt spørsmål</button>';s+='</div>'}
   if(tipMode)s+='<div class="tipnote">'+(myTip==null?'Tipp svaret før '+esc(who.name)+' svarer. Riktig tips gir laget ditt '+(myElig.some(pl=>ab(pl.id,'bookie'))?'2 kr':'1 kr')+'.':'Tipset er låst. Vent på svaret.')+'</div>';
   if(rev&&myElig.length&&myTip!=null)s+='<div class="tipnote">'+(myTip===q.r?'Du tippet riktig.':'Du tippet feil denne gangen.')+'</div>';
-  if(rev){const ok=mine(t.pid)||isHost();s+='<button class="btn wide" style="margin-top:12px" data-a="next" '+(ok&&!ui.pending?'':'disabled')+'>'+(t.n>=5?'Til handlingene':'Neste spørsmål')+'</button>'+(ok?'':'<p class="small muted">'+esc(who.name)+' går videre.</p>')}
+  if(rev){const ok=mine(t.pid)||isHost();s+='<button class="btn wide" style="margin-top:12px" data-a="next" '+(ok&&!ui.pending?'':'disabled')+'>'+(t.n>=5?'Til handlingene':'Neste spørsmål')+'</button>'}
   else if(!tipMode&&!can)s+='<p style="margin-top:10px"><b>'+esc(who.name)+'</b> svarer.</p>';
   return s;
 }
-function chipsHTML(b){return '<div class="chips">'+b.drawn.map(x=>x?'<span class="chip">+'+x+'</span>':'<span class="chip pol">Politi</span>').join('')+'</div>'}
-function actHTML(){
-  const t=S.turn,p=PL(t.pid),tm=turnTeam(),can=mine(p.id),b=t.bag,pend=ui.pending;
-  let s=whoHTML(t.pid,' handler')+progHTML()+'<p>Kassa: <b>'+tm.coins+' kr</b>. '+(t.ok?'Dere kan ta ruter på lengde 1'+(t.ok>1?'–'+Math.min(4,t.ok):'')+'.':'Ingen riktige svar, så ingen rute denne gangen.')+'</p>';
-  if(t.rob){s+='<div class="card"><div class="res">'+(t.rob.ok?'Ranet lyktes':'Tatt av politiet')+'</div><p class="small">'+(t.rob.ok?'Byttet: '+t.rob.amt+' kr fra '+tname(T(t.rob.tid))+'.':'Bot: '+t.rob.amt+' kr til '+tname(T(t.rob.tid))+'.')+'</p></div>'}
-  if(b.pool){const sum=b.drawn.reduce((a,x)=>a+x,0),pol=b.drawn.filter(x=>!x).length;
-    s+='<div class="card"><h3>Smuglerposen</h3>'+chipsHTML(b);
-    if(!b.done){s+='<p class="small">Varer for '+sum+' kr. Politibrikker: '+pol+' av '+b.lim+'. '+b.pool.length+' brikker igjen i posen.</p>';
-      if(can)s+='<div class="row"><button class="btn" data-a="bagDraw" '+(pend?'disabled':'')+'>Trekk en brikke</button><button class="btn ghost" data-a="bagStop" '+(pend?'disabled':'')+'>Stopp og behold '+sum+' kr</button></div>'}
-    else s+='<p class="small">'+(b.bust?'Razzia. Lasten gikk tapt.':'Lasten kom trygt frem: '+sum+' kr.')+'</p>';
-    s+='</div>'}
-  if(!can)return s+'<p class="muted">'+esc(p.name)+' handler på '+(S.mode==='net'?'telefonen':'skjermen')+'.</p>';
-  if(b.pool&&!b.done)return s;
-  if(!t.bought){
-    if(ui.sel!=null){const e=EDGES[ui.sel],len=e[2],ow=S.own[ui.sel],name=NODES[e[0]][0]+' til '+NODES[e[1]][0];
-      if(!ow){const c=routeCost(ui.sel,t.pid),okR=t.ok>=REQ[len];
-        s+='<div class="card" style="margin-top:10px"><h3>'+name+'</h3><p class="small">Lengde '+len+'. Gir '+PTS[len]+' poeng. Krever '+REQ[len]+' riktige.</p><button class="btn" data-a="buy" '+(okR&&tm.coins>=c&&!pend?'':'disabled')+'>Kjøp ruta for '+c+' kr</button>'
-          +(!okR?'<p class="small muted">Dere trenger '+REQ[len]+' riktige, og har '+t.ok+'.</p>':tm.coins<c?'<p class="small muted">Dere mangler '+(c-tm.coins)+' kr.</p>':'')+'</div>'}
-      else{const fee=challengeFee(ui.sel),okR=t.ok>=REQ[len];
-        s+='<div class="card" style="margin-top:10px"><h3>'+name+'</h3><p class="small">Eies av '+tname(T(ow))+'. Utfordre dem om ruta: dere betaler '+fee+' kr til dem, og så avgjør en duell hvem som får ruta. Uavgjort betyr at de beholder den.</p><button class="btn brick" data-a="challenge" '+(okR&&tm.coins>=fee&&!pend?'':'disabled')+'>Utfordre for '+fee+' kr</button>'
-          +(!okR?'<p class="small muted">Dere trenger '+REQ[len]+' riktige for å utfordre om denne ruta.</p>':tm.coins<fee?'<p class="small muted">Dere mangler '+(fee-tm.coins)+' kr.</p>':'')+'</div>'}}
-    else s+='<p>Trykk på en ledig rute for å kjøpe den'+(t.shady?'':', eller på et annet lags rute for å utfordre om den')+'. Én rute per tur.</p>'}
-  else s+='<p class="muted">Dere har tatt en rute denne turen.</p>';
-  s+='<div class="row" style="margin-top:12px">';
-  if(t.ok>=3&&!b.pool)s+='<button class="btn" data-a="bagOpen" '+(pend?'disabled':'')+'>Åpne smuglerposen</button>';
-  const mc=ab(t.pid,'avis')?1:2;
-  if(!t.gotM&&tm.missions.length<4)s+='<button class="btn ghost" data-a="mission" '+(tm.coins>=mc&&!pend?'':'disabled')+'>Nytt oppdrag ('+mc+' kr)</button>';
-  if(!t.shady&&S.teams.length>1)s+='<button class="btn brick" data-a="shadyMenu" aria-expanded="'+ui.shady+'">Lyssky handling</button>';
+function routeCard(c){const e=EDGES[ui.sel],len=e[2],ow=S.own[ui.sel],tm=c.tm,st=c.st,pend=ui.pending,name=NODES[e[0]][0]+' til '+NODES[e[1]][0];let s='<div class="card" style="margin-top:10px"><h3>'+name+'</h3>';
+  if(!ow){const cost=routeCost(ui.sel,c.pid),okR=st.ok>=REQ[len];
+    s+='<p class="small">Lengde '+len+'. Gir '+PTS[len]+' poeng. Krever '+REQ[len]+' riktige.</p><button class="btn" data-a="buy" data-p="'+c.pid+'" '+(okR&&tm.coins>=cost&&!pend?'':'disabled')+'>Kjøp for '+cost+' kr</button>'
+     +(!okR?'<p class="small muted">Dere trenger '+REQ[len]+' riktige, og har '+st.ok+'.</p>':tm.coins<cost?'<p class="small muted">Dere mangler '+(cost-tm.coins)+' kr.</p>':'')}
+  else{s+='<p class="small">Eies av '+tname(T(ow))+'.</p><div class="row">';
+    if(!LYN()&&!st.shady&&!st.bought){const fee=challengeFee(ui.sel),okR=st.ok>=REQ[len];s+='<button class="btn brick" data-a="challenge" '+(okR&&tm.coins>=fee&&!pend?'':'disabled')+'>Utfordre for '+fee+' kr</button>'}
+    if(tm.inv.dyn>0)s+='<button class="btn brick" data-a="dynUse" data-p="'+c.pid+'" '+(pend?'disabled':'')+'>'+token('dyn',26)+' Spreng ruta</button>';
+    s+='</div>';if(!LYN()&&!st.shady&&!st.bought)s+='<p class="small muted">Utfordring: dere betaler avgiften til eieren, og en duell avgjør. Uavgjort betyr at eieren beholder ruta.</p>'}
+  return s+'</div>'}
+function robHTML(c){const tm=c.tm,others=S.teams.filter(x=>x!==tm);
+  let s='<div class="card" style="margin-top:12px">';
+  if(!LYN())s+='<h3>Duell om kroner</h3><p class="small">Begge lag svarer på samme spørsmål. Vinneren tar opptil 3 kr.</p><div class="row">'+others.map(o=>'<button class="btn ghost sm" data-a="duel" data-t="'+o.id+'" '+(Math.min(3,tm.coins,o.coins)>=1&&!ui.pending?'':'disabled')+'>'+tname(o)+'</button>').join('')+'</div>';
+  s+='<h3 style="margin-top:10px">Ran</h3><p class="small">Halvparten av ranene lykkes og gir opptil 3 kr. Blir dere tatt, betaler dere '+(ab(c.pid,'smugler')?'1 kr':'2 kr')+' i bot. En skuddsikker vest stopper ranet.</p>';
+  if(tm.inv.pistol>0)s+='<label class="row small" style="margin-bottom:8px"><input type="checkbox" data-ch="gun" '+(ui.gun?'checked':'')+'> '+token('pistol',26)+' Bruk pistol (ranet lykkes alltid, med mindre de har vest)</label>';
+  s+='<div class="row">'+others.map(o=>'<button class="btn ghost sm" data-a="rob" data-t="'+o.id+'" data-p="'+c.pid+'" '+(o.coins>=1&&!ui.pending?'':'disabled')+'>'+tname(o)+' ('+o.coins+' kr)</button>').join('')+'</div>';
+  if(!LYN())s+='<h3 style="margin-top:10px">Utfordre om en rute</h3><p class="small">'+(c.st.bought?'Dere har allerede tatt en rute denne turen.':'Trykk på en rute som et annet lag eier.')+'</p>';
+  return s+'</div>'}
+function handleHTML(c,can){const st=c.st,tm=c.tm,pend=ui.pending;let s='';
+  if(st.rob)s+='<div class="card"><div class="res">'+(st.rob.vest?'Stoppet av vest':st.rob.ok?'Ranet lyktes':'Tatt av politiet')+'</div><p class="small">'+(st.rob.vest?'Ranet mot '+tname(T(st.rob.tid))+' ble stoppet.':st.rob.ok?'Byttet: '+st.rob.amt+' kr fra '+tname(T(st.rob.tid))+'.':'Bot: '+st.rob.amt+' kr til '+tname(T(st.rob.tid))+'.')+'</p></div>';
+  if(!can)return s;
+  if(!st.bought||tm.inv.dyn>0){if(ui.sel!=null)s+=routeCard(c);else s+='<p>'+(st.bought?'Trykk på et annet lags rute for å sprenge den.':'Trykk på en ledig rute for å kjøpe den'+(!LYN()&&!st.shady?', eller på et annet lags rute for å utfordre':'')+'.')+'</p>'}
+  if(st.bought)s+='<p class="muted">Dere har tatt en rute denne '+(LYN()?'runden':'turen')+'.</p>';
+  const mc=ab(c.pid,'avis')?1:2;
+  s+='<div class="row" style="margin-top:12px"><button class="btn ghost sm" data-a="shopT" aria-expanded="'+ui.shop+'">Butikk</button>';
+  if(!st.gotM&&tm.missions.length<4)s+='<button class="btn ghost sm" data-a="mission" data-p="'+c.pid+'" '+(tm.coins>=mc&&!pend?'':'disabled')+'>Nytt oppdrag ('+mc+' kr)</button>';
+  if(!st.shady&&S.teams.length>1)s+='<button class="btn brick sm" data-a="shadyMenu" aria-expanded="'+ui.shady+'">Lyssky handling</button>';
   s+='</div>';
-  if(t.ok<3&&!b.pool)s+='<p class="small muted">Smuglerposen åpner seg ved minst tre riktige.</p>';
-  if(ui.shady&&!t.shady){const others=S.teams.filter(x=>x!==tm);
-    s+='<div class="card shady"><h3>Duell om kroner</h3><p class="small">Dere og et annet lag svarer på samme spørsmål. Vinneren tar opptil 3 kr fra taperen.</p><div class="row">'
-      +others.map(o=>'<button class="btn ghost" data-a="duel" data-t="'+o.id+'" '+(Math.min(3,tm.coins,o.coins)>=1&&!pend?'':'disabled')+'>'+tname(o)+'</button>').join('')+'</div>'
-      +'<h3>Ran</h3><p class="small">Halvparten av ranene lykkes og gir opptil 3 kr. Blir dere tatt, betaler dere '+(ab(t.pid,'smugler')?'1 kr':'2 kr')+' i bot til laget dere prøvde å rane.</p><div class="row">'
-      +others.map(o=>'<button class="btn ghost" data-a="rob" data-t="'+o.id+'" '+(o.coins>=1&&!pend?'':'disabled')+'>'+tname(o)+' ('+o.coins+' kr)</button>').join('')+'</div>'
-      +'<h3>Utfordre om en rute</h3><p class="small">'+(t.bought?'Dere har allerede tatt en rute denne turen.':'Trykk på en rute som et annet lag eier.')+'</p></div>'}
-  s+='<button class="btn wide" style="margin-top:14px" data-a="endTurn" '+(pend?'disabled':'')+'>Avslutt turen</button>';
-  return s;
+  if(ui.shop)s+=shopHTML(tm,c.pid);
+  if(ui.shady&&!st.shady)s+=robHTML(c);
+  return s}
+function actHTML(){
+  const t=S.turn,p=PL(t.pid),tm=turnTeam(),can=mine(p.id);
+  let s=whoHTML(t.pid,' handler')+progHTML(t.hist,t.ok)+'<p>'+(can?'Kassa: <b>'+tm.coins+' kr</b>. ':'')+(t.ok?'Kan ta ruter opp til lengde '+Math.min(5,t.ok)+'.':'Ingen riktige, så ingen ny rute.')+'</p>';
+  s+=handleHTML({pid:t.pid,tm,st:t},can);
+  if(!can)return s+'<p class="muted">'+esc(p.name)+' handler på '+(S.mode==='net'?'telefonen':'skjermen')+'.</p>';
+  return s+'<button class="btn wide" style="margin-top:14px" data-a="endTurn" '+(ui.pending?'disabled':'')+'>Avslutt turen</button>';
 }
 function duelHTML(){
   const d=S.duel,q=d.q,A=PL(d.a),D=PL(d.d);
-  let s='<h2>'+(d.kind==='coins'?'Duell om '+d.stake+' kr':'Utfordring om ruta '+NODES[EDGES[d.e][0]][0]+'–'+NODES[EDGES[d.e][1]][0])+'</h2>';
-  s+='<div class="vs"><div>'+portrait(A.ch,64)+'<b>'+esc(A.name)+'</b><span class="small muted">'+(d.ans[d.a]!=null?'har svart':'tenker …')+'</span></div><div class="res">mot</div><div>'+portrait(D.ch,64)+'<b>'+esc(D.name)+'</b><span class="small muted">'+(d.ans[d.d]!=null?'har svart':'tenker …')+'</span></div></div>';
+  let s='<h2>'+(d.kind==='coins'?'Duell om '+d.stake+' kr':'Utfordring om '+rname(d.e))+'</h2>';
+  s+='<div class="vs"><div>'+portrait(A.ch,70)+'<b>'+esc(A.name)+'</b><span class="small muted">'+(d.ans[d.a]!=null?'har svart':'tenker …')+'</span></div><div class="res">mot</div><div>'+portrait(D.ch,70)+'<b>'+esc(D.name)+'</b><span class="small muted">'+(d.ans[d.d]!=null?'har svart':'tenker …')+'</span></div></div>';
   const me=[d.a,d.d].find(id=>mine(id)&&d.ans[id]==null);
-  s+='<div class="slip"><div class="cat">'+esc(catName(q.c))+'</div><div class="qt">'+esc(q.t)+'</div>';
-  if(me){const both=mine(d.a)&&mine(d.d);if(both)s+='<p class="small"><b>Nå svarer '+esc(PL(me).name)+'.</b> Den andre ser bort.</p>';
+  s+='<div class="slip"><div class="cat">'+esc(CATS[q.c])+'</div><div class="qt">'+esc(q.t)+'</div>';
+  if(me){if(mine(d.a)&&mine(d.d))s+='<p class="small"><b>Nå svarer '+esc(PL(me).name)+'.</b> Den andre ser bort.</p>';
     q.o.forEach((o,i)=>{s+='<button class="opt" data-a="duelAns" data-p="'+me+'" data-i="'+i+'" '+(ui.pending?'disabled':'')+'><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></button>'})}
   else q.o.forEach((o,i)=>{s+='<div class="opt"><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></div>'});
   return s+fuse()+'</div>';
@@ -695,29 +847,89 @@ function duelHTML(){
 function duelresHTML(){
   const d=S.duel,q=d.q,A=PL(d.a),D=PL(d.d);const sh=pid=>{const i=d.ans[pid];return i==null?'svarte ikke':'svarte '+'ABCD'[i]+(i===q.r?', riktig':', feil')};
   let s='<h2>'+(d.kind==='coins'?'Duellen er avgjort':'Utfordringen er avgjort')+'</h2>';
-  s+='<div class="vs"><div>'+portrait(A.ch,64)+'<b>'+esc(A.name)+'</b><span class="small">'+sh(d.a)+'</span></div><div class="res">'+(d.win==='a'?'←':d.win==='d'?'→':'=')+'</div><div>'+portrait(D.ch,64)+'<b>'+esc(D.name)+'</b><span class="small">'+sh(d.d)+'</span></div></div>';
+  s+='<div class="vs"><div>'+portrait(A.ch,70)+'<b>'+esc(A.name)+'</b><span class="small">'+sh(d.a)+'</span></div><div class="res">'+(d.win==='a'?'◀':d.win==='d'?'▶':'=')+'</div><div>'+portrait(D.ch,70)+'<b>'+esc(D.name)+'</b><span class="small">'+sh(d.d)+'</span></div></div>';
   s+='<div class="slip"><div class="qt">'+esc(q.t)+'</div>'+q.o.map((o,i)=>'<div class="opt '+(i===q.r?'right':'dim')+'"><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></div>').join('')+'</div>';
   const ok=mine(S.turn.pid)||isHost();
   return s+'<button class="btn wide" style="margin-top:12px" data-a="duelNext" '+(ok&&!ui.pending?'':'disabled')+'>Tilbake til turen</button>';
 }
+function teamTabs(list,cur,a){if(list.length<2)return '';return '<div class="seg" style="margin-bottom:10px">'+list.map(t=>'<button data-a="'+a+'" data-t="'+t.id+'" aria-pressed="'+(t.id===cur)+'"><span class="dot" style="background:'+t.color+'"></span> '+tname(t)+'</button>').join('')+'</div>'}
+function lqHTML(){
+  const L=S.lyn,q=L.q,rev=S.phase==='lqres',mt=myTeams().filter(t=>!L.tt[t.id].out);
+  let s='<h2>Lynrunde '+S.round+'</h2><p class="small muted">Spørsmål '+(L.k+1)+' av 5 · '+esc(CATS[q.c])+'</p><div class="slip"><div class="qt">'+esc(q.t)+'</div>';
+  const one=mt.length===1?mt[0]:null,st1=one?L.tt[one.id]:null,my=one?L.ans[one.id]:undefined;
+  q.o.forEach((o,i)=>{let cls='opt';if(rev){cls+=i===q.r?' right':(my===i?' wrong':' dim')}else{if(my===i)cls+=' mytip';if(st1&&st1.hideK===L.k&&st1.hide.includes(i))cls+=' gone'}
+    const can=one&&!rev&&!ui.pending&&(my==null||(teamHas(one.id,'kort')&&!st1.uSwap&&my!==i));
+    s+=(one?'<button class="'+cls+'" data-a="lyAns" data-t="'+one.id+'" data-i="'+i+'" '+(can?'':'disabled')+'>':'<div class="'+cls+'">')+'<i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span>'+(one?'</button>':'</div>')});
+  if(!rev)s+=fuse();s+='</div>';
+  if(!rev&&mt.length>1){s+='<div class="card" style="margin-top:10px"><h3>Svar for hvert lag</h3><div class="ansgrid">'+mt.map(t=>'<div class="ansrow"><span class="nm"><span class="dot" style="background:'+t.color+'"></span> '+tname(t)+'</span>'+[0,1,2,3].map(i=>'<button data-a="lyAns" data-t="'+t.id+'" data-i="'+i+'" aria-pressed="'+(L.ans[t.id]===i)+'" '+(L.ans[t.id]!=null||ui.pending?'disabled':'')+'>'+'ABCD'[i]+'</button>').join('')+'</div>').join('')+'</div></div>'}
+  if(one&&!rev){if(teamHas(one.id,'prof')&&!st1.u5050)s+='<div class="row" style="margin-top:10px"><button class="btn ghost sm" data-a="lyHalf" data-p="'+actorOf(one.id)+'">Fjern to feil svar</button></div>';
+    if(my!=null)s+='<div class="tipnote">Svaret er låst'+(teamHas(one.id,'kort')&&!st1.uSwap?', men Kortspilleren kan endre det én gang':'')+'.</div>'}
+  s+='<div class="teamstat">'+S.teams.map(t=>{const st=L.tt[t.id];if(st.out)return '<span>'+tname(t)+': kidnappet</span>';
+    if(rev){const ok=L.ans[t.id]===q.r;return '<span class="'+(ok?'ok':'no')+'">'+tname(t)+(ok?' ✓':' ✗')+'</span>'}
+    return '<span class="'+(L.ans[t.id]!=null?'done':'')+'">'+tname(t)+(L.ans[t.id]!=null?' ✓':' …')+'</span>'}).join('')+'</div>';
+  if(rev&&isHost())s+='<button class="btn ghost sm" style="margin-top:10px" data-a="lqNext">Videre</button>';
+  return s;
+}
+function lbuyHTML(){
+  const L=S.lyn,mt=myTeams().filter(t=>!L.tt[t.id].out&&!L.tt[t.id].done);
+  if(!ui.lt||!mt.find(t=>t.id===ui.lt))ui.lt=mt.length?mt[0].id:null;
+  let s='<h2>Handelstid</h2>'+fuseLong();
+  s+='<div class="teamstat">'+S.teams.map(t=>{const st=L.tt[t.id];return '<span class="'+(st.done?'done':'')+'">'+tname(t)+' '+st.ok+'/5'+(st.done?' ✓':'')+'</span>'}).join('')+'</div>';
+  if(!ui.lt){s+='<p class="muted" style="margin-top:12px">'+(myTeams().length?'Ferdig. Venter på de andre lagene.':'Lagene handler på telefonene sine.')+'</p>';if(isHost())s+='<button class="btn ghost sm" data-a="lyEnd">Avslutt handelen for alle</button>';return s}
+  const tm=T(ui.lt),st=L.tt[tm.id],pid=actorOf(tm.id);
+  s+='<div style="margin-top:12px">'+teamTabs(mt,tm.id,'lyTab')+'<p><b>'+tname(tm)+'</b>: '+progHTML(st.hist,st.ok)+'Kassa <b>'+tm.coins+' kr</b>. '+(st.ok?'Kan ta ruter opp til lengde '+Math.min(5,st.ok)+'.':'Ingen riktige, så ingen ny rute.')+'</p>';
+  s+=handleHTML({pid,tm,st},true);
+  s+='<button class="btn wide" style="margin-top:14px" data-a="lyDone" data-t="'+tm.id+'" '+(ui.pending?'disabled':'')+'>Ferdig med handelen</button></div>';
+  if(isHost())s+='<button class="btn ghost sm" style="margin-top:10px" data-a="lyEnd">Avslutt handelen for alle</button>';
+  return s;
+}
+function fuseLong(){const d=120,el=Math.min(d,(Date.now()-ui.pnAt)/1000);return '<div class="fuse" aria-hidden="true"><i style="animation-duration:'+d+'s;animation-delay:-'+el.toFixed(1)+'s"></i></div>'}
+function chipsHTML(b){return '<div class="chips">'+b.drawn.map((c,k)=>{const x=b.xs.includes(k);const k2=CODE2[c]||'coin';return '<span class="'+(x?'x1':'')+'" title="'+(k2==='coin'?c+' kr':k2==='pol'?'Politi':k2==='kid'?'Kidnappet':ITEMS[k2].n)+'">'+token(k2,40,k2==='coin'?c:null)+'</span>'}).join('')+'</div>'}
+function bagHTML(){
+  const lim=S.cfg.level==='easy'?3:2;const mt=myTeams();
+  let s='<h2>Smuglerposen</h2><p class="small muted">Alle trekker samtidig. '+lim+' politibrikker betyr razzia, og alt dere trakk denne gangen går tapt. Mafiabossen avslutter trekningen, og laget står over neste '+(LYN()?'runde':'tur')+'.</p>';
+  if(mt.length){const cur=ui.lt&&mt.find(t=>t.id===ui.lt)?T(ui.lt):mt.find(t=>!S.bags[t.id].done)||mt[0];ui.lt=cur.id;const b=S.bags[cur.id];
+    const pol=b.drawn.filter((x,k)=>x==='X'&&!b.xs.includes(k)).length;
+    s+='<div class="card" style="margin-bottom:12px">'+teamTabs(mt,cur.id,'bagTab')+'<h3>'+tname(cur)+'</h3>'+chipsHTML(b);
+    if(!b.done){s+='<p class="small">Politi: '+pol+' av '+lim+'. '+(b.arm?'Korrupt politi venter på neste politibrikke. ':'')+b.pool.length+' igjen i posen.</p><div class="row"><button class="btn" data-a="bagDraw" data-t="'+cur.id+'" '+(ui.pending?'disabled':'')+'>Trekk</button><button class="btn ghost" data-a="bagStop" data-t="'+cur.id+'" '+(ui.pending?'disabled':'')+'>Stopp og behold</button>'
+      +(cur.inv.cop>0&&pol>0?'<button class="btn ghost" data-a="bagCop" data-t="'+cur.id+'">'+token('cop',26)+' Bruk korrupt politi</button>':'')+'</div>'}
+    else s+='<p class="res">'+(b.bust?'Razzia! Alt gikk tapt.':b.kid?'Kidnappet av mafiabossen.':'I trygg havn: '+b.sum+' kr.')+'</p>';
+    s+='</div>'}
+  s+='<div class="bags">'+S.teams.map(t=>{const b=S.bags[t.id];return '<div class="bagc '+(b.bust?'bust':b.done?'ok':'')+'"><h3><span class="dot" style="background:'+t.color+'"></span> '+tname(t)+'</h3>'+chipsHTML(b)+'<div class="small muted">'+(b.bust?'Razzia':b.kid?'Kidnappet':b.done?'Stoppet: '+b.sum+' kr':'Trekker …')+'</div></div>'}).join('')+'</div>';
+  if(isHost()&&!S.bagAll)s+='<button class="btn ghost sm" style="margin-top:12px" data-a="bagSkip">Stopp alle som fortsatt trekker</button>';
+  if(S.bagAll)s+='<p class="muted" style="margin-top:12px">Alle er ferdige. Spillet går videre …</p>';
+  return s;
+}
+function diceHTML(){const D=S.dice;const mt=myTeams();
+  let s='<h2>Hvem starter?</h2><p class="small muted">Kast to terninger. Høyest sum begynner.</p><div class="dice">'+S.teams.map(t=>{const r=D.r[t.id];const solo=!S.cfg.teams?members(t.id)[0]:null;
+    return '<div class="diec">'+(solo?portrait(solo.ch,40):'<span class="dot" style="background:'+t.color+'"></span>')+'<div><b>'+tname(t)+'</b></div><div class="dd">'+(r?dieSVG(r[0],1)+dieSVG(r[1],1):dieSVG(0)+dieSVG(0))+'</div>'
+      +(r?'<div class="res">'+(r[0]+r[1])+'</div>':(mt.includes(t)&&!D.done?'<button class="btn sm" data-a="roll" data-t="'+t.id+'" '+(ui.pending?'disabled':'')+'>Kast</button>':'<span class="small muted">venter …</span>'))+'</div>'}).join('')+'</div>';
+  if(D.done)s+='<p class="res" style="margin-top:12px">Rekkefølge: '+S.order.map(id=>tname(T(id))).join(', ')+'</p>';
+  else if(isHost())s+='<button class="btn ghost sm" style="margin-top:12px" data-a="rollAll">Kast for alle som mangler</button>';
+  return s}
 function mgHTML(){
   const g=S.mg,info=MG[g.type];
   const pend=S.players.filter(p=>p.owner===CID&&g.sc[p.id]==null&&!ui.mgSent[S.pn+p.id]);
   let s='<h2>Minispill: '+info.name+'</h2>';
   if(ui.mg&&ui.mg.pn!==S.pn)ui.mg=null;
-  if(!ui.mg&&pend.length)ui.mg={pid:pend[0].id,pn:S.pn,st:'ready',n:0,entry:''};
+  if(!ui.mg&&pend.length)ui.mg={pid:pend[0].id,pn:S.pn,st:'ready',n:0,entry:'',r:0,pen:0};
   const m=ui.mg;
   if(!m){
-    s+='<p>'+info.desc+'</p><p class="muted">Venter på resten.</p>'+S.players.map(p=>'<div class="prow">'+portrait(p.ch,32)+'<span class="nm">'+esc(p.name)+'</span><span>'+(g.sc[p.id]!=null?info.fmt(g.sc[p.id]):'spiller …')+'</span></div>').join('');
-    if(isHost())s+='<button class="btn ghost" style="margin-top:12px" data-a="mgSkip">Gå videre uten resten</button>';
+    s+='<p>'+info.desc+'</p><p class="muted">Venter på resten.</p>'+S.players.map(p=>'<div class="prow">'+portrait(p.ch,34)+'<span class="nm">'+esc(p.name)+'</span><span>'+(g.sc[p.id]!=null?info.fmt(g.sc[p.id]):'spiller …')+'</span></div>').join('');
+    if(isHost())s+='<button class="btn ghost sm" style="margin-top:12px" data-a="mgSkip">Gå videre uten resten</button>';
     return s;
   }
   const p=PL(m.pid);
   if(m.st==='ready')return s+'<p>'+info.desc+'</p>'+whoHTML(p.id,', gjør deg klar')+'<button class="btn wide" data-a="mgStart">Jeg er klar</button>';
-  if(g.type==='react')return s+'<p><b>'+esc(p.name)+'</b></p><button class="pad'+(m.st==='go'?' go':'')+'" data-pd="mgTap">'+(m.st==='go'?'Nå!':'Vent …')+'</button>';
-  if(g.type==='taps')return s+'<p><b>'+esc(p.name)+'</b></p><button class="pad go" data-pd="mgTap"><span id="tapn">'+m.n+'</span></button>';
-  if(m.st==='show')return s+'<p><b>'+esc(p.name)+'</b>, husk koden.</p><div class="digits">'+g.code+'</div>';
-  return s+'<p><b>'+esc(p.name)+'</b>, tast koden.</p><div class="digits" id="entry">'+(m.entry||'·')+'</div><div class="keys">'+[1,2,3,4,5,6,7,8,9].map(k=>'<button data-pd="mgKey" data-k="'+k+'">'+k+'</button>').join('')+'<span></span><button data-pd="mgKey" data-k="0">0</button><button data-pd="mgKey" data-k="x" aria-label="Slett">⌫</button></div>';
+  const nm='<p><b>'+esc(p.name)+'</b></p>';
+  if(g.type==='react')return s+nm+'<button class="pad'+(m.st==='go'?' go':'')+'" data-pd="mgTap">'+(m.st==='go'?'Nå!':'Vent …')+'</button>';
+  if(g.type==='taps')return s+nm+'<button class="pad go" data-pd="mgTap"><span id="tapn">'+m.n+'</span></button>';
+  if(g.type==='clock')return s+nm+'<div class="digits" id="clk">0.00</div><button class="pad go" data-pd="mgTap">Stopp</button>';
+  if(g.type==='odd'){const idx=g.odd[m.r];return s+nm+'<p class="small muted">Runde '+(m.r+1)+' av 3</p><div class="oddg">'+Array.from({length:25},(_,i)=>'<button data-pd="mgOdd" data-i="'+i+'" aria-label="Mynt '+(i+1)+'">'+token('fake',56,i===idx?0:1)+'</button>').join('')+'</div>'}
+  if(g.type==='count'&&m.st==='show')return s+nm+'<div class="notes">'+g.pos.map(q=>'<span class="tok" style="left:'+q[0]+'%;top:'+q[1]+'%;width:18%;transform:rotate('+q[2]+'deg)">'+token('note',60).replace(/^<span class="tok"[^>]*>/,'').replace(/<\/span>$/,'')+'</span>').join('')+'</div>';
+  if(g.type==='mem'&&m.st==='show')return s+'<p><b>'+esc(p.name)+'</b>, husk koden.</p><div class="digits">'+g.code+'</div>';
+  const keys='<div class="keys">'+[1,2,3,4,5,6,7,8,9].map(k=>'<button data-pd="mgKey" data-k="'+k+'">'+k+'</button>').join('')+(g.type==='count'?'<button data-pd="mgKey" data-k="ok">OK</button>':'<span></span>')+'<button data-pd="mgKey" data-k="0">0</button><button data-pd="mgKey" data-k="x" aria-label="Slett">⌫</button></div>';
+  return s+'<p><b>'+esc(p.name)+'</b>, '+(g.type==='count'?'hvor mange sedler?':'tast koden.')+'</p><div class="digits" id="entry">'+(m.entry||'·')+'</div>'+keys;
 }
 function mgSubmit(v){const m=ui.mg;if(!m)return;ui.mgSent[S.pn+m.pid]=1;ui.mg=null;act('mgScore',{pid:m.pid,v})}
 function mgresHTML(){
@@ -728,34 +940,43 @@ function mgresHTML(){
 }
 function finalHTML(){
   const res=finalScores(),f=S.fin;const col=(n,v)=>f>=n?v:'';
-  let s='<h2>Oppgjørets time</h2><div class="tw"><table><tr><th>Lag</th><th>Ruter</th><th>Oppdrag</th><th>Kroner</th><th>Bonus</th><th>Sum</th></tr>';
-  const rows=f>=4?res:res.slice().sort((a,b)=>a.id-b.id);
-  rows.forEach(r=>{const t=T(r.id);s+='<tr><td><span class="dot" style="background:'+t.color+'"></span> '+tname(t)+'</td><td>'+r.rp+'</td><td>'+col(1,r.mp)+'</td><td>'+col(2,r.cp)+'</td><td>'+col(3,r.bp)+'</td><td><b>'+col(4,r.tot)+'</b></td></tr>'});
+  let s='<h2>Oppgjørets time</h2><div class="tw"><table><tr><th>Lag</th><th>Ruter</th><th>Oppdrag</th><th>Bonus</th><th>Sum</th><th>Kroner</th></tr>';
+  const rows=f>=3?res:res.slice().sort((a,b)=>a.id-b.id);
+  rows.forEach(r=>{const t=T(r.id);s+='<tr><td><span class="dot" style="background:'+t.color+'"></span> '+tname(t)+'</td><td>'+r.rp+'</td><td>'+col(1,r.mp)+'</td><td>'+col(2,r.bp)+'</td><td><b>'+col(3,r.tot)+'</b></td><td class="muted">'+col(3,r.coins)+'</td></tr>'});
   s+='</table></div>';
-  if(f>=3){const b=res.filter(r=>r.bon.length);if(b.length)s+='<p class="small">'+b.map(r=>tname(T(r.id))+': '+r.bon.join(', ')).join('. ')+'.</p>'}
-  if(f<4)s+='<button class="btn wide" style="margin-top:14px" data-a="finNext" '+(ui.pending?'disabled':'')+'>'+['Avslør oppdragene','Tell kronene','Del ut bonusprisene','Kår vinneren'][f]+'</button><p class="small muted">Tre kroner gir ett poeng.</p>';
-  else{const top=res[0].tot,w=res.filter(r=>r.tot===top);
-    s+='<div class="win">'+(w.length>1?'Byen deles mellom '+w.map(r=>tname(T(r.id))).join(' og '):tname(T(w[0].id))+' styrer '+MAPINFO[MAPID].name)+'</div>';
+  if(f>=2){const b=res.filter(r=>r.bon.length);if(b.length)s+='<p class="small">'+b.map(r=>tname(T(r.id))+': '+r.bon.join(', ')).join('. ')+'.</p>'}
+  if(f<3)s+='<button class="btn wide" style="margin-top:14px" data-a="finNext" '+(ui.pending?'disabled':'')+'>'+['Avslør oppdragene','Del ut bonusprisene','Kår vinneren'][f]+'</button><p class="small muted">Uløste oppdrag gir minuspoeng. Kroner teller bare ved uavgjort.</p>';
+  else{const a=res[0],b=res[1];let w;
+    if(b&&a.tot===b.tot&&a.coins===b.coins){const top=res.filter(r=>r.tot===a.tot&&r.coins===a.coins);w='Byen deles mellom '+top.map(r=>tname(T(r.id))).join(' og ')}
+    else w=tname(T(a.id))+' styrer '+MAPINFO[MAPID].name+(b&&a.tot===b.tot?' <span class="small muted">(flest kroner avgjorde)</span>':'');
+    s+='<div class="win">'+w+'</div>';
     s+=isHost()?'<button class="btn wide" data-a="again">Nytt spill med samme folk</button>':'<p class="muted">Verten kan starte et nytt spill.</p>'}
   return s;
 }
 function gameHTML(){
   const ph=S.phase,t=S.turn;
-  const activeTeam=ph==='duel'||ph==='duelres'?0:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
+  const activeTeam=LYN()||['duel','duelres','dice','bag'].includes(ph)?0:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
   const mt=missionTeam(),big=ui.big&&role==='host';
-  let s=banner()+'<div class="top"><span class="brand">'+MAPINFO[MAPID].name+'</span><span class="small muted">'+(ph==='final'?'Slutt':'Runde '+S.round+' av '+S.rounds)+(S.mode==='net'&&!big?', kode '+esc(S.code):'')+'</span>'+(big?'<span class="joincode">Kode '+esc(S.code)+'</span>':'')+'</div>';
-  s+='<div class="scores">'+S.teams.map(x=>{const solo=!S.cfg.teams?members(x.id)[0]:null;return '<div class="sc'+(x.id===activeTeam&&!['final','mg','mgres'].includes(ph)?' on':'')+'">'+(solo?portrait(solo.ch,22):'<span class="dot" style="background:'+x.color+'"></span>')+' <span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <b>'+x.coins+' kr</b> <span class="muted">'+routePts(x)+' p</span></div>'}).join('')+'</div>';
-  s+='<div class="game'+(ph==='act'?' act':'')+'"><div class="panel">';
+  let mapCtx=null,mapCan=false,mapSt=null;
+  if(ph==='act'&&mine(t.pid)){mapCtx=turnTeam();mapCan=true;mapSt=t}
+  if(ph==='lbuy'&&ui.lt&&T(ui.lt)&&!S.lyn.tt[ui.lt].done){mapCtx=T(ui.lt);mapCan=true;mapSt=S.lyn.tt[ui.lt]}
+  let s=banner()+'<div class="top"><span class="brand">'+MAPINFO[MAPID].name+'</span><span class="small muted">'+(ph==='final'?'Slutt':ph==='dice'?'Terningkast':'Runde '+S.round+' av '+S.rounds)+(LYN()?' · lyn':'')+(S.mode==='net'&&!big?' · kode '+esc(S.code):'')+'</span>'+(big?'<span class="joincode">KODE '+esc(S.code)+'</span>':'')+'</div>';
+  s+='<div class="scores">'+S.teams.map(x=>{const solo=!S.cfg.teams?members(x.id)[0]:null;const showC=myTeams().includes(x)||role==='local';
+    return '<div class="sc'+(x.id===activeTeam&&!['final','mg','mgres'].includes(ph)?' on':'')+'">'+(solo?portrait(solo.ch,26):'')+'<span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <span class="pts">'+routePts(x)+' p</span>'+' <span class="muted">'+x.coins+' kr</span>'+'</div>'}).join('')+'</div>';
+  s+='<div class="game'+(mapCan?' act':'')+'"><div class="panel">';
   if(S.msg)s+='<div class="msg" role="status">'+esc(S.msg)+'</div>';
-  s+=ph==='cat'?catHTML():(ph==='q'||ph==='qres')?qHTML():ph==='act'?actHTML():ph==='duel'?duelHTML():ph==='duelres'?duelresHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
-  if(mt&&ph!=='final'&&ph!=='mg'){s+='<div class="foot"><button class="btn ghost" data-a="showM">'+(ui.showM?'Skjul oppdrag':'Vis hemmelige oppdrag')+'</button></div>';if(ui.showM)s+=missionsHTML(mt)}
-  s+='</div><div class="mapwrap">'+mapSVG(mt)+'</div></div>';
-  s+='<div class="foot"><button class="btn ghost" data-a="menu">Meny</button>'+(big?'<button class="btn ghost" data-a="fs">Fullskjerm</button>':'');
+  s+=ph==='count'?(LYN()?'<h2>Lynrunde '+S.round+'</h2>':(S.turn.pid?whoHTML(S.turn.pid):'')):ph==='dice'?diceHTML():ph==='cat'?catHTML():(ph==='q'||ph==='qres')?qHTML():ph==='act'?actHTML():ph==='duel'?duelHTML():ph==='duelres'?duelresHTML()
+    :(ph==='lq'||ph==='lqres')?lqHTML():ph==='lbuy'?lbuyHTML():ph==='bag'?bagHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
+  if(mt&&!['final','mg','dice'].includes(ph)){s+='<div class="foot"><button class="btn ghost sm" data-a="showM">'+(ui.showM?'Skjul oppdrag':'Hemmelige oppdrag')+'</button><button class="btn ghost sm" data-a="invT">Gjenstander</button></div>';if(ui.showM)s+=missionsHTML(mt);if(ui.inv)s+='<div class="card" style="margin-top:10px"><h3>'+tname(mt)+' eier</h3>'+invHTML(mt)+'</div>'}
+  s+='</div><div class="mapwrap">'+mapSVG(mt,mapCtx,mapCan,mapSt)+'</div></div>';
+  s+='<div class="foot"><button class="btn ghost sm" data-a="menu">Meny</button>'+(big?'<button class="btn ghost sm" data-a="fs">Fullskjerm</button>':'');
   if(ui.menu){
-    if(role==='host'&&['cat','q','qres','act','duel','duelres'].includes(ph))s+='<button class="btn ghost" data-a="takeover">Styr denne turen herfra</button>';
-    s+='<button class="btn ghost" data-a="quit">'+(role==='guest'?'Forlat spillet':'Avslutt spillet')+'</button>';
+    if(role==='host'&&!LYN()&&['cat','q','qres','act','duel','duelres'].includes(ph))s+='<button class="btn ghost sm" data-a="takeover">Styr denne turen herfra</button>';
+    s+='<button class="btn ghost sm" data-a="quit">'+(role==='guest'?'Forlat spillet':'Avslutt spillet')+'</button>';
   }
-  return s+'</div>';
+  s+='</div>';
+  if(ph==='count')s+=countHTML();
+  return s;
 }
 
 /* ---------- hendelser ---------- */
@@ -780,36 +1001,57 @@ const UIA={
   addP(){const el=$('#pname');const name=(el?el.value:'').trim();if(!name)return;const free=freeChars(null);const ch=ui.char!=null&&free.includes(ui.char)?ui.char:free[0];ui.draft='';ui.char=null;if(el)el.value='';act('addP',{name,ch})},
   delP(d){if(ui.chFor===d('id'))ui.chFor=null;act('delP',{id:d('id')})},
   start(){ui.chFor=null;act('start')},
+  roll(d){act('roll',{tid:+d('t')})},rollAll(){act('rollAll')},
   cat(d){act('pickCat',{cat:+d('c')})},
   ans(d){act('answer',{i:+d('i')})},
   tip(d){act('tip',{i:+d('i')})},
   half(){act('half')},swap(){act('swap')},
+  lyHalf(d){act('half',{pid:d('p')})},
+  lyAns(d){act('lyAns',{tid:+d('t'),i:+d('i')})},
+  lqNext(){act('lqNext')},
+  lyTab(d){ui.lt=+d('t');ui.sel=null;render()},
+  lyDone(d){ui.sel=null;ui.shop=false;ui.shady=false;act('lyDone',{tid:+d('t')})},
+  lyEnd(){act('lyEnd')},
   next(){act('next')},
   sel(d){ui.sel=+d('e');render()},
-  buy(){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('buy',{e})}},
+  buy(d){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('buy',{e,pid:d('p')})}},
   challenge(){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('challenge',{e})}},
-  shadyMenu(){ui.shady=!ui.shady;render()},
+  dynUse(d){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('dyn',{e,pid:d('p')})}},
+  shopT(){ui.shop=!ui.shop;ui.shady=false;render()},
+  shopBuy(d){act('shop',{item:d('item'),pid:d('p')})},
+  shadyMenu(){ui.shady=!ui.shady;ui.shop=false;render()},
   duel(d){ui.shady=false;act('duel',{tid:+d('t')})},
-  rob(d){ui.shady=false;act('rob',{tid:+d('t')})},
+  rob(d){ui.shady=false;const gun=ui.gun;ui.gun=false;act('rob',{tid:+d('t'),pid:d('p'),gun})},
   duelAns(d){act('duelAns',{pid:d('p'),i:+d('i')})},
   duelNext(){act('duelNext')},
-  mission(){act('mission')},bagOpen(){act('bagOpen')},bagDraw(){act('bagDraw')},bagStop(){act('bagStop')},endTurn(){act('endTurn')},
+  mission(d){act('mission',{pid:d('p')})},endTurn(){act('endTurn')},
+  bagTab(d){ui.lt=+d('t');render()},
+  bagDraw(d){act('bagDraw',{tid:+d('t')})},bagStop(d){act('bagStop',{tid:+d('t')})},bagCop(d){act('bagCop',{tid:+d('t')})},bagSkip(){act('bagSkip')},
   showM(){ui.showM=!ui.showM;render()},
+  invT(){ui.inv=!ui.inv;render()},
   menu(){ui.menu=!ui.menu;render()},
   takeover(){ui.menu=false;act('takeover')},
   mgStart(){const m=ui.mg,g=S.mg;if(!m||m.st!=='ready')return;
     if(g.type==='react'){m.st='wait';render();setTimeout(()=>{if(ui.mg!==m||m.st!=='wait')return;m.st='go';m.t0=performance.now();render()},1500+rnd(2600))}
     else if(g.type==='taps'){m.st='run';m.n=0;render();setTimeout(()=>{if(ui.mg===m)mgSubmit(m.n)},5000)}
-    else{m.st='show';render();setTimeout(()=>{if(ui.mg!==m)return;m.st='enter';render()},S.cfg.level==='easy'?4000:3000)}},
+    else if(g.type==='clock'){m.st='run';m.t0=performance.now();render();const tick=()=>{if(ui.mg!==m||m.st!=='run')return;const el=$('#clk'),e=performance.now()-m.t0;if(el)el.textContent=e<2000?(e/1000).toFixed(2):'?.??';if(e>15000){mgSubmit(5000);return}requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+    else if(g.type==='odd'){m.st='run';m.r=0;m.pen=0;m.t0=performance.now();render()}
+    else{m.st='show';render();setTimeout(()=>{if(ui.mg!==m)return;m.st='enter';render()},g.type==='count'?(S.cfg.level==='easy'?3500:2500):(S.cfg.level==='easy'?4000:3000))}},
   mgSkip(){act('mgSkip')},mgNext(){act('mgNext')},finNext(){act('finNext')},again(){act('again')}
 };
 const PD={
   mgTap(){const m=ui.mg,g=S&&S.mg;if(!m||!g)return;
     if(g.type==='react'){if(m.st==='wait')mgSubmit(1500);else if(m.st==='go')mgSubmit(Math.min(1500,Math.round(performance.now()-m.t0)))}
-    else if(g.type==='taps'&&m.st==='run'){m.n++;const el=$('#tapn');if(el)el.textContent=m.n}},
+    else if(g.type==='taps'&&m.st==='run'){m.n++;const el=$('#tapn');if(el)el.textContent=m.n}
+    else if(g.type==='clock'&&m.st==='run'){m.st='done';mgSubmit(Math.min(5000,Math.round(Math.abs(performance.now()-m.t0-5000))))}},
+  mgOdd(el){const m=ui.mg,g=S&&S.mg;if(!m||m.st!=='run'||g.type!=='odd')return;const i=+el.getAttribute('data-i');
+    if(i===g.odd[m.r]){m.r++;if(m.r>=3){mgSubmit(Math.min(30000,Math.round(performance.now()-m.t0+m.pen)));return}render()}else{m.pen+=2000;el.style.opacity='.2'}},
   mgKey(el){const m=ui.mg,g=S&&S.mg;if(!m||m.st!=='enter')return;const k=el.getAttribute('data-k');
-    if(k==='x')m.entry=m.entry.slice(0,-1);else m.entry+=k;
-    if(m.entry.length>=g.code.length){let v=0;for(let i=0;i<g.code.length;i++)if(m.entry[i]===g.code[i])v++;mgSubmit(v);return}
+    if(k==='x')m.entry=m.entry.slice(0,-1);
+    else if(k==='ok'){if(g.type==='count'&&m.entry){mgSubmit(Math.min(99,Math.abs(+m.entry-g.cnt)))}return}
+    else if(g.type==='count'){if(m.entry.length<2)m.entry+=k}
+    else m.entry+=k;
+    if(g.type==='mem'&&m.entry.length>=g.code.length){let v=0;for(let i=0;i<g.code.length;i++)if(m.entry[i]===g.code[i])v++;mgSubmit(v);return}
     const e=$('#entry');if(e)e.textContent=m.entry||'·'}
 };
 document.addEventListener('click',e=>{const el=e.target.closest&&e.target.closest('[data-a]');if(!el||el.disabled)return;const f=UIA[el.getAttribute('data-a')];if(f)f(n=>el.getAttribute('data-'+n),el)});
@@ -817,7 +1059,8 @@ document.addEventListener('pointerdown',e=>{const el=e.target.closest&&e.target.
 document.addEventListener('input',e=>{const el=e.target;if(el.id==='pname')ui.draft=el.value;if(el.id==='code')ui.codeDraft=el.value});
 document.addEventListener('change',e=>{const el=e.target,k=el.getAttribute&&el.getAttribute('data-ch');if(!k||!S)return;
   if(k==='team')act('setTeam',{id:el.getAttribute('data-id'),team:+el.value});
-  if(k==='rounds')act('cfg',{k:'rounds',v:+el.value})});
+  if(k==='rounds')act('cfg',{k:'rounds',v:+el.value});
+  if(k==='gun')ui.gun=el.checked});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const id=e.target&&e.target.id;if(id==='pname'){e.preventDefault();UIA.addP()}if(id==='code'){e.preventDefault();UIA.join()}});
 
 /* ---------- oppstart ---------- */
