@@ -152,6 +152,33 @@ body.big .joincode{font-family:var(--display);font-size:1.6rem;letter-spacing:.0
 .banner{background:var(--brick);color:#fff8e6;padding:8px 12px;border-radius:4px;margin-bottom:10px}
 .foot{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){.fuse i{animation:none}}
+
+.pt{display:inline-block;border-radius:50%;overflow:hidden;vertical-align:middle;flex:0 0 auto;border:2px solid var(--ink);background:var(--raise)}
+.pt svg{display:block;width:100%;height:100%}
+.who{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.who h2{margin:0}
+.chars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 0}
+.charb{border:2px solid var(--line);background:var(--raise);border-radius:6px;padding:5px 2px;font-size:.72rem;line-height:1.15;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:44px;min-width:0}
+.charb .pt{width:100%;max-width:58px;aspect-ratio:1/1;height:auto}
+.charb[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 -5px 0 var(--brass)}
+.charb:disabled{opacity:.3}
+.ability{font-size:.92rem;color:var(--muted);min-height:1.4em}
+.prog{display:flex;gap:6px;margin:4px 0 8px;align-items:center}
+.prog i{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);display:block}
+.prog i.ok{background:var(--ok);border-color:var(--ok)}
+.prog i.no{background:var(--bad);border-color:var(--bad)}
+.vs{display:flex;align-items:center;justify-content:space-around;gap:10px;margin:8px 0;text-align:center}
+.vs b{display:block}
+.req{font-size:.88rem;color:var(--muted)}
+.req b{color:var(--ink)}
+.shady{margin-top:12px}
+.shady .row{margin-bottom:6px}
+.res{font-family:var(--display);font-size:1.25rem;margin:.3em 0}
+.opt.gone{visibility:hidden}
+.mini{max-width:420px}
+body.big .who .pt{width:110px!important;height:110px!important}
+body.big .vs .pt{width:110px!important;height:110px!important}
+body.big .res{font-size:1.8rem}
 </style>
 </head>
 <body>
@@ -162,19 +189,15 @@ body.big .joincode{font-family:var(--display);font-size:1.6rem;letter-spacing:.0
 /* ---------- hjelpere ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const clone=o=>JSON.parse(JSON.stringify(o));
 const rnd=n=>Math.floor(Math.random()*n);
 const pick=a=>a[rnd(a.length)];
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
 const LS={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const rid=n=>{let s='';const ab='abcdefghjkmnpqrstuvwxyz23456789';for(let i=0;i<n;i++)s+=pick(ab);return s};
 let CID=LS.get('sot.cid'); if(!CID){CID='c'+rid(10);LS.set('sot.cid',CID)}
+const VERSION=2;
 
 /* ---------- data ---------- */
-const NODES=[['Havna',110,95],['Fiskebrygga',360,70],['Tollboden',650,95],['Kullgruva',90,320],['Jernverket',300,245],['Markedet',520,265],['Stasjonen',715,310],['Bryggeriet',190,470],['Hesteskoen',410,425],['Rådhuset',615,475],['Slakteriet',105,670],['Veddeløpsbanen',340,640],['Kirkebakken',555,670],['Politikammeret',700,600]];
-const EDGES=[[0,1,2],[1,2,3],[0,3,2],[0,4,2],[1,4,1],[1,5,2],[2,5,2],[2,6,2],[3,4,2],[4,5,2],[5,6,2],[3,7,1],[4,7,2],[4,8,2],[5,8,1],[5,9,2],[6,9,1],[7,8,2],[8,9,2],[3,10,4],[7,10,2],[7,11,2],[8,11,2],[8,12,3],[9,12,2],[9,13,1],[6,13,3],[10,11,3],[11,12,2],[12,13,1]];
-const PTS=[0,1,2,4,7];
-const COST=l=>l*2;
 const CATS=['Historie','Geografi','Natur og vitenskap','Sport og lek','Kultur og underholdning','Smått og stort'];
 const TEAM_NAMES=['Sotluene','Kanalrottene','Jernnevene','Nattskiftet','Stålkråkene','Bryggegjengen','Fyrstikkguttene','Kullsvarte','Hesteskoene','Røykdykkerne'];
 const COLORS=['#c0392b','#2e86c1','#d4a017','#2e9e6b','#8e5bb5','#e67e22','#1aa3a3','#d65a94','#5d6d7e','#a0724a'];
@@ -182,7 +205,6 @@ const MG={react:{name:'Rask på avtrekkeren',desc:'Vent på signalet, og trykk s
           taps:{name:'Veddeløpet',desc:'Trykk så mange ganger du klarer på fem sekunder.',fmt:v=>v+' trykk'},
           mem:{name:'Safekoden',desc:'Koden vises et øyeblikk. Husk den, og tast den inn.',fmt:v=>v+' riktige'}};
 const MGORDER=['react','mem','taps'];
-// Format: spørsmål|riktig|feil|feil|feil
 const RAW={easy:[
 [ 'Hva het skipene vikingene seilte med?|Langskip|Galeier|Dampskip|Kanoer','Hvem bygde pyramidene?|Egypterne|Vikingene|Romerne|Kineserne','Hvilken dato er Norges nasjonaldag?|17. mai|1. mai|24. desember|7. juni','Hva kaltes kongene i det gamle Egypt?|Faraoer|Keisere|Høvdinger|Sultaner','Hvilket dyr red ridderne på?|Hest|Kamel|Elefant|Okse','Hvem var det første mennesket som gikk på månen?|Neil Armstrong|Roald Amundsen|Albert Einstein|Christopher Columbus','Hvilken norsk polfarer kom først til Sydpolen?|Roald Amundsen|Fridtjof Nansen|Thor Heyerdahl|Leiv Eiriksson','Hva lyste folk opp husene med før de fikk strøm?|Stearinlys og oljelamper|Lommelykter|Lysrør|Solceller','Hva het flåten Thor Heyerdahl seilte over Stillehavet med?|Kon-Tiki|Fram|Gjøa|Titanic','I hvilken by står Colosseum?|Roma|Paris|Athen|London','Hvilket stort skip sank etter å ha truffet et isfjell i 1912?|Titanic|Fram|Vasa|Kon-Tiki','Hvilke dyr levde på jorda for mange millioner år siden og er nå utdødd?|Dinosaurer|Hester|Elefanter|Hvaler'],
 [ 'Hva er hovedstaden i Norge?|Oslo|Bergen|Trondheim|Stockholm','Hvilket land har form som en støvel?|Italia|Spania|Hellas|Frankrike','Hva heter verdens største hav?|Stillehavet|Atlanterhavet|Nordsjøen|Middelhavet','I hvilket land ligger Paris?|Frankrike|Italia|England|Tyskland','Hva heter Norges høyeste fjell?|Galdhøpiggen|Snøhetta|Gaustatoppen|Glittertind','I hvilken verdensdel ligger Egypt?|Afrika|Asia|Europa|Sør-Amerika','Hva er hovedstaden i Sverige?|Stockholm|København|Göteborg|Helsingfors','Hvilke farger har det norske flagget?|Rødt, hvitt og blått|Rødt og hvitt|Blått og gult|Rødt, gult og blått','Hvor bor isbjørnen?|I Arktis|I Antarktis|I Afrika|I Australia','Hvilket land er kjent for kenguruer?|Australia|India|Canada|Brasil','Hva heter Norges lengste elv?|Glomma|Tana|Numedalslågen|Akerselva','Hva heter verdens høyeste fjell?|Mount Everest|Mont Blanc|Kilimanjaro|Galdhøpiggen'],
@@ -198,24 +220,80 @@ const RAW={easy:[
 [ 'Hvem regisserte «Gudfaren»?|Francis Ford Coppola|Martin Scorsese|Steven Spielberg|Sergio Leone','Hvilket band ga ut albumet «Abbey Road»?|The Beatles|The Rolling Stones|Pink Floyd|The Who','Hvem komponerte «I Dovregubbens hall»?|Edvard Grieg|Johan Svendsen|Jean Sibelius|Ole Bull','Hvilken norsk gruppe slo gjennom med «Take On Me»?|a-ha|Bel Canto|DumDum Boys|Röyksopp','Hvem spilte Jack i filmen «Titanic» fra 1997?|Leonardo DiCaprio|Brad Pitt|Matt Damon|Johnny Depp','Hvem malte «Skrik»?|Edvard Munch|Christian Krohg|Harald Sohlberg|Nikolai Astrup','Hvem skrev «Et dukkehjem»?|Henrik Ibsen|Bjørnstjerne Bjørnson|Knut Hamsun|Alexander Kielland','Hvilket instrument spilte Louis Armstrong?|Trompet|Saksofon|Klarinett|Trombone','Hvilken film vant Oscar for beste film i 2020?|Parasitt|1917|Joker|Green Book','Hvor mange strenger har en fiolin?|Fire|Seks|Fem|Tre','Hvem skrev «Ringenes herre»?|J.R.R. Tolkien|C.S. Lewis|George R.R. Martin|Terry Pratchett','Hvilken musikksjanger vokste frem i New Orleans tidlig på 1900-tallet?|Jazz|Rock and roll|Country|Reggae'],
 [ 'Hvor mange nuller er det i én million?|Seks|Fem|Sju|Ni','Hva er romertallet for 50?|L|C|D|X','Hvilken valuta brukes i Japan?|Yen|Won|Yuan|Baht','Hva betyr «carpe diem»?|Grip dagen|Jeg kom, jeg så|Kunnskap er makt|Tiden flyr','Hvilket metall er flytende ved romtemperatur?|Kvikksølv|Bly|Tinn|Sink','Hvor mange minutter er det i et døgn?|1440|1240|1640|2400','Hvilken farge har «den svarte boksen» i et fly?|Oransje|Svart|Gul|Rød','Hva er hovedingrediensen i guacamole?|Avokado|Erter|Agurk|Lime','Hva er pi avrundet til to desimaler?|3,14|3,41|3,16|3,12','Hvilket år kom den første iPhone i salg?|2007|2005|2009|2003','Hva kalles frykten for trange rom?|Klaustrofobi|Agorafobi|Araknofobi|Akrofobi','Hvilket land kommer osten gouda fra?|Nederland|Belgia|Sveits|Danmark']
 ]};
+const EXTRA={"easy": [["Hva het kongen som kom til Norge i 1905?|Haakon VII|Olav V|Harald V|Oscar II", "Hva skrev vikingene med?|Runer|Hieroglyfer|Kinesiske tegn|Morsekode", "Hva kaller vi et stort hus av stein der riddere og konger bodde?|Borg|Hytte|Telt|Iglo", "Hvilket dyr trakk oftest vognene før bilene kom?|Hesten|Grisen|Sauen|Hunden", "Hva heter den gamle festningen ved havna i Oslo?|Akershus festning|Bergenhus festning|Kristiansten festning|Fredriksten festning", "I hvilket land bodde faraoene?|Egypt|Hellas|Italia|Kina", "Hvem fant ifølge sagaene Amerika lenge før Columbus?|Leiv Eiriksson|Harald Hårfagre|Olav Tryggvason|Erik Blodøks", "Hvem bodde i iglo i gamle dager?|Inuitter|Vikinger|Romere|Egyptere"], ["Hva er hovedstaden i Danmark?|København|Aarhus|Odense|Oslo", "I hvilken verdensdel ligger Norge?|Europa|Asia|Afrika|Amerika", "Hva heter øygruppen langt nord der det bor isbjørn?|Svalbard|Lofoten|Færøyene|Island", "Hvilket land har lengst grense mot Norge?|Sverige|Finland|Russland|Danmark", "Hvilken verdensdel ligger ved Sydpolen?|Antarktis|Arktis|Grønland|Island", "I hvilken by står klokketårnet Big Ben?|London|Paris|Berlin|Roma", "Hva kaller vi et stykke land med vann rundt seg?|Øy|Halvøy|Fjell|Dal", "Hvilket land har et lønneblad i flagget?|Canada|USA|Mexico|Australia"], ["Hvilket dyr sier «mø»?|Ku|Sau|Gris|Hest", "Hva puster fisker med?|Gjeller|Lunger|Nesen|Finnene", "Hvilken planet kalles den røde planeten?|Mars|Venus|Jupiter|Saturn", "Hva kalles det når vann blir til damp?|Fordamping|Frysing|Smelting|Regn", "Hvilket dyr har snabel?|Elefant|Neshorn|Flodhest|Sjiraff", "Hva kaller vi dyr som bare spiser planter?|Planteetere|Rovdyr|Altetere|Insektetere", "Hvor mange årstider har vi i Norge?|Fire|Tre|To|Seks", "Hvilket av disse dyrene legger egg?|Høne|Ku|Hund|Katt"], ["Hva kalles det når én spiller scorer tre mål i samme kamp?|Hat trick|Strike|Ess|Birdie", "Hvilken av disse ballene er størst?|Basketball|Tennisball|Golfball|Bordtennisball", "I hvilken sport hopper man ned en stor bakke på ski?|Skihopp|Slalåm|Langrenn|Skiskyting", "Hvor mange hull har en vanlig golfbane?|18|9|12|20", "I hvilket spill slår man hjem andres brikker etter terningkast?|Ludo|Sjakk|Dam|Bingo", "Hvor mange spiller i et vanlig sjakkparti?|To|Fire|Tre|Seks", "Hvilken sport spilles på is med steiner og koster?|Curling|Ishockey|Bandy|Kunstløp", "Hvor mange baller er i spill samtidig i en fotballkamp?|Én|To|Tre|Fire"], ["Hva heter kjæresten til Mikke Mus?|Minni|Dolly|Klarabella|Andersine", "Hvem er gutten som aldri vil bli voksen?|Peter Pan|Pinocchio|Aladdin|Robin Hood", "Hvem får lengre nese når han lyver?|Pinocchio|Peter Pan|Ole Brumm|Emil", "Hvilket av disse instrumentene blåser man i?|Fløyte|Piano|Gitar|Tromme", "Hvilken farge har Grinchen?|Grønn|Blå|Rød|Lilla", "Hvem hjelper Askepott så hun kan dra på ballet?|Gudmoren|Heksa|Dragen|Kongen", "Hva heter Simbas far i «Løvenes konge»?|Mufasa|Scar|Timon|Pumba", "Hvilket eventyrdyr kan spy ild?|Drage|Enhjørning|Troll|Nisse"], ["Hva er 10 minus 4?|6|5|7|4", "Hvor mange hjul har en sykkel?|To|Tre|Fire|Ett", "Hvilken dag kommer etter fredag?|Lørdag|Søndag|Torsdag|Mandag", "Hvilken farge får du når du blander rødt og hvitt?|Rosa|Lilla|Oransje|Brun", "Hva er 3 ganger 4?|12|7|10|14", "Hvor mange timer er det i et døgn?|24|12|20|48", "Hva kaller vi ungen til en ku?|Kalv|Føll|Lam|Valp", "Hvilken frukt kan være rød eller grønn og vokser på trær her i Norge?|Eple|Banan|Appelsin|Ananas"]], "hard": [["Hvilket år sank Titanic?|1912|1905|1915|1920", "Hvilken keiser grunnla Konstantinopel?|Konstantin den store|Augustus|Nero|Hadrian", "Hvilket år landet Apollo 11 på månen?|1969|1967|1971|1965", "Hvem var USAs første president?|George Washington|Thomas Jefferson|Abraham Lincoln|John Adams", "Hvilket slag i 1066 ga normannerne makten i England?|Slaget ved Hastings|Slaget ved Stamford Bridge|Slaget ved Waterloo|Slaget ved Agincourt", "Hvilket år ble FN grunnlagt?|1945|1919|1948|1950", "Hvilket land ga Frihetsgudinnen til USA?|Frankrike|Storbritannia|Spania|Nederland", "Hvilket år trådte alkoholforbudet i USA i kraft?|1920|1912|1929|1933"], ["Hva heter Afrikas høyeste fjell?|Kilimanjaro|Mount Kenya|Mont Blanc|Aconcagua", "Hva er hovedstaden i Brasil?|Brasília|Rio de Janeiro|São Paulo|Salvador", "Hva heter verdens dypeste innsjø?|Bajkalsjøen|Tanganyikasjøen|Victoriasjøen|Lake Superior", "Hvilket lite land ligger i Pyreneene mellom Spania og Frankrike?|Andorra|Monaco|Liechtenstein|San Marino", "Hva er Norges lengste fjord?|Sognefjorden|Hardangerfjorden|Oslofjorden|Trondheimsfjorden", "Hva er hovedstaden i Skottland?|Edinburgh|Glasgow|Aberdeen|Dundee", "Hvilken elv renner gjennom London?|Themsen|Severn|Mersey|Tyne", "Hva er hovedstaden på Island?|Reykjavík|Akureyri|Tórshavn|Nuuk"], ["Hvilket grunnstoff har symbolet Fe?|Jern|Fluor|Fosfor|Bly", "Hvor mange hjerter har en blekksprut?|Tre|Ett|To|Fire", "Hvilken planet bruker kortest tid rundt sola?|Merkur|Venus|Mars|Jorda", "Hva er kokepunktet for vann ved havnivå i Fahrenheit?|212|100|180|232", "Hva kalles blodårene som fører blod bort fra hjertet?|Arterier|Vener|Kapillærer|Lymfeårer", "Hvem formulerte gravitasjonsloven på 1600-tallet?|Isaac Newton|Galileo Galilei|Johannes Kepler|René Descartes", "Hva heter stjernen nærmest sola?|Proxima Centauri|Sirius|Betelgeuse|Vega", "Hvor mange tenner har et voksent menneske vanligvis, med visdomstenner?|32|28|30|36"], ["Hvor mange minutter varer en håndballkamp for voksne?|60|70|80|90", "Hvilken norsk langrennsløper har vunnet åtte OL-gull?|Marit Bjørgen|Therese Johaug|Bente Skari|Kristin Størmer Steira", "Hvilken by arrangerte sommer-OL i 2012?|London|Beijing|Rio de Janeiro|Athen", "Hvor mange spillere har et volleyballag på banen?|Seks|Fem|Sju|Fire", "Hvor mange runder har en VM-tittelkamp i proffboksing i dag?|12|10|15|8", "Hvor langt er et olympisk svømmebasseng?|50 meter|25 meter|100 meter|33 meter", "Hvilken sport forbindes med Tour de France?|Sykling|Løping|Bilsport|Ridning", "Hvor mange tallfelt er det rundt en dartskive?|20|18|24|12"], ["Hvem malte «Mona Lisa»?|Leonardo da Vinci|Michelangelo|Rafael|Rembrandt", "Hvem skrev romanen «Sult» fra 1890?|Knut Hamsun|Henrik Ibsen|Sigrid Undset|Arne Garborg", "Hvilken norsk forfatter fikk Nobelprisen i litteratur i 1928?|Sigrid Undset|Knut Hamsun|Bjørnstjerne Bjørnson|Cora Sandel", "Hvem komponerte «Måneskinnssonaten»?|Ludwig van Beethoven|Wolfgang Amadeus Mozart|Frédéric Chopin|Johann Sebastian Bach", "Hvilket band hadde Freddie Mercury som vokalist?|Queen|Genesis|Deep Purple|The Police", "Hvem skrev «Peer Gynt»?|Henrik Ibsen|Bjørnstjerne Bjørnson|Ludvig Holberg|Henrik Wergeland", "Hvilken dans forbindes mest med 1920-tallet?|Charleston|Twist|Disco|Lambada", "Hvem skapte detektiven Hercule Poirot?|Agatha Christie|Arthur Conan Doyle|Dorothy L. Sayers|Raymond Chandler"], ["Hva er kvadratroten av 144?|12|14|11|16", "Hvilket år var det første i det 21. århundre?|2001|2000|1999|2010", "Hvor mange sekunder er det i en time?|3600|360|6000|1440", "Hvilket språk har flest morsmålsbrukere i verden?|Mandarin|Engelsk|Spansk|Hindi", "Hva betyr forkortelsen «bl.a.»?|Blant annet|Bare litt av|Blant alle|Blir antatt", "Hva kalles en mangekant med åtte sider?|Oktogon|Heksagon|Pentagon|Dekagon", "Hvilket år kom euro i omløp som sedler og mynter?|2002|1999|2000|2004", "Hva er 15 prosent av 200?|30|15|20|35"]]};
+['easy','hard'].forEach(l=>EXTRA[l].forEach((c,i)=>{RAW[l][i]=RAW[l][i].concat(c)}));
 const BANK={easy:RAW.easy.map(c=>c.map(s=>s.split('|'))),hard:RAW.hard.map(c=>c.map(s=>s.split('|')))};
 
-/* avstander for oppdrag */
-const DIST=(()=>{const n=NODES.length,d=[];for(let i=0;i<n;i++){d.push(Array(n).fill(99));d[i][i]=0}
-  EDGES.forEach(([a,b,l])=>{d[a][b]=d[b][a]=l});
-  for(let k=0;k<n;k++)for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(d[i][k]+d[k][j]<d[i][j])d[i][j]=d[i][k]+d[k][j];return d})();
-const MPAIRS=(()=>{const r=[];for(let i=0;i<NODES.length;i++)for(let j=i+1;j<NODES.length;j++)if(DIST[i][j]>=3)r.push([i,j]);return r})();
+const CHARS=[
+ {n:'Bokseren',k:'bokser',a:'Vinner uavgjorte dueller og ruteutfordringer.',bg:'#8a3b2e',coat:'#3b3236',skin:'#c68642',hair:'short',hc:'#1d1a1c',x:['glove']},
+ {n:'Bookmakeren',k:'bookie',a:'Riktige tips gir laget 2 kr i stedet for 1.',bg:'#2f5d62',coat:'#4a3d42',skin:'#f1c9a5',hat:'bowler',hc:'#1d1a1c',x:['mustache']},
+ {n:'Smuglersken',k:'smugler',a:'Blir hun tatt under et ran, betaler hun bare 1 kr i bot.',bg:'#6b4f8a',coat:'#2a2226',skin:'#e0ac69',hair:'bob',hc:'#3a2418',hat:'cloche',hat2:'#7a1f2b',x:['earring']},
+ {n:'Sjåføren',k:'sjafor',a:'Ruter på lengde 3 og 4 koster 1 kr mindre.',bg:'#3d6b45',coat:'#22303a',skin:'#8d5524',hat:'chauffeur',hc:'#1d1a1c',x:['goggles']},
+ {n:'Professoren',k:'prof',a:'Én gang per tur kan hun fjerne to feil svar.',bg:'#8a6417',coat:'#5b4a3a',skin:'#f6d7b8',hair:'bun',hc:'#9a9a9a',x:['glasses']},
+ {n:'Kortspilleren',k:'kort',a:'Én gang per tur kan han bytte ut et spørsmål.',bg:'#1f4e5a',coat:'#3b3236',skin:'#e0ac69',hair:'short',hc:'#4a2c1a',hat:'eyeshade',x:['card']},
+ {n:'Kjøpmannsdatteren',k:'kjopmann',a:'Starter spillet med 3 kr ekstra.',bg:'#a0522d',coat:'#4b5a3a',skin:'#c68642',hair:'braid',hc:'#2a1a12',hat:'scarf',hat2:'#d4a017',x:['purse']},
+ {n:'Smeden',k:'smed',a:'Rutene til laget hans koster 2 kr ekstra å utfordre.',bg:'#5d6d7e',coat:'#3a2e28',skin:'#f1c9a5',hc:'#6b3a1f',x:['beard','hammer']},
+ {n:'Jockeyen',k:'jockey',a:'Laget hans får 1 kr ekstra i hvert minispill.',bg:'#b8860b',coat:'#7a1f2b',skin:'#8d5524',hat:'jockey',hat2:'#2e86c1',hc:'#1d1a1c',x:[]},
+ {n:'Avisgutten',k:'avis',a:'Nye oppdrag koster ham 1 kr i stedet for 2.',bg:'#4a5f8a',coat:'#5b4a3a',skin:'#f6d7b8',hair:'short',hc:'#b5651d',hat:'newsboy',hat2:'#6b5f5a',x:['freckles','paper']}
+];
+function portrait(ci,px){const c=CHARS[ci];if(!c)return '';const sk=c.skin,ink='#2a2226',hc=c.hc,h2=c.hat2||'#2a2226';
+  let h='<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="'+c.bg+'"/>';
+  h+='<path d="M14 100 C 16 74, 84 74, 86 100 Z" fill="'+c.coat+'"/><rect x="44" y="60" width="12" height="14" fill="'+sk+'"/><path d="M41 74 L50 86 L59 74 Z" fill="#f3ebd6"/>';
+  if(c.hair==='bob')h+='<path d="M29 54 Q27 24 50 24 Q73 24 71 54 L66 54 Q66 34 50 34 Q34 34 34 54 Z" fill="'+hc+'"/>';
+  if(c.hair==='braid')h+='<path d="M67 50 Q76 64 71 80" stroke="'+hc+'" stroke-width="6" fill="none" stroke-linecap="round"/>';
+  h+='<ellipse cx="50" cy="48" rx="17" ry="20" fill="'+sk+'"/>';
+  if(c.hair==='short')h+='<path d="M33 44 Q32 26 50 26 Q68 26 67 44 Q62 34 50 34 Q38 34 33 44 Z" fill="'+hc+'"/>';
+  if(c.hair==='bun')h+='<circle cx="50" cy="25" r="7" fill="'+hc+'"/><path d="M33 44 Q33 28 50 28 Q67 28 67 44 Q60 35 50 35 Q40 35 33 44 Z" fill="'+hc+'"/>';
+  if(c.hair==='bob')h+='<path d="M33 42 Q36 30 50 30 Q64 30 67 42 Q58 36 50 37 Q42 36 33 42 Z" fill="'+hc+'"/>';
+  if(c.x.includes('beard'))h+='<path d="M33 50 Q34 73 50 74 Q66 73 67 50 Q62 61 50 61 Q38 61 33 50 Z" fill="'+hc+'"/>';
+  h+='<circle cx="43" cy="47" r="2" fill="'+ink+'"/><circle cx="57" cy="47" r="2" fill="'+ink+'"/><path d="M45 58 Q50 61 55 58" stroke="'+ink+'" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+  if(c.x.includes('mustache'))h+='<path d="M42 55 Q46 52 50 54 Q54 52 58 55 Q54 57 50 55.5 Q46 57 42 55 Z" fill="'+hc+'"/>';
+  if(c.x.includes('glasses'))h+='<g fill="none" stroke="'+ink+'" stroke-width="1.6"><circle cx="43" cy="47" r="5"/><circle cx="57" cy="47" r="5"/><path d="M48 47 L52 47"/></g>';
+  if(c.x.includes('freckles'))h+='<g fill="#a0623a"><circle cx="40" cy="53" r="1"/><circle cx="43" cy="55" r="1"/><circle cx="57" cy="55" r="1"/><circle cx="60" cy="53" r="1"/></g>';
+  if(c.x.includes('earring'))h+='<circle cx="33.5" cy="55" r="2.2" fill="#d4a017"/>';
+  const hat=c.hat;
+  if(hat==='bowler')h+='<ellipse cx="50" cy="35" rx="25" ry="4.5" fill="'+h2+'"/><path d="M35 35 Q35 16 50 16 Q65 16 65 35 Z" fill="'+h2+'"/><rect x="35" y="30" width="30" height="3" fill="#000" opacity=".35"/>';
+  if(hat==='cloche')h+='<path d="M30 46 Q28 21 50 20 Q72 21 70 46 Q50 37 30 46 Z" fill="'+h2+'"/><path d="M31 40 Q50 32 69 40" stroke="#d4a017" stroke-width="3" fill="none"/>';
+  if(hat==='chauffeur')h+='<rect x="32" y="23" width="36" height="12" rx="4" fill="'+h2+'"/><path d="M32 35 L68 35 L74 41 L32 40 Z" fill="#1d1a1c"/><rect x="32" y="31" width="36" height="3" fill="#c9a24a"/>';
+  if(c.x.includes('goggles'))h+='<g stroke="#1d1a1c" stroke-width="1.5" fill="#9fc3c9"><circle cx="43" cy="27" r="4"/><circle cx="57" cy="27" r="4"/></g>';
+  if(hat==='eyeshade')h+='<path d="M29 37 L71 37 L79 45 L29 42 Z" fill="#2e7d4f" opacity=".92"/><rect x="31" y="35" width="38" height="3" fill="#1d1a1c"/>';
+  if(hat==='scarf')h+='<path d="M30 52 Q28 20 50 21 Q72 20 70 52 Q68 36 50 33 Q32 36 30 52 Z" fill="'+h2+'"/><circle cx="69" cy="54" r="4" fill="'+h2+'"/>';
+  if(hat==='jockey')h+='<path d="M33 39 Q33 20 50 20 Q67 20 67 39 Z" fill="'+h2+'"/><path d="M50 20 L50 39" stroke="#fff8e6" stroke-width="5"/><path d="M60 38 L81 41 L66 35 Z" fill="'+h2+'"/>';
+  if(hat==='newsboy')h+='<ellipse cx="49" cy="31" rx="23" ry="10" fill="'+h2+'"/><path d="M32 37 L66 37 L73 42 L32 41 Z" fill="#1d1a1c" opacity=".75"/><circle cx="49" cy="22" r="2" fill="#1d1a1c"/>';
+  if(c.x.includes('glove'))h+='<circle cx="78" cy="84" r="11" fill="#b3261e"/><ellipse cx="68" cy="80" rx="4" ry="6" fill="#b3261e"/><rect x="72" y="93" width="12" height="7" fill="#f3ebd6"/>';
+  if(c.x.includes('card'))h+='<g transform="rotate(-12 76 83)"><rect x="68" y="72" width="16" height="22" rx="2" fill="#fbf5e4" stroke="#2a2226"/><path d="M76 79 l3 3 -3 4 -3 -4 z" fill="#b3261e"/></g>';
+  if(c.x.includes('purse'))h+='<path d="M68 82 Q68 74 78 74 Q88 74 88 82 L88 92 L68 92 Z" fill="#8a6417" stroke="#2a2226"/><circle cx="78" cy="78" r="2" fill="#d4a017"/>';
+  if(c.x.includes('hammer'))h+='<g transform="rotate(25 74 84)"><rect x="72" y="72" width="5" height="26" fill="#6b4a2a"/><rect x="65" y="67" width="19" height="8" fill="#555"/></g>';
+  if(c.x.includes('paper'))h+='<g transform="rotate(-8 78 84)"><rect x="66" y="74" width="24" height="20" fill="#fbf5e4" stroke="#2a2226"/><path d="M69 79h18M69 83h18M69 87h12" stroke="#2a2226" stroke-width="1.2"/></g>';
+  return '<span class="pt" style="width:'+px+'px;height:'+px+'px">'+h+'</svg></span>';
+}
+
+const MAPS={"sot": {"nodes": [["Havna", 110, 95], ["Fiskebrygga", 360, 70], ["Tollboden", 650, 95], ["Kullgruva", 90, 320], ["Jernverket", 300, 245], ["Markedet", 520, 265], ["Stasjonen", 715, 310], ["Bryggeriet", 190, 470], ["Hesteskoen", 410, 425], ["Rådhuset", 615, 475], ["Slakteriet", 105, 670], ["Veddeløpsbanen", 340, 640], ["Kirkebakken", 555, 670], ["Politikammeret", 700, 600]], "edges": [[0, 1, 2], [1, 2, 3], [0, 3, 2], [0, 4, 2], [1, 4, 1], [1, 5, 2], [2, 5, 2], [2, 6, 2], [3, 4, 2], [4, 5, 2], [5, 6, 2], [3, 7, 1], [4, 7, 2], [4, 8, 2], [5, 8, 1], [5, 9, 2], [6, 9, 1], [7, 8, 2], [8, 9, 2], [3, 10, 4], [7, 10, 2], [7, 11, 2], [8, 11, 2], [8, 12, 3], [9, 12, 2], [9, 13, 1], [6, 13, 3], [10, 11, 3], [11, 12, 2], [12, 13, 1], [4, 5, 2], [5, 8, 1], [5, 6, 2], [8, 9, 2], [0, 3, 2], [11, 12, 2], [1, 5, 2], [7, 11, 2]]}, "havn": {"nodes": [["Fyret", 90, 110], ["Moloen", 300, 95], ["Fiskehallen", 520, 120], ["Tollboden", 715, 105], ["Ferjeleiet", 120, 310], ["Lagerskur 7", 330, 275], ["Kranene", 555, 300], ["Tørrdokka", 720, 345], ["Røykeriet", 95, 525], ["Pakkhuset", 300, 480], ["Sluseporten", 505, 505], ["Sjømannskirka", 710, 565], ["Kanalbroa", 240, 685], ["Verftet", 520, 690]], "edges": [[0, 1, 2], [1, 2, 2], [2, 3, 2], [0, 4, 2], [1, 5, 1], [2, 5, 2], [2, 6, 1], [3, 6, 2], [3, 7, 2], [4, 5, 2], [5, 6, 2], [6, 7, 1], [4, 8, 2], [4, 9, 2], [5, 9, 2], [5, 10, 3], [6, 10, 2], [7, 11, 2], [8, 9, 2], [9, 10, 2], [10, 11, 2], [8, 12, 2], [9, 12, 2], [10, 13, 1], [11, 13, 2], [12, 13, 2], [12, 10, 3], [0, 5, 3], [11, 6, 3], [1, 5, 1], [5, 6, 2], [9, 10, 2], [6, 7, 1], [4, 9, 2], [10, 13, 1], [2, 3, 2], [8, 12, 2]]}, "hei": {"nodes": [["Nordstasjonen", 400, 80], ["Steinbruddet", 120, 130], ["Sølvdalen", 690, 140], ["Gruvebyen", 250, 290], ["Kirkebygda", 540, 280], ["Sagbruket", 90, 430], ["Elvekrysset", 400, 410], ["Kraftverket", 715, 400], ["Gården", 220, 570], ["Markedsbyen", 565, 555], ["Fjellstua", 740, 690], ["Tunnelen", 90, 690], ["Vannstasjonen", 390, 690], ["Sørhavna", 600, 705]], "edges": [[0, 1, 2], [0, 2, 3], [0, 3, 2], [0, 4, 2], [1, 3, 2], [1, 5, 3], [2, 4, 2], [2, 7, 2], [3, 4, 3], [3, 5, 2], [3, 6, 2], [4, 6, 2], [4, 7, 2], [5, 8, 2], [5, 11, 2], [6, 8, 2], [6, 9, 2], [7, 9, 2], [7, 10, 3], [8, 11, 1], [8, 12, 2], [9, 12, 2], [9, 13, 1], [10, 13, 1], [11, 12, 3], [12, 13, 2], [6, 12, 2], [0, 3, 2], [3, 6, 2], [6, 9, 2], [9, 13, 1], [4, 7, 2], [8, 12, 2], [0, 4, 2], [5, 8, 2]]}};
+const MAPINFO={sot:{name:'Sotbyen',desc:'Industribyen ved kanalen',deco:'<path d="M-20 200 C 160 250, 230 130, 430 185 S 650 420, 820 400" fill="none" stroke="var(--teal)" stroke-width="26" opacity=".28" stroke-linecap="round"/>'},
+  havn:{name:'Havnebyen',desc:'Kaier, sluser og verft',deco:'<path d="M-10 -10 L810 -10 L810 50 Q600 70 400 45 Q200 25 -10 55 Z" fill="var(--teal)" opacity=".28"/><path d="M380 330 C 420 420, 470 430, 600 450 S 760 470, 820 480" fill="none" stroke="var(--teal)" stroke-width="22" opacity=".25" stroke-linecap="round"/>'},
+  hei:{name:'Heibanen',desc:'Jernbane over fjell og dal',deco:'<path d="M500 -20 C 470 120, 330 200, 330 330 S 470 480, 470 600 S 420 720, 470 780" fill="none" stroke="var(--teal)" stroke-width="20" opacity=".28" stroke-linecap="round"/><path d="M600 220 l40 -60 l40 60 z M650 230 l30 -45 l30 45 z M60 250 l35 -50 l35 50 z" fill="var(--route)" opacity=".45"/>'}};
+let NODES,EDGES,PAIR,DIST,MPAIRS,MAPID=null;
+function setMap(id){if(!MAPS[id])id='sot';if(id===MAPID)return;MAPID=id;NODES=MAPS[id].nodes;EDGES=MAPS[id].edges;
+  PAIR=EDGES.map((e,i)=>EDGES.findIndex((f,j)=>j!==i&&((f[0]===e[0]&&f[1]===e[1])||(f[0]===e[1]&&f[1]===e[0]))));
+  const n=NODES.length,d=[];for(let i=0;i<n;i++){d.push(Array(n).fill(99));d[i][i]=0}
+  EDGES.forEach(([a,b,l])=>{if(l<d[a][b])d[a][b]=d[b][a]=l});
+  for(let k=0;k<n;k++)for(let i=0;i<n;i++)for(let j=0;j<n;j++)if(d[i][k]+d[k][j]<d[i][j])d[i][j]=d[i][k]+d[k][j];DIST=d;
+  MPAIRS=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(d[i][j]>=3)MPAIRS.push([i,j]);}
+setMap('sot');
+const PTS=[0,1,2,4,7];
+const REQ=[0,1,2,3,4];
+const est=(r,n)=>Math.max(5,Math.round((r*Math.max(1,n)*2.5+Math.floor(r/3)*2)/5)*5);
 
 /* ---------- tilstand ---------- */
-let S=null, role=null;               // role: 'local' | 'host' | 'guest'
-const ui={big:false,stake:2,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:''};
+let S=null, role=null;
+const ui={big:false,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:'',char:null,chFor:null,shady:false};
 let timer=null;
 
 function newState(mode,code){
-  return {v:1,gid:rid(8),code:code||'',mode,host:CID,rev:0,pn:0,phase:'lobby',
-    cfg:{level:'hard',mins:30,teams:0,src:'bank',topic:''},
-    players:[],teams:[],own:EDGES.map(()=>0),order:[],ti:0,round:1,rounds:0,mgEvery:3,mgN:0,
-    turn:{},mg:{},used:LS.get('sot.used')||{},aiq:[],seq:{},fin:0,msg:'',pc:0};
+  return {v:VERSION,gid:rid(8),code:code||'',mode,host:CID,rev:0,pn:0,phase:'lobby',
+    cfg:{level:'hard',rounds:6,teams:0,map:'sot'},
+    players:[],teams:[],own:[],order:[],ti:0,round:1,rounds:0,mgEvery:3,mgN:0,
+    turn:{},duel:{},mg:{},used:LS.get('sot.used')||{},seq:{},fin:0,msg:'',pc:0};
 }
 const T=id=>S.teams.find(t=>t.id===id);
 const PL=id=>S.players.find(p=>p.id===id);
@@ -223,10 +301,16 @@ const members=tid=>S.players.filter(p=>p.team===tid);
 const mine=pid=>{const p=PL(pid);return !!p&&p.owner===CID};
 const isHost=()=>role==='local'||role==='host';
 const owns=(cid,pid)=>{const p=PL(pid);return !!p&&(p.owner===cid||cid===S.host)};
-const catName=c=>(c===5&&S.cfg.topic)?S.cfg.topic:CATS[c];
+const ab=(pid,k)=>{const p=PL(pid);return !!p&&!!CHARS[p.ch]&&CHARS[p.ch].k===k};
+const teamHas=(tid,k)=>members(tid).some(p=>CHARS[p.ch]&&CHARS[p.ch].k===k);
+const catName=c=>CATS[c];
 const tname=t=>esc(t.name);
-function calcRounds(nTeams){const turns=S.cfg.mins*0.8;return Math.max(3,Math.min(14,Math.round(turns/Math.max(1,nTeams))))}
 function teamCount(){if(!S.cfg.teams)return Math.max(1,S.players.length);return Math.max(1,new Set(S.players.map(p=>p.team)).size)}
+const freeChars=except=>{const used=S.players.filter(p=>p.id!==except).map(p=>p.ch);return CHARS.map((_,i)=>i).filter(i=>!used.includes(i))};
+const routeCost=(e,pid)=>{const l=EDGES[e][2];return l+1-((l>=3&&ab(pid,'sjafor'))?1:0)};
+const challengeFee=e=>2+(teamHas(S.own[e],'smed')?2:0);
+const defender=tid=>{const t=T(tid),ms=members(tid);return ms[t.pi%ms.length].id};
+const turnTeam=()=>T(PL(S.turn.pid).team);
 
 /* graf */
 function connected(t,a,b){const adj={};t.routes.forEach(e=>{const[x,y]=EDGES[e];(adj[x]=adj[x]||[]).push(y);(adj[y]=adj[y]||[]).push(x)});
@@ -234,22 +318,23 @@ function connected(t,a,b){const adj={};t.routes.forEach(e=>{const[x,y]=EDGES[e];
 function netLen(t){const par={};const f=x=>par[x]===undefined||par[x]===x?x:(par[x]=f(par[x]));
   t.routes.forEach(e=>{const[a,b]=EDGES[e];par[f(a)]=f(b)});const sum={};let mx=0;
   t.routes.forEach(e=>{const r=f(EDGES[e][0]);sum[r]=(sum[r]||0)+EDGES[e][2];if(sum[r]>mx)mx=sum[r]});return mx}
-function newMission(t){const have=t.missions.map(m=>m.a+'-'+m.b);const short=S.rounds<=4;const c=MPAIRS.filter(([a,b])=>(short?DIST[a][b]<=5:DIST[a][b]>=5)&&!have.includes(a+'-'+b)&&!connected(t,a,b));
-  if(!c.length)return null;const[a,b]=pick(c);return {a,b,v:DIST[a][b]+2,d:0}}
+function newMission(t){const have=t.missions.map(m=>m.a+'-'+m.b);const short=S.rounds<=4;
+  const c=MPAIRS.filter(([a,b])=>(short?DIST[a][b]<=5:DIST[a][b]>=5)&&!have.includes(a+'-'+b)&&!connected(t,a,b));
+  if(!c.length)return null;const[a,b]=pick(c);return {a,b,v:DIST[a][b]+2}}
+const mDone=(t,m)=>connected(t,m.a,m.b);
 const routePts=t=>t.routes.reduce((s,e)=>s+PTS[EDGES[e][2]],0);
 
 /* ---------- spillregler (kjører hos verten) ---------- */
+function newCats(){return shuffle([0,1,2,3,4,5]).slice(0,3)}
 function startTurn(){
   const t=T(S.order[S.ti]),ms=members(t.id),p=ms[t.pi%ms.length];t.pi++;
-  S.turn={pid:p.id,cats:shuffle([0,1,2,3,4,5]).slice(0,3),cat:-1,stake:0,q:{},picked:-2,ok:0,steal:{},bought:0,gotM:0,bag:{},tips:{},tipWin:[],tipDone:0};
+  S.turn={pid:p.id,n:0,ok:0,hist:[],cats:newCats(),cat:-1,q:{},picked:-2,tips:{},tipWin:[],hide:[],u5050:0,uSwap:0,bought:0,gotM:0,bag:{},shady:0,rob:null};
   S.phase='cat';S.pn++;
 }
 function pickQ(cat){
-  const lv=S.cfg.level;let src,ai=0;const ix=S.aiq.findIndex(q=>q.c===cat&&!q.u);
-  if(ix>=0){S.aiq[ix].u=1;src=[S.aiq[ix].q].concat(S.aiq[ix].a);ai=1}
-  else{const pool=BANK[lv][cat],key=lv+cat;let used=S.used[key]||[];let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
-    if(!free.length){used=[];free=pool.map((_,i)=>i)}const i=pick(free);used.push(i);S.used[key]=used;src=pool[i]}
-  const o=shuffle(src.slice(1,5));return {t:src[0],o,r:o.indexOf(src[1]),ai};
+  const lv=S.cfg.level,pool=BANK[lv][cat],key=lv+cat;let used=S.used[key]||[];let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
+  if(!free.length){used=[];free=pool.map((_,i)=>i)}const i=pick(free);used.push(i);S.used[key]=used;const src=pool[i];
+  const o=shuffle(src.slice(1,5));return {t:src[0],o,r:o.indexOf(src[1]),c:cat};
 }
 function startMg(){
   const type=MGORDER[S.mgN%MGORDER.length];S.mgN++;const n=S.cfg.level==='easy'?4:6;let code='';for(let i=0;i<n;i++)code+=rnd(10);
@@ -257,59 +342,96 @@ function startMg(){
 }
 function mgFinish(){
   const g=S.mg,lower=g.type==='react',worst=lower?1500:0;
-  const rows=S.teams.map(t=>{const ms=members(t.id);const v=ms.reduce((s,p)=>s+(g.sc[p.id]==null?worst:g.sc[p.id]),0)/ms.length;return {id:t.id,v:Math.round(v*10)/10,p:0}});
+  const rows=S.teams.map(t=>{const ms=members(t.id);const v=ms.reduce((s,p)=>s+(g.sc[p.id]==null?worst:g.sc[p.id]),0)/ms.length;return {id:t.id,v:Math.round(v*10)/10,p:0,j:0}});
   rows.sort((a,b)=>lower?a.v-b.v:b.v-a.v);const PR=[4,2,1];let rank=0;
-  rows.forEach((r,i)=>{if(i>0&&r.v!==rows[i-1].v)rank=i;r.p=rows.length===1?2:(PR[rank]||0);const t=T(r.id);t.coins+=r.p;t.mg+=r.p});
+  rows.forEach((r,i)=>{if(i>0&&r.v!==rows[i-1].v)rank=i;r.p=rows.length===1?2:(PR[rank]||0);if(teamHas(r.id,'jockey'))r.j=1;const t=T(r.id);t.coins+=r.p+r.j;t.mg+=r.p+r.j});
   g.res=rows;S.phase='mgres';S.pn++;
 }
 function finalScores(){
-  const res=S.teams.map(t=>({id:t.id,rp:routePts(t),mp:t.missions.filter(m=>m.d).reduce((s,m)=>s+m.v,0),cp:Math.floor(t.coins/3),net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,tips:t.tips||0,bon:[],bp:0,tot:0}));
+  const res=S.teams.map(t=>({id:t.id,rp:routePts(t),mp:t.missions.filter(m=>mDone(t,m)).reduce((s,m)=>s+m.v,0),cp:Math.floor(t.coins/3),net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,tips:t.tips||0,heist:t.heist||0,bon:[],bp:0,tot:0}));
   const award=(k,name,pts)=>{const mx=Math.max.apply(null,res.map(r=>r[k]));if(mx<=0)return;res.filter(r=>r[k]===mx).forEach(r=>{r.bon.push(name);r.bp+=pts})};
-  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);award('tips','Beste tippere',3);
+  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);award('tips','Beste tippere',3);award('heist','Mesterbanditten',3);
   res.forEach(r=>r.tot=r.rp+r.mp+r.cp+r.bp);res.sort((a,b)=>b.tot-a.tot);return res;
 }
+function awardTips(){const t=S.turn,win=[],teams={};
+  Object.keys(t.tips||{}).forEach(pid=>{const pl=PL(pid);if(pl&&t.tips[pid]===t.q.r){win.push(pid);pl.tips=(pl.tips||0)+1;teams[pl.team]=(teams[pl.team]||0)||1;if(ab(pid,'bookie'))teams[pl.team]=2}});
+  Object.keys(teams).forEach(id=>{const tm=T(+id);if(tm){tm.coins+=teams[id];tm.tips=(tm.tips||0)+1}});t.tipWin=win;
+  if(win.length)S.msg+=' Riktig tips: '+win.map(id=>PL(id).name).join(', ')+'.'}
+function resolveQ(i){const t=S.turn,tm=turnTeam();t.picked=i;const ok=i===t.q.r;t.hist.push(ok?1:0);t.n++;
+  if(ok){t.ok++;tm.coins+=1;tm.right++;S.msg='Riktig! +1 kr.'}else S.msg=i<0?'Tiden er ute.':'Feil svar.';
+  if(t.n===5&&t.ok===5){tm.coins+=2;S.msg+=' Fem av fem gir 2 kr ekstra.'}
+  awardTips();S.phase='qres';S.pn++}
+function resolveDuel(){const d=S.duel,r=d.q.r,ca=d.ans[d.a]===r,cd=d.ans[d.d]===r;let win=null;
+  if(ca&&!cd)win='a';else if(cd&&!ca)win='d';
+  else{const ba=ab(d.a,'bokser'),bd=ab(d.d,'bokser');if(ba&&!bd)win='a';else if(bd&&!ba)win='d';else if(d.kind==='route')win='d'}
+  const A=T(d.ta),D=T(d.td);d.win=win;
+  if(d.kind==='coins'){if(win){const w=win==='a'?A:D,l=win==='a'?D:A,amt=Math.min(d.stake,l.coins);l.coins-=amt;w.coins+=amt;d.amt=amt;if(win==='a')A.heist=(A.heist||0)+1;
+      S.msg=w.name+' vant duellen og tok '+amt+' kr fra '+l.name+'.'}else S.msg='Uavgjort. Ingen penger skifter eier.'}
+  else{const e=d.e;if(win==='a'){S.own[e]=A.id;D.routes=D.routes.filter(x=>x!==e);A.routes.push(e);A.heist=(A.heist||0)+1;S.msg=A.name+' tok over ruta '+NODES[EDGES[e][0]][0]+'–'+NODES[EDGES[e][1]][0]+'.'}
+      else S.msg=D.name+' forsvarte ruta.'}
+  S.phase='duelres';S.pn++}
 const H={
   cfg(p,cid){if(cid!==S.host||S.phase!=='lobby')return;const c=S.cfg;
     if(p.k==='level'&&(p.v==='easy'||p.v==='hard'))c.level=p.v;
-    if(p.k==='mins'&&[15,30,60].includes(+p.v))c.mins=+p.v;
-    if(p.k==='src'&&(p.v==='bank'||p.v==='ai'))c.src=p.v;
-    if(p.k==='topic')c.topic=String(p.v||'').slice(0,40);
+    if(p.k==='rounds'&&+p.v>=3&&+p.v<=15)c.rounds=+p.v;
+    if(p.k==='map'&&MAPS[p.v])c.map=p.v;
     if(p.k==='teams'&&[0,2,3,4,5].includes(+p.v)){c.teams=+p.v;S.players.forEach((pl,i)=>{pl.team=c.teams?(i%c.teams)+1:0})}},
   addP(p,cid){if(S.phase!=='lobby'||S.players.length>=10)return;const name=String(p.name||'').trim().slice(0,16);if(!name)return;
+    const free=freeChars(null);if(!free.length)return;const ch=free.includes(+p.ch)?+p.ch:free[0];
     S.pc++;const n=S.cfg.teams;let team=0;if(n){const cnt=Array(n).fill(0);S.players.forEach(x=>{if(x.team>=1&&x.team<=n)cnt[x.team-1]++});team=cnt.indexOf(Math.min.apply(null,cnt))+1}
-    S.players.push({id:'p'+S.pc,name,team,owner:cid})},
+    S.players.push({id:'p'+S.pc,name,team,owner:cid,ch,tips:0})},
+  setChar(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;if(freeChars(p.id).includes(+p.ch))PL(p.id).ch=+p.ch},
   delP(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;S.players=S.players.filter(x=>x.id!==p.id)},
   setTeam(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;const t=+p.team;if(t>=1&&t<=S.cfg.teams)PL(p.id).team=t},
-  start(p,cid){if(cid!==S.host||S.phase!=='lobby'||!S.players.length)return;
-    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,tips:0,pi:0});S.players.forEach(pl=>pl.tips=0);
-    S.teams=[];
+  start(p,cid){if(cid!==S.host||S.phase!=='lobby'||!S.players.length)return;setMap(S.cfg.map);
+    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,tips:0,heist:0,pi:0});
+    S.teams=[];S.players.forEach(pl=>pl.tips=0);
     if(!S.cfg.teams)S.players.forEach((pl,i)=>{pl.team=i+1;S.teams.push(mk(i+1,pl.name))});
     else Array.from(new Set(S.players.map(x=>x.team))).sort((a,b)=>a-b).forEach(t=>S.teams.push(mk(t,TEAM_NAMES[t-1])));
-    S.rounds=calcRounds(S.teams.length);S.teams.forEach(t=>{for(let i=0;i<2;i++){const m=newMission(t);if(m)t.missions.push(m)}});
-    S.own=EDGES.map(()=>0);S.order=shuffle(S.teams.map(t=>t.id));S.ti=0;S.round=1;S.mgN=0;S.fin=0;S.aiq=[];
-    S.rounds=calcRounds(S.teams.length);S.mgEvery=S.rounds<=6?2:3;S.msg='Byen ligger åpen. Lykke til.';startTurn()},
-  pickCat(p,cid){const t=S.turn;if(S.phase!=='cat'||!owns(cid,t.pid))return;const c=+p.cat,st=+p.stake;if(!t.cats.includes(c)||![1,2,3].includes(st))return;
-    t.cat=c;t.stake=st;t.q=pickQ(c);S.phase='q';S.pn++;S.msg=''},
-  answer(p,cid){const t=S.turn;const i=+p.i;
-    if(S.phase==='q'){if(!owns(cid,t.pid))return;resolveQ(i)}
-    else if(S.phase==='steal'){if(!owns(cid,t.steal.pid)||i===t.picked)return;resolveSteal(i)}},
+    S.teams.forEach(t=>{members(t.id).forEach(m=>{if(ab(m.id,'kjopmann'))t.coins+=3})});
+    S.rounds=S.cfg.rounds;S.mgEvery=3;
+    S.teams.forEach(t=>{for(let i=0;i<2;i++){const m=newMission(t);if(m)t.missions.push(m)}});
+    S.own=EDGES.map(()=>0);S.order=shuffle(S.teams.map(t=>t.id));S.ti=0;S.round=1;S.mgN=0;S.fin=0;
+    S.msg='Byen ligger åpen. Lykke til.';startTurn()},
+  pickCat(p,cid){const t=S.turn;if(S.phase!=='cat'||!owns(cid,t.pid))return;const c=+p.cat;if(!t.cats.includes(c))return;
+    t.cat=c;t.q=pickQ(c);t.tips={};t.tipWin=[];t.hide=[];t.picked=-2;S.phase='q';S.pn++;S.msg=''},
+  answer(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid))return;const i=+p.i;if(!(i>=0&&i<4)||t.hide.includes(i))return;resolveQ(i)},
+  half(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid)||!ab(t.pid,'prof')||t.u5050)return;t.u5050=1;t.hide=shuffle([0,1,2,3].filter(i=>i!==t.q.r)).slice(0,2)},
+  swap(p,cid){const t=S.turn;if(S.phase!=='q'||!owns(cid,t.pid)||!ab(t.pid,'kort')||t.uSwap)return;t.uSwap=1;t.q=pickQ(t.cat);t.tips={};t.hide=[];S.pn++},
   tip(p,cid){const t=S.turn;if(S.phase!=='q'||S.mode!=='net')return;const i=+p.i;if(!(i>=0&&i<4))return;const at=PL(t.pid).team;
     S.players.forEach(pl=>{if(pl.owner===cid&&pl.team!==at&&t.tips[pl.id]==null)t.tips[pl.id]=i})},
-  timeout(p,cid){if(cid!==S.host||+p.pn!==S.pn)return;if(S.phase==='q')resolveQ(-1);else if(S.phase==='steal')resolveSteal(-1)},
-  next(p,cid){if(S.phase!=='reveal')return;if(!owns(cid,S.turn.pid))return;S.phase='act';S.pn++;S.msg=''},
+  timeout(p,cid){if(cid!==S.host||+p.pn!==S.pn)return;if(S.phase==='q')resolveQ(-1);else if(S.phase==='duel')resolveDuel()},
+  next(p,cid){const t=S.turn;if(S.phase!=='qres'||!owns(cid,t.pid))return;S.msg='';
+    if(t.n>=5){S.phase='act';S.msg=PL(t.pid).name+' fikk '+t.ok+' av 5 riktige.'}else{t.cats=newCats();S.phase='cat'}S.pn++},
   buy(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.bought)return;const e=+p.e;if(!(e>=0&&e<EDGES.length)||S.own[e])return;
-    const tm=T(PL(t.pid).team),c=COST(EDGES[e][2]);if(tm.coins<c)return;tm.coins-=c;S.own[e]=tm.id;tm.routes.push(e);t.bought=1;
+    const tm=turnTeam(),len=EDGES[e][2],c=routeCost(e,t.pid);if(t.ok<REQ[len]||tm.coins<c)return;if(PAIR[e]>=0&&S.own[PAIR[e]]===tm.id)return;
+    const before=tm.missions.map(m=>mDone(tm,m));tm.coins-=c;S.own[e]=tm.id;tm.routes.push(e);t.bought=1;
     S.msg=tm.name+' tok ruta '+NODES[EDGES[e][0]][0]+'–'+NODES[EDGES[e][1]][0]+'.';
-    tm.missions.forEach(m=>{if(!m.d&&connected(tm,m.a,m.b)){m.d=1;S.msg+=' Et oppdrag er fullført!'}})},
-  mission(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.gotM)return;const tm=T(PL(t.pid).team);if(tm.coins<2||tm.missions.length>=4)return;
-    const m=newMission(tm);if(!m)return;tm.coins-=2;tm.missions.push(m);t.gotM=1;S.msg=tm.name+' tok et nytt oppdrag.'},
-  bagOpen(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||!t.ok||t.bag.pool)return;const tm=T(PL(t.pid).team);
+    if(tm.missions.some((m,i)=>!before[i]&&mDone(tm,m)))S.msg+=' Et oppdrag er fullført!'},
+  mission(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.gotM)return;const tm=turnTeam(),c=ab(t.pid,'avis')?1:2;if(tm.coins<c||tm.missions.length>=4)return;
+    const m=newMission(tm);if(!m)return;tm.coins-=c;tm.missions.push(m);t.gotM=1;S.msg=tm.name+' tok et nytt oppdrag.'},
+  bagOpen(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.ok<3||t.bag.pool)return;const tm=turnTeam();
     const pool=[1,1,1,1,2,2,2,4,0,0,0,0];tm.routes.forEach(()=>pool.push(2));t.bag={pool:shuffle(pool),drawn:[],bust:0,done:0,lim:S.cfg.level==='easy'?3:2}},
   bagDraw(p,cid){const t=S.turn,b=t.bag;if(S.phase!=='act'||!owns(cid,t.pid)||!b.pool||b.done||!b.pool.length)return;
     b.drawn.push(b.pool.pop());if(b.drawn.filter(x=>x===0).length>=b.lim){b.bust=1;b.done=1;S.msg='Razzia! Politiet tok hele lasten.'}
     else if(!b.pool.length)H.bagStop(p,cid)},
   bagStop(p,cid){const t=S.turn,b=t.bag;if(S.phase!=='act'||!owns(cid,t.pid)||!b.pool||b.done)return;const sum=b.drawn.reduce((s,x)=>s+x,0);
-    const tm=T(PL(t.pid).team);tm.coins+=sum;tm.bag+=sum;b.done=1;S.msg=tm.name+' smuglet varer for '+sum+' kr.'},
+    const tm=turnTeam();tm.coins+=sum;tm.bag+=sum;b.done=1;S.msg=tm.name+' smuglet varer for '+sum+' kr.'},
+  rob(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.shady)return;const tm=turnTeam(),vt=T(+p.tid);if(!vt||vt===tm||vt.coins<1)return;
+    t.shady=1;const ok=Math.random()<0.5;
+    if(ok){const amt=Math.min(3,vt.coins);vt.coins-=amt;tm.coins+=amt;tm.heist=(tm.heist||0)+1;t.rob={tid:vt.id,ok:1,amt};S.msg='Ranet lyktes! '+tm.name+' stakk av med '+amt+' kr fra '+vt.name+'.'}
+    else{const amt=Math.min(ab(t.pid,'smugler')?1:2,tm.coins);tm.coins-=amt;vt.coins+=amt;t.rob={tid:vt.id,ok:0,amt};S.msg='Tatt på fersk gjerning! '+tm.name+' betaler '+amt+' kr i bot til '+vt.name+'.'}},
+  duel(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.shady)return;const tm=turnTeam(),vt=T(+p.tid);if(!vt||vt===tm)return;
+    const stake=Math.min(3,tm.coins,vt.coins);if(stake<1)return;t.shady=1;
+    S.duel={kind:'coins',a:t.pid,d:defender(vt.id),ta:tm.id,td:vt.id,stake,e:-1,q:pickQ(rnd(6)),ans:{},win:null};S.phase='duel';S.pn++;S.msg=''},
+  challenge(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.shady||t.bought)return;const e=+p.e;if(!(e>=0&&e<EDGES.length))return;
+    const tm=turnTeam(),ow=S.own[e];if(!ow||ow===tm.id)return;if(PAIR[e]>=0&&S.own[PAIR[e]]===tm.id)return;
+    const fee=challengeFee(e);if(t.ok<REQ[EDGES[e][2]]||tm.coins<fee)return;const vt=T(ow);
+    tm.coins-=fee;vt.coins+=fee;t.shady=1;t.bought=1;
+    S.duel={kind:'route',a:t.pid,d:defender(vt.id),ta:tm.id,td:vt.id,stake:0,fee,e,q:pickQ(rnd(6)),ans:{},win:null};S.phase='duel';S.pn++;S.msg=''},
+  duelAns(p,cid){const d=S.duel;if(S.phase!=='duel')return;const pid=p.pid,i=+p.i;if((pid!==d.a&&pid!==d.d)||!owns(cid,pid)||d.ans[pid]!=null||!(i>=0&&i<4))return;
+    d.ans[pid]=i;if(d.ans[d.a]!=null&&d.ans[d.d]!=null)resolveDuel()},
+  duelNext(p,cid){if(S.phase!=='duelres'||!owns(cid,S.turn.pid))return;S.phase='act';S.pn++},
   endTurn(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid))return;if(t.bag.pool&&!t.bag.done)return;
     S.msg='';S.ti++;if(S.ti<S.order.length){startTurn();return}
     S.ti=0;if(S.round>=S.rounds){S.phase='final';S.fin=0;S.pn++;return}
@@ -320,22 +442,10 @@ const H={
   mgSkip(p,cid){if(S.phase!=='mg'||cid!==S.host)return;mgFinish()},
   mgNext(p,cid){if(S.phase!=='mgres')return;S.round++;startTurn()},
   finNext(p,cid){if(S.phase!=='final'||S.fin>=4)return;S.fin++},
-  again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.mg={};S.msg='';S.pn++},
-  takeover(p,cid){if(cid!==S.host)return;const pid=S.phase==='steal'?S.turn.steal.pid:S.turn.pid;const pl=PL(pid);if(pl)pl.owner=S.host}
+  again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.duel={};S.mg={};S.msg='';S.pn++},
+  takeover(p,cid){if(cid!==S.host)return;const ids=S.phase==='duel'?[S.duel.a,S.duel.d]:[S.turn.pid];ids.forEach(id=>{const pl=PL(id);if(pl)pl.owner=S.host})}
 };
-function awardTips(){const t=S.turn;if(t.tipDone)return;t.tipDone=1;const win=[],teams={};
-  Object.keys(t.tips||{}).forEach(pid=>{const pl=PL(pid);if(pl&&t.tips[pid]===t.q.r){win.push(pid);pl.tips=(pl.tips||0)+1;teams[pl.team]=1}});
-  Object.keys(teams).forEach(id=>{const tm=T(+id);if(tm){tm.coins+=1;tm.tips=(tm.tips||0)+1}});t.tipWin=win;
-  if(win.length)S.msg+=' Riktig tips: '+win.map(id=>PL(id).name).join(', ')+' (+1 kr til laget).'}
-function resolveQ(i){const t=S.turn,tm=T(PL(t.pid).team);t.picked=i;
-  if(i===t.q.r){t.ok=1;tm.coins+=t.stake*2;tm.right++;S.msg='Riktig! '+tm.name+' får '+(t.stake*2)+' kr.';awardTips();S.phase='reveal';S.pn++;return}
-  const loss=Math.min(tm.coins,t.stake-1);tm.coins-=loss;S.msg=(i<0?'Tiden er ute. ':'Feil. ')+(loss?tm.name+' mister '+loss+' kr.':'');
-  if(S.order.length>1){const st=T(S.order[(S.ti+1)%S.order.length]),ms=members(st.id);t.steal={team:st.id,pid:ms[st.pi%ms.length].id,picked:-2,ok:0};S.phase='steal';S.pn++}
-  else{awardTips();S.phase='reveal';S.pn++}}
-function resolveSteal(i){const t=S.turn,st=T(t.steal.team);t.steal.picked=i;
-  if(i===t.q.r){t.steal.ok=1;st.coins+=2;st.right++;S.msg=st.name+' snappet svaret og får 2 kr.'}else S.msg='Ingen klarte den.';
-  awardTips();S.phase='reveal';S.pn++}
-function apply(a,cid){try{const h=H[a&&a.t];if(h&&S)h(a.p||{},cid)}catch(e){console.error(e)}}
+function apply(a,cid){try{if(!S)return;setMap(S.cfg.map);const h=H[a&&a.t];if(h)h(a.p||{},cid)}catch(e){console.error(e)}}
 
 /* ---------- lagring og nett (PeerJS, direkte mellom enheter) ---------- */
 const NET_OK=()=>typeof window.Peer!=='undefined';
@@ -397,23 +507,26 @@ function joinGame(code){
 }
 function sendAct(t,p){mySeq=Math.max(mySeq+1,Date.now());const a={seq:mySeq,t,p:p||{},gid:S.gid};outbox.push(a);outbox=outbox.slice(-6);
   if(hostConn&&hostConn.open){try{hostConn.send({k:'act',cid:CID,a})}catch(e){}}}
+
 let pendTok=0;
 function act(t,p){
   if(!S)return;
   if(role==='guest'){sendAct(t,p);ui.pending=true;const k=++pendTok;setTimeout(()=>{if(k===pendTok&&ui.pending){ui.pending=false;render()}},4000);render()}
   else{apply({t,p:p||{}},CID);commit()}
 }
+const qDur=()=>{const b=S.cfg.level==='easy'?40:30;if(S.phase==='duel'){const d=S.duel;return (PL(d.a)&&PL(d.d)&&PL(d.a).owner===PL(d.d).owner)?b*2:b}return b};
 function onState(){
-  if(S.pn!==ui.pn){ui.pn=S.pn;ui.pnAt=Date.now();ui.cat=null;ui.stake=2;ui.sel=null;ui.menu=false;if(role==='local')ui.showM=false;if(S.phase!=='mg')ui.mg=null}
-  if(isHost()&&(S.phase==='q'||S.phase==='steal')&&ui.timerPn!==S.pn){ui.timerPn=S.pn;clearTimeout(timer);const pn=S.pn;
+  setMap(S.cfg.map);
+  if(S.pn!==ui.pn){ui.pn=S.pn;ui.pnAt=Date.now();ui.cat=null;ui.sel=null;ui.menu=false;ui.shady=false;if(role==='local')ui.showM=false;if(S.phase!=='mg')ui.mg=null}
+  if(isHost()&&(S.phase==='q'||S.phase==='duel')&&ui.timerPn!==S.pn){ui.timerPn=S.pn;clearTimeout(timer);const pn=S.pn;
     timer=setTimeout(()=>{if(S&&S.pn===pn&&isHost()){apply({t:'timeout',p:{pn}},CID);commit()}},qDur()*1000+(role==='host'?1500:0))}
   render();
 }
-const qDur=()=>S.phase==='steal'?20:(S.cfg.level==='easy'?45:30);
 
 /* ---------- visning ---------- */
 function render(){
   document.body.classList.toggle('big',!!(ui.big&&S&&role==='host'));keepAwake();
+  if(S)setMap(S.cfg.map);
   const app=$('#app');const ae=document.activeElement,fid=ae&&ae.id,pos=ae&&ae.selectionStart;
   app.innerHTML=!S?homeHTML():S.phase==='lobby'?lobbyHTML():gameHTML();
   if(fid){const el=document.getElementById(fid);if(el&&el.tagName==='INPUT'){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
@@ -425,122 +538,167 @@ function homeHTML(){
   return '<div class="home">'+banner()+'<h1>Sotbyen</h1><p class="smoke">Året er 1922. Røyken ligger tung over byen, og gatene skal fordeles. Den som vet mest, tar mest.</p>'
   +(ui.busy?'<p>'+esc(ui.busy)+'</p>':'')
   +'<div class="stack">'
-  +(sl&&sl.phase&&sl.phase!=='lobby'?'<button class="choice" data-a="resumeLocal"><b>Fortsett spillet på denne enheten</b><span>Runde '+sl.round+' av '+sl.rounds+'</span></button>':'')
+  +(sl&&sl.v===VERSION&&sl.phase&&sl.phase!=='lobby'?'<button class="choice" data-a="resumeLocal"><b>Fortsett spillet på denne enheten</b><span>Runde '+sl.round+' av '+sl.rounds+'</span></button>':'')
   +(sn&&netOk?'<button class="choice" data-a="resumeNet"><b>Tilbake til spill '+esc(sn.code)+'</b><span>'+(sn.role==='host'?'Du er vert':'Du er med som spiller')+'</span></button>':'')
-  +'<button class="choice" data-a="newLocal"><b>Spill på denne enheten</b><span>Send telefonen rundt, eller vis spillet på en større skjerm.</span></button>'
   +'<button class="choice" data-a="newBig" '+(netOk?'':'disabled')+'><b>Storskjerm som spillbrett</b><span>'+(netNote||'Denne skjermen viser kart, spørsmål og poeng. Alle spiller, følger med og tipper fra egen telefon.')+'</span></button>'
   +'<button class="choice" data-a="newHost" '+(netOk?'':'disabled')+'><b>Mobil mot mobil</b><span>'+(netNote||'Denne telefonen blir vert og spiller selv. De andre blir med med en kode.')+'</span></button>'
+  +'<button class="choice" data-a="newLocal"><b>Spill på denne enheten</b><span>Send telefonen rundt, eller vis spillet på en skjerm uten egne telefoner.</span></button>'
   +'<div class="card"><h3>Bli med i et spill</h3><div class="row"><input type="text" id="code" inputmode="text" autocapitalize="characters" autocomplete="off" maxlength="4" placeholder="Kode på fire bokstaver" value="'+esc(ui.codeDraft)+'" aria-label="Spillkode"><button class="btn" data-a="join" '+(netOk?'':'disabled')+'>Bli med</button></div>'
   +(netNote?'<p class="small muted">'+netNote+'</p>':'')+'</div>'
   +'</div><details><summary>Slik spiller dere</summary><ol>'
-  +'<li>Velg kategori og innsats. Riktig svar gir dobbel innsats i kroner. Feil svar koster innsatsen minus én, og neste lag får prøve seg.</li>'
-  +'<li>Bruk kronene på ruter mellom bydelene. Lange ruter gir flest poeng. Hvert lag har hemmelige oppdrag: knytt to steder sammen med egne ruter.</li>'
-  +'<li>Svarte du riktig, kan du prøve smuglerposen. Trekk varer så lenge du tør. For mange politibrikker, og lasten er tapt.</li>'
-  +'<li>Spiller dere med egne telefoner, kan alle på de andre lagene tippe svaret mens noen svarer. Riktig tips gir laget 1 kr, og de beste tipperne får bonus til slutt.</li><li>Mellom rundene møtes alle i et minispill om ekstra kroner.</li>'
-  +'<li>Til slutt telles ruter, oppdrag, kroner og bonuspriser.</li></ol></details></div>';
+  +'<li>Hver tur består av fem spørsmål. Du velger kategori før hvert spørsmål, og hvert riktige svar gir 1 kr. Fem av fem gir 2 kr ekstra.</li>'
+  +'<li>Etter spørsmålene kan du kjøpe én rute. Ruta krever like mange riktige svar som lengden sin (1–4), og koster lengden pluss én krone. Lange ruter gir mest poeng.</li>'
+  +'<li>Hvert lag har hemmelige oppdrag: knytt to steder sammen med egne ruter. Noen strekninger har doble spor, slik at to lag kan eie hvert sitt.</li>'
+  +'<li>Én gang per tur kan du gjøre noe lyssky: utfordre et lag til duell om kroner, rane dem, eller utfordre dem om en rute.</li>'
+  +'<li>Med egne telefoner kan alle på de andre lagene tippe hvert spørsmål. Riktig tips gir laget 1 kr.</li>'
+  +'<li>Hver tredje runde møtes alle i et minispill. Til slutt telles ruter, oppdrag, kroner og bonuspriser.</li></ol></details></div>';
 }
 function seg(k,cur,opts,dis){return '<div class="seg" role="group">'+opts.map(o=>'<button data-a="cfg" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(cur)===String(o[0]))+'" '+(dis?'disabled':'')+'>'+o[1]+'</button>').join('')+'</div>'}
+function charGrid(forPid){const free=freeChars(forPid);const cur=forPid?PL(forPid).ch:ui.char;
+  let s='<div class="chars" role="group" aria-label="Velg figur">'+CHARS.map((c,i)=>'<button class="charb" data-a="'+(forPid?'setChar':'pickChar')+'" data-c="'+i+'" aria-pressed="'+(cur===i)+'" '+(free.includes(i)?'':'disabled')+'>'+portrait(i,52)+'<span>'+c.n+'</span></button>').join('')+'</div>';
+  const show=cur!=null&&CHARS[cur]?cur:null;
+  return s+'<div class="ability">'+(show!=null?'<b>'+CHARS[show].n+':</b> '+CHARS[show].a:'Velg en figur. Hver figur har en liten evne.')+'</div>';
+}
 function lobbyHTML(){
   const c=S.cfg,h=isHost(),net=S.mode==='net';const n=teamCount();
   let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><button class="btn ghost" data-a="quit">Forlat</button></div>';
   if(net){const link=location.href.split('#')[0]+'#'+S.code;let qr='';try{if(typeof window.qrcode==='function'){const q=window.qrcode(0,'M');q.addData(link);q.make();qr=q.createSvgTag({cellSize:4,margin:2,scalable:true})}}catch(e){}
-    s+='<div class="card row" style="margin-bottom:12px;align-items:center;gap:16px">'+(qr?'<div class="qr" aria-label="QR-kode for å bli med">'+qr+'</div>':'')+'<div style="flex:1;min-width:200px"><div class="small muted">Spillkode</div><div class="code">'+esc(S.code)+'</div><p class="small">Skann koden med telefonen, eller åpn '+esc(link.split('#')[0])+' og skriv inn koden.</p>'+(role==='guest'?'':'<p class="small muted">Hold denne skjermen åpen gjennom hele spillet. Den styrer spillet.</p>')+'</div></div>'}
+    s+='<div class="card row" style="margin-bottom:12px;align-items:center;gap:16px">'+(qr?'<div class="qr" aria-label="QR-kode for å bli med">'+qr+'</div>':'')+'<div style="flex:1;min-width:200px"><div class="small muted">Spillkode</div><div class="code">'+esc(S.code)+'</div><p class="small">Skann koden med telefonen, eller åpne '+esc(link.split('#')[0])+' og skriv inn koden.</p>'+(role==='guest'?'':'<p class="small muted">Hold denne skjermen åpen gjennom hele spillet. Den styrer spillet.</p>')+'</div></div>'}
   s+='<div class="game"><div class="card"><h2>Oppsett</h2>';
   if(!h)s+='<p class="small muted">Verten velger oppsettet.</p>';
   s+='<div class="field"><div class="lab">Nivå</div>'+seg('level',c.level,[['easy','Barn (lett)'],['hard','Voksen (vanskelig)']],!h)+'</div>'
-   +'<div class="field"><div class="lab">Lengde</div>'+seg('mins',c.mins,[[15,'Ca. 15 min'],[30,'Ca. 30 min'],[60,'Ca. 60 min']],!h)+'<div class="small muted">Gir omtrent '+calcRounds(n)+' runder med '+n+' '+(S.cfg.teams?'lag':(n===1?'spiller':'spillere'))+'.</div></div>'
+   +'<div class="field"><label for="rounds">Antall runder</label><select id="rounds" data-ch="rounds" '+(h?'':'disabled')+'>'+Array.from({length:13},(_,i)=>i+3).map(r=>'<option value="'+r+'" '+(r===c.rounds?'selected':'')+'>'+r+' runder (ca. '+est(r,n)+' min)</option>').join('')+'</select><div class="small muted">Tiden er beregnet for '+n+' '+(c.teams?'lag':(n===1?'spiller':'spillere'))+', og endrer seg når flere blir med.</div></div>'
    +'<div class="field"><div class="lab">Lag</div>'+seg('teams',c.teams,[[0,'Alle mot alle'],[2,'2 lag'],[3,'3 lag'],[4,'4 lag'],[5,'5 lag']],!h)+'<div class="small muted">Lagene kan være ulike store.</div></div>'
+   +'<div class="field"><div class="lab">Kart</div>'+seg('map',c.map,Object.keys(MAPINFO).map(k=>[k,MAPINFO[k].name]),!h)+'<div class="small muted">'+MAPINFO[c.map].desc+'</div></div>'
+   +'<div class="mapwrap mini">'+mapSVG(null)+'</div>'
+   +(h&&ui.big?'<button class="btn ghost wide" style="margin-top:12px" data-a="fs">Fullskjerm</button>':'')
    +'</div>';
   s+='<div class="card"><h2>Spillere</h2>';
   if(!S.players.length)s+='<p class="muted">Ingen har satt seg ved bordet ennå. Legg til den første spilleren.</p>';
   S.players.forEach(p=>{const can=p.owner===CID||h;
-    s+='<div class="prow"><span class="nm">'+(c.teams?'<span class="dot" style="background:'+COLORS[(p.team-1)%10]+'"></span> ':'')+esc(p.name)+(net&&p.owner===CID?' <span class="small muted">(denne enheten)</span>':'')+'</span>'
+    s+='<div class="prow">'+portrait(p.ch,40)+'<span class="nm">'+(c.teams?'<span class="dot" style="background:'+COLORS[(p.team-1)%10]+'"></span> ':'')+esc(p.name)+' <span class="small muted">'+CHARS[p.ch].n+'</span>'+(net&&p.owner===CID?' <span class="small muted">(denne enheten)</span>':'')+'</span>'
      +(c.teams?(can?'<select data-ch="team" data-id="'+p.id+'" aria-label="Lag for '+esc(p.name)+'">'+Array.from({length:c.teams},(_,i)=>'<option value="'+(i+1)+'" '+(p.team===i+1?'selected':'')+'>'+TEAM_NAMES[i]+'</option>').join('')+'</select>':'<span class="small">'+TEAM_NAMES[p.team-1]+'</span>'):'')
-     +(can?'<button class="x" data-a="delP" data-id="'+p.id+'" aria-label="Fjern '+esc(p.name)+'">×</button>':'')+'</div>'});
-  if(S.players.length<10)s+='<div class="row" style="margin-top:12px"><input type="text" id="pname" maxlength="16" placeholder="'+(ui.big&&role==='host'?'Navn (spiller uten telefon)':'Navn')+'" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til spiller</button></div>';
+     +(can?'<button class="x" data-a="chFor" data-id="'+p.id+'" aria-label="Bytt figur for '+esc(p.name)+'" title="Bytt figur">↻</button><button class="x" data-a="delP" data-id="'+p.id+'" aria-label="Fjern '+esc(p.name)+'">×</button>':'')+'</div>'});
+  if(ui.chFor&&PL(ui.chFor))s+='<div class="card" style="margin-top:12px"><h3>Ny figur for '+esc(PL(ui.chFor).name)+'</h3>'+charGrid(ui.chFor)+'<button class="btn ghost" data-a="chDone">Ferdig</button></div>';
+  else if(S.players.length<10){s+='<div style="margin-top:14px"><h3>Ny spiller</h3>'+charGrid(null)+'<div class="row" style="margin-top:8px"><input type="text" id="pname" maxlength="16" placeholder="'+(ui.big&&role==='host'?'Navn (spiller uten telefon)':'Navn')+'" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til spiller</button></div></div>'}
   else s+='<p class="small muted">Bordet er fullt: ti spillere.</p>';
-  if(h&&ui.big)s+='<button class="btn ghost wide" style="margin-top:16px" data-a="fs">Fullskjerm</button>';
   if(h)s+='<button class="btn wide" style="margin-top:16px" data-a="start" '+(S.players.length?'':'disabled')+'>Start spillet</button>';
   else s+='<p class="muted" style="margin-top:14px">Venter på at verten starter spillet.</p>';
   return s+'</div></div>';
 }
 function mapSVG(mt){
-  const t=S.turn,canPick=S.phase==='act'&&mine(t.pid)&&!t.bought;
+  const t=S.turn||{},act=S.phase==='act'&&mine(t.pid)&&!t.bought,own=S.own&&S.own.length===EDGES.length?S.own:EDGES.map(()=>0);
+  const myTeam=act?PL(t.pid).team:0;
   const goals={};if(ui.showM&&mt)mt.missions.forEach(m=>{goals[m.a]=1;goals[m.b]=1});
-  let s='<svg viewBox="0 0 800 750" class="mapsvg" role="img" aria-label="Kart over Sotbyen"><path class="canal" d="M-20 200 C 160 250, 230 130, 430 185 S 650 420, 820 400"/>';
-  EDGES.forEach((e,i)=>{const A=NODES[e[0]],B=NODES[e[1]],dx=B[1]-A[1],dy=B[2]-A[2],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L,pad=24,gap=7,len=e[2];
-    const tot=L-2*pad,sl=(tot-gap*(len-1))/len,own=S.own[i],col=own?T(own)&&T(own).color:null;
-    s+='<g class="rt'+(ui.sel===i?' sel':'')+'"'+(canPick&&!own?' data-a="sel" data-e="'+i+'"':'')+'>';
-    for(let k=0;k<len;k++){const a=pad+k*(sl+gap),b=a+sl;const c='x1="'+(A[1]+ux*a).toFixed(1)+'" y1="'+(A[2]+uy*a).toFixed(1)+'" x2="'+(A[1]+ux*b).toFixed(1)+'" y2="'+(A[2]+uy*b).toFixed(1)+'"';
+  let s='<svg viewBox="0 0 800 750" class="mapsvg" role="img" aria-label="Kart over '+MAPINFO[MAPID].name+'">'+MAPINFO[MAPID].deco;
+  EDGES.forEach((e,i)=>{const A=NODES[e[0]],B=NODES[e[1]];let ax=A[1],ay=A[2],bx=B[1],by=B[2];const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+    if(PAIR[i]>=0){const sg=i<PAIR[i]?-1:1,o=10*sg;ax+=-uy*o;ay+=ux*o;bx+=-uy*o;by+=ux*o}
+    const pad=24,gap=7,len=e[2],tot=L-2*pad,sl=(tot-gap*(len-1))/len,ow=own[i],col=ow&&T(ow)?T(ow).color:null;
+    const clickable=act&&(!ow||(ow!==myTeam&&!t.shady))&&!(PAIR[i]>=0&&own[PAIR[i]]===myTeam);
+    s+='<g class="rt'+(ui.sel===i?' sel':'')+'"'+(clickable?' data-a="sel" data-e="'+i+'"':'')+'>';
+    for(let k=0;k<len;k++){const a=pad+k*(sl+gap),b=a+sl;const c='x1="'+(ax+ux*a).toFixed(1)+'" y1="'+(ay+uy*a).toFixed(1)+'" x2="'+(ax+ux*b).toFixed(1)+'" y2="'+(ay+uy*b).toFixed(1)+'"';
       s+=col?'<line class="segb" '+c+'/><line class="segc" stroke="'+col+'" '+c+'/>':'<line class="seg0" '+c+'/>'}
-    if(canPick&&!own)s+='<line class="hit" x1="'+A[1]+'" y1="'+A[2]+'" x2="'+B[1]+'" y2="'+B[2]+'"/>';
+    if(clickable)s+='<line class="hit" style="stroke-width:'+(PAIR[i]>=0?20:46)+'px" x1="'+ax.toFixed(1)+'" y1="'+ay.toFixed(1)+'" x2="'+bx.toFixed(1)+'" y2="'+by.toFixed(1)+'"/>';
     s+='</g>'});
   NODES.forEach((n,i)=>{s+='<circle class="nd'+(goals[i]?' goal':'')+'" cx="'+n[1]+'" cy="'+n[2]+'" r="15"/><text class="nl" x="'+n[1]+'" y="'+(n[2]+42)+'">'+n[0]+'</text>'});
   return s+'</svg>';
 }
-function missionTeam(){const t=S.turn;if(t.pid&&S.phase!=='mg'&&S.phase!=='mgres'&&S.phase!=='final'&&mine(S.phase==='steal'?t.pid:t.pid))return T(PL(t.pid).team);
+function missionTeam(){const t=S.turn;if(t&&t.pid&&['cat','q','qres','act','duel','duelres'].includes(S.phase)&&mine(t.pid))return turnTeam();
   const mt=Array.from(new Set(S.players.filter(p=>p.owner===CID).map(p=>p.team)));return mt.length===1?T(mt[0]):null}
 function missionsHTML(mt){if(!mt)return '';
-  return '<div class="card" style="margin-top:10px"><h3>Hemmelige oppdrag for '+tname(mt)+'</h3>'+mt.missions.map(m=>'<div>'+(m.d?'✓ ':'')+NODES[m.a][0]+' til '+NODES[m.b][0]+' <span class="muted">('+m.v+' poeng)</span></div>').join('')+'</div>'}
+  return '<div class="card" style="margin-top:10px"><h3>Hemmelige oppdrag for '+tname(mt)+'</h3>'+mt.missions.map(m=>'<div>'+(mDone(mt,m)?'✓ ':'')+NODES[m.a][0]+' til '+NODES[m.b][0]+' <span class="muted">('+m.v+' poeng)</span></div>').join('')+'</div>'}
 function fuse(){const d=qDur(),el=Math.min(d,(Date.now()-ui.pnAt)/1000);return '<div class="fuse" aria-hidden="true"><i style="animation-duration:'+d+'s;animation-delay:-'+el.toFixed(1)+'s"></i></div>'}
+function whoHTML(pid,extra){const p=PL(pid),tm=T(p.team);return '<div class="who">'+portrait(p.ch,56)+'<div><h2>'+esc(p.name)+(extra||'')+'</h2><div class="small muted">'+(S.cfg.teams?tname(tm)+'. ':'')+CHARS[p.ch].n+'</div></div></div>'}
+function progHTML(){const t=S.turn;let s='<div class="prog" aria-label="'+t.ok+' riktige av '+t.n+'">';for(let i=0;i<5;i++)s+='<i class="'+(i<t.hist.length?(t.hist[i]?'ok':'no'):'')+'"></i>';
+  return s+'<span class="small">'+t.ok+' riktige</span></div>'}
+const reqHTML=()=>'<div class="req">Rute på lengde 1, 2, 3 eller 4 krever like mange riktige svar.</div>';
+function catHTML(){
+  const t=S.turn,p=PL(t.pid);
+  let s=whoHTML(t.pid,' sin tur')+progHTML()+'<p class="small muted">Spørsmål '+(t.n+1)+' av 5</p>';
+  if(!mine(p.id))return s+'<p>'+esc(p.name)+' velger kategori.</p><div class="cats">'+t.cats.map(c=>'<div class="catb">'+esc(catName(c))+'</div>').join('')+'</div>'+reqHTML();
+  return s+'<div class="cats" role="group" aria-label="Kategori">'+t.cats.map(c=>'<button class="catb" data-a="cat" data-c="'+c+'" '+(ui.pending?'disabled':'')+'>'+esc(catName(c))+'</button>').join('')+'</div>'+reqHTML();
+}
 function qHTML(){
-  const t=S.turn,q=t.q,ph=S.phase,rev=ph==='reveal',steal=ph==='steal';
-  const who=steal?PL(t.steal.pid):PL(t.pid),can=!rev&&mine(who.id)&&!ui.pending;
-  const at=PL(t.pid).team,tips=t.tips||{},net=S.mode==='net';
+  const t=S.turn,q=t.q,ph=S.phase,rev=ph==='qres',who=PL(t.pid),can=!rev&&mine(who.id)&&!ui.pending;
+  const at=who.team,tips=t.tips||{},net=S.mode==='net';
   const elig=net?S.players.filter(pl=>pl.team!==at):[],myElig=elig.filter(pl=>pl.owner===CID);
-  const myTip=myElig.length?tips[myElig[0].id]:undefined,tipMode=ph==='q'&&!mine(t.pid)&&myElig.length>0;
-  let s='<div class="slip"><div class="cat">'+esc(catName(t.cat))+' <span class="muted">innsats '+t.stake+'</span></div><div class="qt">'+esc(q.t)+'</div>';
+  const myTip=myElig.length?tips[myElig[0].id]:undefined,tipMode=!rev&&!mine(t.pid)&&myElig.length>0;
+  let s=whoHTML(t.pid)+progHTML()+'<div class="slip"><div class="cat">'+esc(catName(t.cat))+' <span class="muted">spørsmål '+(rev?t.n:t.n+1)+' av 5</span></div><div class="qt">'+esc(q.t)+'</div>';
   q.o.forEach((o,i)=>{let cls='opt',dis=!can,a='ans';
-    if(rev){if(i===q.r)cls+=' right';else if(i===t.picked||i===t.steal.picked)cls+=' wrong';else cls+=' dim'}
-    else if(steal&&i===t.picked){cls+=' wrong';dis=true}
+    if(rev){if(i===q.r)cls+=' right';else if(i===t.picked)cls+=' wrong';else cls+=' dim'}
+    else if(t.hide.includes(i)){cls+=' gone';dis=true}
     else if(tipMode){a='tip';dis=myTip!=null||ui.pending}
     if(myTip===i&&!(rev&&i===q.r))cls+=' mytip';
     s+='<button class="'+cls+'" data-a="'+a+'" data-i="'+i+'" '+(dis?'disabled':'')+'><i>'+'ABCD'[i]+'</i><span>'+esc(o)+(myTip===i?' <small>(ditt tips)</small>':'')+'</span></button>'});
   if(!rev)s+=fuse();
-  if(elig.length&&ph==='q')s+='<div class="small muted">Tips inne: '+elig.filter(pl=>tips[pl.id]!=null).length+' av '+elig.length+'</div>';
+  if(elig.length&&!rev)s+='<div class="small muted">Tips inne: '+elig.filter(pl=>tips[pl.id]!=null).length+' av '+elig.length+'</div>';
   s+='</div>';
-  if(tipMode)s+='<div class="tipnote">'+(myTip==null?'Tipp svaret før '+esc(PL(t.pid).name)+' svarer. Riktig tips gir laget ditt 1 kr.':'Tipset er låst. Vent på svaret.')+'</div>';
+  if(can&&(ab(t.pid,'prof')&&!t.u5050||ab(t.pid,'kort')&&!t.uSwap)){s+='<div class="row" style="margin-top:10px">';
+    if(ab(t.pid,'prof')&&!t.u5050)s+='<button class="btn ghost" data-a="half">Fjern to feil svar</button>';
+    if(ab(t.pid,'kort')&&!t.uSwap)s+='<button class="btn ghost" data-a="swap">Bytt spørsmål</button>';s+='</div>'}
+  if(tipMode)s+='<div class="tipnote">'+(myTip==null?'Tipp svaret før '+esc(who.name)+' svarer. Riktig tips gir laget ditt '+(myElig.some(pl=>ab(pl.id,'bookie'))?'2 kr':'1 kr')+'.':'Tipset er låst. Vent på svaret.')+'</div>';
   if(rev&&myElig.length&&myTip!=null)s+='<div class="tipnote">'+(myTip===q.r?'Du tippet riktig.':'Du tippet feil denne gangen.')+'</div>';
-  if(rev){if(q.ai)s+='<p class="small muted">Dette spørsmålet er skrevet av Claude og kan inneholde feil.</p>';
-    const ok=mine(t.pid)||isHost();s+='<button class="btn wide" style="margin-top:12px" data-a="next" '+(ok&&!ui.pending?'':'disabled')+'>Videre</button>'+(ok?'':'<p class="small muted">'+esc(PL(t.pid).name)+' går videre.</p>')}
-  else s+='<p style="margin-top:10px">'+(steal?'<b>Sjanse for '+tname(T(t.steal.team))+':</b> '+esc(who.name)+' kan snappe svaret for 2 kr.':'<b>'+esc(who.name)+'</b> svarer for '+tname(T(who.team))+'.')+'</p>';
-  return s;
-}
-function catHTML(){
-  const t=S.turn,p=PL(t.pid),tm=T(p.team);
-  let s='<h2>'+esc(p.name)+' sin tur</h2>';
-  if(S.teams.length&&S.cfg.teams)s+='<p class="muted">'+tname(tm)+'</p>';
-  if(!mine(p.id))return s+'<p>'+esc(p.name)+' velger kategori og innsats.</p><div class="cats">'+t.cats.map(c=>'<div class="catb">'+esc(catName(c))+'</div>').join('')+'</div>';
-  s+='<div class="cats" role="group" aria-label="Kategori">'+t.cats.map(c=>'<button class="catb" data-a="cat" data-c="'+c+'" aria-pressed="'+(ui.cat===c)+'">'+esc(catName(c))+'</button>').join('')+'</div>'
-   +'<div class="field" style="margin-top:14px"><div class="lab">Innsats</div><div class="seg" role="group">'+[1,2,3].map(v=>'<button data-a="stake" data-v="'+v+'" aria-pressed="'+(ui.stake===v)+'">'+v+' kr</button>').join('')+'</div>'
-   +'<div class="small muted">Riktig svar gir '+ui.stake*2+' kr. Feil svar koster '+(ui.stake-1)+' kr.</div></div>'
-   +'<button class="btn wide" data-a="go" '+(ui.cat==null||ui.pending?'disabled':'')+'>Still spørsmålet</button>';
+  if(rev){const ok=mine(t.pid)||isHost();s+='<button class="btn wide" style="margin-top:12px" data-a="next" '+(ok&&!ui.pending?'':'disabled')+'>'+(t.n>=5?'Til handlingene':'Neste spørsmål')+'</button>'+(ok?'':'<p class="small muted">'+esc(who.name)+' går videre.</p>')}
+  else if(!tipMode&&!can)s+='<p style="margin-top:10px"><b>'+esc(who.name)+'</b> svarer.</p>';
   return s;
 }
 function chipsHTML(b){return '<div class="chips">'+b.drawn.map(x=>x?'<span class="chip">+'+x+'</span>':'<span class="chip pol">Politi</span>').join('')+'</div>'}
 function actHTML(){
-  const t=S.turn,p=PL(t.pid),tm=T(p.team),can=mine(p.id),b=t.bag,pend=ui.pending;
-  let s='<h2>'+tname(tm)+' handler</h2><p>Kassa: <b>'+tm.coins+' kr</b>'+(S.cfg.teams?' <span class="muted">('+esc(p.name)+' styrer)</span>':'')+'</p>';
+  const t=S.turn,p=PL(t.pid),tm=turnTeam(),can=mine(p.id),b=t.bag,pend=ui.pending;
+  let s=whoHTML(t.pid,' handler')+progHTML()+'<p>Kassa: <b>'+tm.coins+' kr</b>. '+(t.ok?'Dere kan ta ruter på lengde 1'+(t.ok>1?'–'+Math.min(4,t.ok):'')+'.':'Ingen riktige svar, så ingen rute denne gangen.')+'</p>';
+  if(t.rob){s+='<div class="card"><div class="res">'+(t.rob.ok?'Ranet lyktes':'Tatt av politiet')+'</div><p class="small">'+(t.rob.ok?'Byttet: '+t.rob.amt+' kr fra '+tname(T(t.rob.tid))+'.':'Bot: '+t.rob.amt+' kr til '+tname(T(t.rob.tid))+'.')+'</p></div>'}
   if(b.pool){const sum=b.drawn.reduce((a,x)=>a+x,0),pol=b.drawn.filter(x=>!x).length;
     s+='<div class="card"><h3>Smuglerposen</h3>'+chipsHTML(b);
     if(!b.done){s+='<p class="small">Varer for '+sum+' kr. Politibrikker: '+pol+' av '+b.lim+'. '+b.pool.length+' brikker igjen i posen.</p>';
       if(can)s+='<div class="row"><button class="btn" data-a="bagDraw" '+(pend?'disabled':'')+'>Trekk en brikke</button><button class="btn ghost" data-a="bagStop" '+(pend?'disabled':'')+'>Stopp og behold '+sum+' kr</button></div>'}
     else s+='<p class="small">'+(b.bust?'Razzia. Lasten gikk tapt.':'Lasten kom trygt frem: '+sum+' kr.')+'</p>';
     s+='</div>'}
-  if(!can)return s+'<p class="muted">'+esc(p.name)+' kjøper ruter og avslutter turen.</p>';
+  if(!can)return s+'<p class="muted">'+esc(p.name)+' handler på '+(S.mode==='net'?'telefonen':'skjermen')+'.</p>';
   if(b.pool&&!b.done)return s;
   if(!t.bought){
-    if(ui.sel!=null){const e=EDGES[ui.sel],c=COST(e[2]);
-      s+='<div class="card" style="margin-top:10px"><h3>'+NODES[e[0]][0]+' til '+NODES[e[1]][0]+'</h3><p class="small">Lengde '+e[2]+'. Gir '+PTS[e[2]]+' poeng.</p><button class="btn" data-a="buy" '+(tm.coins>=c&&!pend?'':'disabled')+'>Kjøp ruta for '+c+' kr</button>'+(tm.coins<c?'<p class="small muted">Dere mangler '+(c-tm.coins)+' kr.</p>':'')+'</div>'}
-    else s+='<p>Trykk på en ledig rute på kartet for å kjøpe den. Én rute per tur.</p>'}
-  else s+='<p class="muted">Dere har kjøpt en rute denne turen.</p>';
+    if(ui.sel!=null){const e=EDGES[ui.sel],len=e[2],ow=S.own[ui.sel],name=NODES[e[0]][0]+' til '+NODES[e[1]][0];
+      if(!ow){const c=routeCost(ui.sel,t.pid),okR=t.ok>=REQ[len];
+        s+='<div class="card" style="margin-top:10px"><h3>'+name+'</h3><p class="small">Lengde '+len+'. Gir '+PTS[len]+' poeng. Krever '+REQ[len]+' riktige.</p><button class="btn" data-a="buy" '+(okR&&tm.coins>=c&&!pend?'':'disabled')+'>Kjøp ruta for '+c+' kr</button>'
+          +(!okR?'<p class="small muted">Dere trenger '+REQ[len]+' riktige, og har '+t.ok+'.</p>':tm.coins<c?'<p class="small muted">Dere mangler '+(c-tm.coins)+' kr.</p>':'')+'</div>'}
+      else{const fee=challengeFee(ui.sel),okR=t.ok>=REQ[len];
+        s+='<div class="card" style="margin-top:10px"><h3>'+name+'</h3><p class="small">Eies av '+tname(T(ow))+'. Utfordre dem om ruta: dere betaler '+fee+' kr til dem, og så avgjør en duell hvem som får ruta. Uavgjort betyr at de beholder den.</p><button class="btn brick" data-a="challenge" '+(okR&&tm.coins>=fee&&!pend?'':'disabled')+'>Utfordre for '+fee+' kr</button>'
+          +(!okR?'<p class="small muted">Dere trenger '+REQ[len]+' riktige for å utfordre om denne ruta.</p>':tm.coins<fee?'<p class="small muted">Dere mangler '+(fee-tm.coins)+' kr.</p>':'')+'</div>'}}
+    else s+='<p>Trykk på en ledig rute for å kjøpe den'+(t.shady?'':', eller på et annet lags rute for å utfordre om den')+'. Én rute per tur.</p>'}
+  else s+='<p class="muted">Dere har tatt en rute denne turen.</p>';
   s+='<div class="row" style="margin-top:12px">';
-  if(t.ok&&!b.pool)s+='<button class="btn brick" data-a="bagOpen" '+(pend?'disabled':'')+'>Åpne smuglerposen</button>';
-  if(!t.gotM&&tm.missions.length<4)s+='<button class="btn ghost" data-a="mission" '+(tm.coins>=2&&!pend?'':'disabled')+'>Nytt oppdrag (2 kr)</button>';
+  if(t.ok>=3&&!b.pool)s+='<button class="btn" data-a="bagOpen" '+(pend?'disabled':'')+'>Åpne smuglerposen</button>';
+  const mc=ab(t.pid,'avis')?1:2;
+  if(!t.gotM&&tm.missions.length<4)s+='<button class="btn ghost" data-a="mission" '+(tm.coins>=mc&&!pend?'':'disabled')+'>Nytt oppdrag ('+mc+' kr)</button>';
+  if(!t.shady&&S.teams.length>1)s+='<button class="btn brick" data-a="shadyMenu" aria-expanded="'+ui.shady+'">Lyssky handling</button>';
   s+='</div>';
-  if(!t.ok)s+='<p class="small muted">Smuglerposen åpner seg bare for den som svarer riktig.</p>';
+  if(t.ok<3&&!b.pool)s+='<p class="small muted">Smuglerposen åpner seg ved minst tre riktige.</p>';
+  if(ui.shady&&!t.shady){const others=S.teams.filter(x=>x!==tm);
+    s+='<div class="card shady"><h3>Duell om kroner</h3><p class="small">Dere og et annet lag svarer på samme spørsmål. Vinneren tar opptil 3 kr fra taperen.</p><div class="row">'
+      +others.map(o=>'<button class="btn ghost" data-a="duel" data-t="'+o.id+'" '+(Math.min(3,tm.coins,o.coins)>=1&&!pend?'':'disabled')+'>'+tname(o)+'</button>').join('')+'</div>'
+      +'<h3>Ran</h3><p class="small">Halvparten av ranene lykkes og gir opptil 3 kr. Blir dere tatt, betaler dere '+(ab(t.pid,'smugler')?'1 kr':'2 kr')+' i bot til laget dere prøvde å rane.</p><div class="row">'
+      +others.map(o=>'<button class="btn ghost" data-a="rob" data-t="'+o.id+'" '+(o.coins>=1&&!pend?'':'disabled')+'>'+tname(o)+' ('+o.coins+' kr)</button>').join('')+'</div>'
+      +'<h3>Utfordre om en rute</h3><p class="small">'+(t.bought?'Dere har allerede tatt en rute denne turen.':'Trykk på en rute som et annet lag eier.')+'</p></div>'}
   s+='<button class="btn wide" style="margin-top:14px" data-a="endTurn" '+(pend?'disabled':'')+'>Avslutt turen</button>';
   return s;
+}
+function duelHTML(){
+  const d=S.duel,q=d.q,A=PL(d.a),D=PL(d.d);
+  let s='<h2>'+(d.kind==='coins'?'Duell om '+d.stake+' kr':'Utfordring om ruta '+NODES[EDGES[d.e][0]][0]+'–'+NODES[EDGES[d.e][1]][0])+'</h2>';
+  s+='<div class="vs"><div>'+portrait(A.ch,64)+'<b>'+esc(A.name)+'</b><span class="small muted">'+(d.ans[d.a]!=null?'har svart':'tenker …')+'</span></div><div class="res">mot</div><div>'+portrait(D.ch,64)+'<b>'+esc(D.name)+'</b><span class="small muted">'+(d.ans[d.d]!=null?'har svart':'tenker …')+'</span></div></div>';
+  const me=[d.a,d.d].find(id=>mine(id)&&d.ans[id]==null);
+  s+='<div class="slip"><div class="cat">'+esc(catName(q.c))+'</div><div class="qt">'+esc(q.t)+'</div>';
+  if(me){const both=mine(d.a)&&mine(d.d);if(both)s+='<p class="small"><b>Nå svarer '+esc(PL(me).name)+'.</b> Den andre ser bort.</p>';
+    q.o.forEach((o,i)=>{s+='<button class="opt" data-a="duelAns" data-p="'+me+'" data-i="'+i+'" '+(ui.pending?'disabled':'')+'><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></button>'})}
+  else q.o.forEach((o,i)=>{s+='<div class="opt"><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></div>'});
+  return s+fuse()+'</div>';
+}
+function duelresHTML(){
+  const d=S.duel,q=d.q,A=PL(d.a),D=PL(d.d);const sh=pid=>{const i=d.ans[pid];return i==null?'svarte ikke':'svarte '+'ABCD'[i]+(i===q.r?', riktig':', feil')};
+  let s='<h2>'+(d.kind==='coins'?'Duellen er avgjort':'Utfordringen er avgjort')+'</h2>';
+  s+='<div class="vs"><div>'+portrait(A.ch,64)+'<b>'+esc(A.name)+'</b><span class="small">'+sh(d.a)+'</span></div><div class="res">'+(d.win==='a'?'←':d.win==='d'?'→':'=')+'</div><div>'+portrait(D.ch,64)+'<b>'+esc(D.name)+'</b><span class="small">'+sh(d.d)+'</span></div></div>';
+  s+='<div class="slip"><div class="qt">'+esc(q.t)+'</div>'+q.o.map((o,i)=>'<div class="opt '+(i===q.r?'right':'dim')+'"><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></div>').join('')+'</div>';
+  const ok=mine(S.turn.pid)||isHost();
+  return s+'<button class="btn wide" style="margin-top:12px" data-a="duelNext" '+(ok&&!ui.pending?'':'disabled')+'>Tilbake til turen</button>';
 }
 function mgHTML(){
   const g=S.mg,info=MG[g.type];
@@ -550,12 +708,12 @@ function mgHTML(){
   if(!ui.mg&&pend.length)ui.mg={pid:pend[0].id,pn:S.pn,st:'ready',n:0,entry:''};
   const m=ui.mg;
   if(!m){
-    s+='<p>'+info.desc+'</p><p class="muted">Venter på resten.</p>'+S.players.map(p=>'<div class="prow"><span class="nm">'+esc(p.name)+'</span><span>'+(g.sc[p.id]!=null?info.fmt(g.sc[p.id]):'spiller …')+'</span></div>').join('');
+    s+='<p>'+info.desc+'</p><p class="muted">Venter på resten.</p>'+S.players.map(p=>'<div class="prow">'+portrait(p.ch,32)+'<span class="nm">'+esc(p.name)+'</span><span>'+(g.sc[p.id]!=null?info.fmt(g.sc[p.id]):'spiller …')+'</span></div>').join('');
     if(isHost())s+='<button class="btn ghost" style="margin-top:12px" data-a="mgSkip">Gå videre uten resten</button>';
     return s;
   }
   const p=PL(m.pid);
-  if(m.st==='ready')return s+'<p>'+info.desc+'</p><p><b>'+esc(p.name)+'</b>, gjør deg klar.</p><button class="btn wide" data-a="mgStart">Jeg er klar</button>';
+  if(m.st==='ready')return s+'<p>'+info.desc+'</p>'+whoHTML(p.id,', gjør deg klar')+'<button class="btn wide" data-a="mgStart">Jeg er klar</button>';
   if(g.type==='react')return s+'<p><b>'+esc(p.name)+'</b></p><button class="pad'+(m.st==='go'?' go':'')+'" data-pd="mgTap">'+(m.st==='go'?'Nå!':'Vent …')+'</button>';
   if(g.type==='taps')return s+'<p><b>'+esc(p.name)+'</b></p><button class="pad go" data-pd="mgTap"><span id="tapn">'+m.n+'</span></button>';
   if(m.st==='show')return s+'<p><b>'+esc(p.name)+'</b>, husk koden.</p><div class="digits">'+g.code+'</div>';
@@ -565,7 +723,7 @@ function mgSubmit(v){const m=ui.mg;if(!m)return;ui.mgSent[S.pn+m.pid]=1;ui.mg=nu
 function mgresHTML(){
   const g=S.mg,info=MG[g.type];
   return '<h2>'+info.name+': resultat</h2><div class="tw"><table><tr><th>Lag</th><th>Resultat</th><th>Premie</th></tr>'
-   +g.res.map(r=>'<tr><td><span class="dot" style="background:'+T(r.id).color+'"></span> '+tname(T(r.id))+'</td><td>'+info.fmt(r.v)+'</td><td>'+(r.p?'+'+r.p+' kr':'')+'</td></tr>').join('')
+   +g.res.map(r=>'<tr><td><span class="dot" style="background:'+T(r.id).color+'"></span> '+tname(T(r.id))+'</td><td>'+info.fmt(r.v)+'</td><td>'+(r.p+r.j?'+'+(r.p+r.j)+' kr':'')+(r.j?' <span class="small muted">(jockey)</span>':'')+'</td></tr>').join('')
    +'</table></div><button class="btn wide" style="margin-top:14px" data-a="mgNext" '+(ui.pending?'disabled':'')+'>Neste runde</button>';
 }
 function finalHTML(){
@@ -577,24 +735,24 @@ function finalHTML(){
   if(f>=3){const b=res.filter(r=>r.bon.length);if(b.length)s+='<p class="small">'+b.map(r=>tname(T(r.id))+': '+r.bon.join(', ')).join('. ')+'.</p>'}
   if(f<4)s+='<button class="btn wide" style="margin-top:14px" data-a="finNext" '+(ui.pending?'disabled':'')+'>'+['Avslør oppdragene','Tell kronene','Del ut bonusprisene','Kår vinneren'][f]+'</button><p class="small muted">Tre kroner gir ett poeng.</p>';
   else{const top=res[0].tot,w=res.filter(r=>r.tot===top);
-    s+='<div class="win">'+(w.length>1?'Byen deles mellom '+w.map(r=>tname(T(r.id))).join(' og '):tname(T(w[0].id))+' styrer Sotbyen')+'</div>';
+    s+='<div class="win">'+(w.length>1?'Byen deles mellom '+w.map(r=>tname(T(r.id))).join(' og '):tname(T(w[0].id))+' styrer '+MAPINFO[MAPID].name)+'</div>';
     s+=isHost()?'<button class="btn wide" data-a="again">Nytt spill med samme folk</button>':'<p class="muted">Verten kan starte et nytt spill.</p>'}
   return s;
 }
 function gameHTML(){
-  const ph=S.phase,t=S.turn,act=ph==='act';
-  const activeTeam=(ph==='steal')?t.steal.team:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
-  const mt=missionTeam();
-  let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><span class="small muted">'+(ph==='final'?'Slutt':'Runde '+S.round+' av '+S.rounds)+(S.mode==='net'&&!(ui.big&&role==='host')?', kode '+esc(S.code):'')+'</span>'+(ui.big&&role==='host'?'<span class="joincode">Kode '+esc(S.code)+'</span>':'')+'</div>';
-  s+='<div class="scores">'+S.teams.map(x=>'<div class="sc'+(x.id===activeTeam&&ph!=='final'&&ph!=='mg'&&ph!=='mgres'?' on':'')+'"><span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <b>'+x.coins+' kr</b> <span class="muted">'+routePts(x)+' p</span></div>').join('')+'</div>';
-  s+='<div class="game'+(act?' act':'')+'"><div class="panel">';
+  const ph=S.phase,t=S.turn;
+  const activeTeam=ph==='duel'||ph==='duelres'?0:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
+  const mt=missionTeam(),big=ui.big&&role==='host';
+  let s=banner()+'<div class="top"><span class="brand">'+MAPINFO[MAPID].name+'</span><span class="small muted">'+(ph==='final'?'Slutt':'Runde '+S.round+' av '+S.rounds)+(S.mode==='net'&&!big?', kode '+esc(S.code):'')+'</span>'+(big?'<span class="joincode">Kode '+esc(S.code)+'</span>':'')+'</div>';
+  s+='<div class="scores">'+S.teams.map(x=>{const solo=!S.cfg.teams?members(x.id)[0]:null;return '<div class="sc'+(x.id===activeTeam&&!['final','mg','mgres'].includes(ph)?' on':'')+'">'+(solo?portrait(solo.ch,22):'<span class="dot" style="background:'+x.color+'"></span>')+' <span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <b>'+x.coins+' kr</b> <span class="muted">'+routePts(x)+' p</span></div>'}).join('')+'</div>';
+  s+='<div class="game'+(ph==='act'?' act':'')+'"><div class="panel">';
   if(S.msg)s+='<div class="msg" role="status">'+esc(S.msg)+'</div>';
-  s+=ph==='cat'?catHTML():(ph==='q'||ph==='steal'||ph==='reveal')?qHTML():act?actHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
+  s+=ph==='cat'?catHTML():(ph==='q'||ph==='qres')?qHTML():ph==='act'?actHTML():ph==='duel'?duelHTML():ph==='duelres'?duelresHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
   if(mt&&ph!=='final'&&ph!=='mg'){s+='<div class="foot"><button class="btn ghost" data-a="showM">'+(ui.showM?'Skjul oppdrag':'Vis hemmelige oppdrag')+'</button></div>';if(ui.showM)s+=missionsHTML(mt)}
   s+='</div><div class="mapwrap">'+mapSVG(mt)+'</div></div>';
-  s+='<div class="foot"><button class="btn ghost" data-a="menu">Meny</button>'+(ui.big&&role==='host'?'<button class="btn ghost" data-a="fs">Fullskjerm</button>':'');
+  s+='<div class="foot"><button class="btn ghost" data-a="menu">Meny</button>'+(big?'<button class="btn ghost" data-a="fs">Fullskjerm</button>':'');
   if(ui.menu){
-    if(role==='host'&&(ph==='cat'||ph==='q'||ph==='steal'||ph==='reveal'||ph==='act'))s+='<button class="btn ghost" data-a="takeover">Styr denne turen herfra</button>';
+    if(role==='host'&&['cat','q','qres','act','duel','duelres'].includes(ph))s+='<button class="btn ghost" data-a="takeover">Styr denne turen herfra</button>';
     s+='<button class="btn ghost" data-a="quit">'+(role==='guest'?'Forlat spillet':'Avslutt spillet')+'</button>';
   }
   return s+'</div>';
@@ -610,22 +768,31 @@ const UIA={
   newHost(){if(NET_OK()){ui.err='';ui.big=false;LS.set('sot.big',false);hostCreate()}},
   newBig(){if(NET_OK()){ui.err='';ui.big=true;LS.set('sot.big',true);hostCreate()}},
   fs(){const el=document.documentElement;try{if(!document.fullscreenElement&&el.requestFullscreen)el.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(e){}},
-  tip(d){act('tip',{i:+d('i')})},
   join(){const el=$('#code');joinGame(el?el.value:ui.codeDraft)},
-  resumeLocal(){const sl=LS.get('sot.local');if(sl){S=sl;S.host=CID;S.players.forEach(p=>p.owner=CID);role='local';ui.timerPn=-1;onState()}},
-  resumeNet(){const sn=LS.get('sot.net');if(!sn)return;const sh=LS.get('sot.host');if(sn.role==='host'&&sh&&sh.code===sn.code){S=sh;role='host';ui.big=!!LS.get('sot.big');hostOpen(sn.code,true)}else joinGame(sn.code)},
+  resumeLocal(){const sl=LS.get('sot.local');if(sl&&sl.v===VERSION){S=sl;S.host=CID;S.players.forEach(p=>p.owner=CID);role='local';ui.timerPn=-1;onState()}},
+  resumeNet(){const sn=LS.get('sot.net');if(!sn)return;const sh=LS.get('sot.host');if(sn.role==='host'&&sh&&sh.code===sn.code&&sh.v===VERSION){S=sh;role='host';ui.big=!!LS.get('sot.big');hostOpen(sn.code,true)}else joinGame(sn.code)},
   quit(){if(role==='local'&&S.phase==='lobby')LS.del('sot.local');if(role!=='local')LS.del('sot.net');if(role==='host')LS.del('sot.host');stopNet();S=null;role=null;ui.big=false;ui.menu=false;ui.net='';ui.err='';ui.pn=-1;render()},
   cfg(d){act('cfg',{k:d('k'),v:d('v')})},
-  addP(){const el=$('#pname');const name=(el?el.value:'').trim();if(!name)return;ui.draft='';if(el)el.value='';act('addP',{name})},
-  delP(d){act('delP',{id:d('id')})},
-  start(){act('start')},
-  cat(d){ui.cat=+d('c');render()},
-  stake(d){ui.stake=+d('v');render()},
-  go(){if(ui.cat!=null)act('pickCat',{cat:ui.cat,stake:ui.stake})},
+  pickChar(d){ui.char=+d('c');render()},
+  setChar(d){act('setChar',{id:ui.chFor,ch:+d('c')})},
+  chFor(d){ui.chFor=d('id');render()},
+  chDone(){ui.chFor=null;render()},
+  addP(){const el=$('#pname');const name=(el?el.value:'').trim();if(!name)return;const free=freeChars(null);const ch=ui.char!=null&&free.includes(ui.char)?ui.char:free[0];ui.draft='';ui.char=null;if(el)el.value='';act('addP',{name,ch})},
+  delP(d){if(ui.chFor===d('id'))ui.chFor=null;act('delP',{id:d('id')})},
+  start(){ui.chFor=null;act('start')},
+  cat(d){act('pickCat',{cat:+d('c')})},
   ans(d){act('answer',{i:+d('i')})},
+  tip(d){act('tip',{i:+d('i')})},
+  half(){act('half')},swap(){act('swap')},
   next(){act('next')},
   sel(d){ui.sel=+d('e');render()},
   buy(){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('buy',{e})}},
+  challenge(){if(ui.sel!=null){const e=ui.sel;ui.sel=null;act('challenge',{e})}},
+  shadyMenu(){ui.shady=!ui.shady;render()},
+  duel(d){ui.shady=false;act('duel',{tid:+d('t')})},
+  rob(d){ui.shady=false;act('rob',{tid:+d('t')})},
+  duelAns(d){act('duelAns',{pid:d('p'),i:+d('i')})},
+  duelNext(){act('duelNext')},
   mission(){act('mission')},bagOpen(){act('bagOpen')},bagDraw(){act('bagDraw')},bagStop(){act('bagStop')},endTurn(){act('endTurn')},
   showM(){ui.showM=!ui.showM;render()},
   menu(){ui.menu=!ui.menu;render()},
@@ -650,14 +817,14 @@ document.addEventListener('pointerdown',e=>{const el=e.target.closest&&e.target.
 document.addEventListener('input',e=>{const el=e.target;if(el.id==='pname')ui.draft=el.value;if(el.id==='code')ui.codeDraft=el.value});
 document.addEventListener('change',e=>{const el=e.target,k=el.getAttribute&&el.getAttribute('data-ch');if(!k||!S)return;
   if(k==='team')act('setTeam',{id:el.getAttribute('data-id'),team:+el.value});
-  if(k==='topic')act('cfg',{k:'topic',v:el.value})});
+  if(k==='rounds')act('cfg',{k:'rounds',v:+el.value})});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const id=e.target&&e.target.id;if(id==='pname'){e.preventDefault();UIA.addP()}if(id==='code'){e.preventDefault();UIA.join()}});
 
 /* ---------- oppstart ---------- */
 (function(){const h=(location.hash||'').slice(1).toUpperCase();
   if(/^[A-Z]{4}$/.test(h)){ui.codeDraft=h;try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}if(NET_OK()){joinGame(h);return}}
   render()})();
-window.__sot={get S(){return S},ui,UIA,PD,H,act,finalScores};
+window.__sot={get S(){return S},ui,UIA,PD,H,act,finalScores,get EDGES(){return EDGES},get PAIR(){return PAIR}};
 })();
 </script>
 </body>
