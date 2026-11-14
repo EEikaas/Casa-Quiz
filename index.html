@@ -136,6 +136,19 @@ th:first-child,td:first-child{text-align:left}
 th{font-weight:600;font-size:.85rem}
 .tw{overflow-x:auto}
 .win{font-family:var(--display);font-size:clamp(1.6rem,6vw,2.6rem);margin:.4em 0}
+.opt.mytip{border-color:var(--teal);box-shadow:inset 6px 0 0 var(--teal)}
+.tipnote{margin-top:10px;padding:8px 10px;border-left:4px solid var(--teal);background:var(--raise);font-size:.95rem}
+body.big{font-size:22px}
+body.big #app{max-width:none;padding:20px 32px 32px}
+body.big h2{font-size:2rem}
+body.big .top .brand{font-size:1.8rem}
+body.big .sc{font-size:1.15rem;padding:8px 14px}
+body.big .slip .qt{font-size:2.2rem}
+body.big .slip .cat{font-size:1.2rem}
+body.big .opt{font-size:1.45rem;min-height:66px}
+body.big .qr{width:280px;max-width:30vw}
+body.big .joincode{font-family:var(--display);font-size:1.6rem;letter-spacing:.08em}
+@media (min-width:900px){body.big .game{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .banner{background:var(--brick);color:#fff8e6;padding:8px 12px;border-radius:4px;margin-bottom:10px}
 .foot{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){.fuse i{animation:none}}
@@ -195,7 +208,7 @@ const MPAIRS=(()=>{const r=[];for(let i=0;i<NODES.length;i++)for(let j=i+1;j<NOD
 
 /* ---------- tilstand ---------- */
 let S=null, role=null;               // role: 'local' | 'host' | 'guest'
-const ui={stake:2,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:''};
+const ui={big:false,stake:2,cat:null,sel:null,showM:false,pn:-1,pnAt:0,mg:null,mgSent:{},draft:'',codeDraft:'',err:'',net:'',pending:false,menu:false,timerPn:-1,busy:''};
 let timer=null;
 
 function newState(mode,code){
@@ -228,7 +241,7 @@ const routePts=t=>t.routes.reduce((s,e)=>s+PTS[EDGES[e][2]],0);
 /* ---------- spillregler (kjører hos verten) ---------- */
 function startTurn(){
   const t=T(S.order[S.ti]),ms=members(t.id),p=ms[t.pi%ms.length];t.pi++;
-  S.turn={pid:p.id,cats:shuffle([0,1,2,3,4,5]).slice(0,3),cat:-1,stake:0,q:{},picked:-2,ok:0,steal:{},bought:0,gotM:0,bag:{}};
+  S.turn={pid:p.id,cats:shuffle([0,1,2,3,4,5]).slice(0,3),cat:-1,stake:0,q:{},picked:-2,ok:0,steal:{},bought:0,gotM:0,bag:{},tips:{},tipWin:[],tipDone:0};
   S.phase='cat';S.pn++;
 }
 function pickQ(cat){
@@ -250,9 +263,9 @@ function mgFinish(){
   g.res=rows;S.phase='mgres';S.pn++;
 }
 function finalScores(){
-  const res=S.teams.map(t=>({id:t.id,rp:routePts(t),mp:t.missions.filter(m=>m.d).reduce((s,m)=>s+m.v,0),cp:Math.floor(t.coins/3),net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,bon:[],bp:0,tot:0}));
+  const res=S.teams.map(t=>({id:t.id,rp:routePts(t),mp:t.missions.filter(m=>m.d).reduce((s,m)=>s+m.v,0),cp:Math.floor(t.coins/3),net:netLen(t),right:t.right,bag:t.bag,mg:t.mg,tips:t.tips||0,bon:[],bp:0,tot:0}));
   const award=(k,name,pts)=>{const mx=Math.max.apply(null,res.map(r=>r[k]));if(mx<=0)return;res.filter(r=>r[k]===mx).forEach(r=>{r.bon.push(name);r.bp+=pts})};
-  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);
+  award('net','Byens lengste nett',5);award('right','Kvikkeste hode',3);award('bag','Smuglerkongen',3);award('mg','Minispillmester',3);award('tips','Beste tippere',3);
   res.forEach(r=>r.tot=r.rp+r.mp+r.cp+r.bp);res.sort((a,b)=>b.tot-a.tot);return res;
 }
 const H={
@@ -268,7 +281,7 @@ const H={
   delP(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;S.players=S.players.filter(x=>x.id!==p.id)},
   setTeam(p,cid){if(S.phase!=='lobby'||!owns(cid,p.id))return;const t=+p.team;if(t>=1&&t<=S.cfg.teams)PL(p.id).team=t},
   start(p,cid){if(cid!==S.host||S.phase!=='lobby'||!S.players.length)return;
-    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,pi:0});
+    const mk=(id,name)=>({id,name,color:COLORS[(id-1)%10],coins:6,routes:[],missions:[],right:0,bag:0,mg:0,tips:0,pi:0});S.players.forEach(pl=>pl.tips=0);
     S.teams=[];
     if(!S.cfg.teams)S.players.forEach((pl,i)=>{pl.team=i+1;S.teams.push(mk(i+1,pl.name))});
     else Array.from(new Set(S.players.map(x=>x.team))).sort((a,b)=>a-b).forEach(t=>S.teams.push(mk(t,TEAM_NAMES[t-1])));
@@ -280,6 +293,8 @@ const H={
   answer(p,cid){const t=S.turn;const i=+p.i;
     if(S.phase==='q'){if(!owns(cid,t.pid))return;resolveQ(i)}
     else if(S.phase==='steal'){if(!owns(cid,t.steal.pid)||i===t.picked)return;resolveSteal(i)}},
+  tip(p,cid){const t=S.turn;if(S.phase!=='q'||S.mode!=='net')return;const i=+p.i;if(!(i>=0&&i<4))return;const at=PL(t.pid).team;
+    S.players.forEach(pl=>{if(pl.owner===cid&&pl.team!==at&&t.tips[pl.id]==null)t.tips[pl.id]=i})},
   timeout(p,cid){if(cid!==S.host||+p.pn!==S.pn)return;if(S.phase==='q')resolveQ(-1);else if(S.phase==='steal')resolveSteal(-1)},
   next(p,cid){if(S.phase!=='reveal')return;if(!owns(cid,S.turn.pid))return;S.phase='act';S.pn++;S.msg=''},
   buy(p,cid){const t=S.turn;if(S.phase!=='act'||!owns(cid,t.pid)||t.bought)return;const e=+p.e;if(!(e>=0&&e<EDGES.length)||S.own[e])return;
@@ -308,14 +323,18 @@ const H={
   again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.mg={};S.msg='';S.pn++},
   takeover(p,cid){if(cid!==S.host)return;const pid=S.phase==='steal'?S.turn.steal.pid:S.turn.pid;const pl=PL(pid);if(pl)pl.owner=S.host}
 };
+function awardTips(){const t=S.turn;if(t.tipDone)return;t.tipDone=1;const win=[],teams={};
+  Object.keys(t.tips||{}).forEach(pid=>{const pl=PL(pid);if(pl&&t.tips[pid]===t.q.r){win.push(pid);pl.tips=(pl.tips||0)+1;teams[pl.team]=1}});
+  Object.keys(teams).forEach(id=>{const tm=T(+id);if(tm){tm.coins+=1;tm.tips=(tm.tips||0)+1}});t.tipWin=win;
+  if(win.length)S.msg+=' Riktig tips: '+win.map(id=>PL(id).name).join(', ')+' (+1 kr til laget).'}
 function resolveQ(i){const t=S.turn,tm=T(PL(t.pid).team);t.picked=i;
-  if(i===t.q.r){t.ok=1;tm.coins+=t.stake*2;tm.right++;S.msg='Riktig! '+tm.name+' får '+(t.stake*2)+' kr.';S.phase='reveal';S.pn++;return}
+  if(i===t.q.r){t.ok=1;tm.coins+=t.stake*2;tm.right++;S.msg='Riktig! '+tm.name+' får '+(t.stake*2)+' kr.';awardTips();S.phase='reveal';S.pn++;return}
   const loss=Math.min(tm.coins,t.stake-1);tm.coins-=loss;S.msg=(i<0?'Tiden er ute. ':'Feil. ')+(loss?tm.name+' mister '+loss+' kr.':'');
   if(S.order.length>1){const st=T(S.order[(S.ti+1)%S.order.length]),ms=members(st.id);t.steal={team:st.id,pid:ms[st.pi%ms.length].id,picked:-2,ok:0};S.phase='steal';S.pn++}
-  else{S.phase='reveal';S.pn++}}
+  else{awardTips();S.phase='reveal';S.pn++}}
 function resolveSteal(i){const t=S.turn,st=T(t.steal.team);t.steal.picked=i;
   if(i===t.q.r){t.steal.ok=1;st.coins+=2;st.right++;S.msg=st.name+' snappet svaret og får 2 kr.'}else S.msg='Ingen klarte den.';
-  S.phase='reveal';S.pn++}
+  awardTips();S.phase='reveal';S.pn++}
 function apply(a,cid){try{const h=H[a&&a.t];if(h&&S)h(a.p||{},cid)}catch(e){console.error(e)}}
 
 /* ---------- lagring og nett (PeerJS, direkte mellom enheter) ---------- */
@@ -394,6 +413,7 @@ const qDur=()=>S.phase==='steal'?20:(S.cfg.level==='easy'?45:30);
 
 /* ---------- visning ---------- */
 function render(){
+  document.body.classList.toggle('big',!!(ui.big&&S&&role==='host'));keepAwake();
   const app=$('#app');const ae=document.activeElement,fid=ae&&ae.id,pos=ae&&ae.selectionStart;
   app.innerHTML=!S?homeHTML():S.phase==='lobby'?lobbyHTML():gameHTML();
   if(fid){const el=document.getElementById(fid);if(el&&el.tagName==='INPUT'){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}
@@ -408,14 +428,15 @@ function homeHTML(){
   +(sl&&sl.phase&&sl.phase!=='lobby'?'<button class="choice" data-a="resumeLocal"><b>Fortsett spillet på denne enheten</b><span>Runde '+sl.round+' av '+sl.rounds+'</span></button>':'')
   +(sn&&netOk?'<button class="choice" data-a="resumeNet"><b>Tilbake til spill '+esc(sn.code)+'</b><span>'+(sn.role==='host'?'Du er vert':'Du er med som spiller')+'</span></button>':'')
   +'<button class="choice" data-a="newLocal"><b>Spill på denne enheten</b><span>Send telefonen rundt, eller vis spillet på en større skjerm.</span></button>'
-  +'<button class="choice" data-a="newHost" '+(netOk?'':'disabled')+'><b>Start spill med egne telefoner</b><span>'+(netNote||'Denne skjermen blir vert, for eksempel TV-en som spillbrett eller en av telefonene. Alle blir med fra egen telefon med en kode.')+'</span></button>'
+  +'<button class="choice" data-a="newBig" '+(netOk?'':'disabled')+'><b>Storskjerm som spillbrett</b><span>'+(netNote||'Denne skjermen viser kart, spørsmål og poeng. Alle spiller, følger med og tipper fra egen telefon.')+'</span></button>'
+  +'<button class="choice" data-a="newHost" '+(netOk?'':'disabled')+'><b>Mobil mot mobil</b><span>'+(netNote||'Denne telefonen blir vert og spiller selv. De andre blir med med en kode.')+'</span></button>'
   +'<div class="card"><h3>Bli med i et spill</h3><div class="row"><input type="text" id="code" inputmode="text" autocapitalize="characters" autocomplete="off" maxlength="4" placeholder="Kode på fire bokstaver" value="'+esc(ui.codeDraft)+'" aria-label="Spillkode"><button class="btn" data-a="join" '+(netOk?'':'disabled')+'>Bli med</button></div>'
   +(netNote?'<p class="small muted">'+netNote+'</p>':'')+'</div>'
   +'</div><details><summary>Slik spiller dere</summary><ol>'
   +'<li>Velg kategori og innsats. Riktig svar gir dobbel innsats i kroner. Feil svar koster innsatsen minus én, og neste lag får prøve seg.</li>'
   +'<li>Bruk kronene på ruter mellom bydelene. Lange ruter gir flest poeng. Hvert lag har hemmelige oppdrag: knytt to steder sammen med egne ruter.</li>'
   +'<li>Svarte du riktig, kan du prøve smuglerposen. Trekk varer så lenge du tør. For mange politibrikker, og lasten er tapt.</li>'
-  +'<li>Mellom rundene møtes alle i et minispill om ekstra kroner.</li>'
+  +'<li>Spiller dere med egne telefoner, kan alle på de andre lagene tippe svaret mens noen svarer. Riktig tips gir laget 1 kr, og de beste tipperne får bonus til slutt.</li><li>Mellom rundene møtes alle i et minispill om ekstra kroner.</li>'
   +'<li>Til slutt telles ruter, oppdrag, kroner og bonuspriser.</li></ol></details></div>';
 }
 function seg(k,cur,opts,dis){return '<div class="seg" role="group">'+opts.map(o=>'<button data-a="cfg" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(cur)===String(o[0]))+'" '+(dis?'disabled':'')+'>'+o[1]+'</button>').join('')+'</div>'}
@@ -436,8 +457,9 @@ function lobbyHTML(){
     s+='<div class="prow"><span class="nm">'+(c.teams?'<span class="dot" style="background:'+COLORS[(p.team-1)%10]+'"></span> ':'')+esc(p.name)+(net&&p.owner===CID?' <span class="small muted">(denne enheten)</span>':'')+'</span>'
      +(c.teams?(can?'<select data-ch="team" data-id="'+p.id+'" aria-label="Lag for '+esc(p.name)+'">'+Array.from({length:c.teams},(_,i)=>'<option value="'+(i+1)+'" '+(p.team===i+1?'selected':'')+'>'+TEAM_NAMES[i]+'</option>').join('')+'</select>':'<span class="small">'+TEAM_NAMES[p.team-1]+'</span>'):'')
      +(can?'<button class="x" data-a="delP" data-id="'+p.id+'" aria-label="Fjern '+esc(p.name)+'">×</button>':'')+'</div>'});
-  if(S.players.length<10)s+='<div class="row" style="margin-top:12px"><input type="text" id="pname" maxlength="16" placeholder="Navn" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til spiller</button></div>';
+  if(S.players.length<10)s+='<div class="row" style="margin-top:12px"><input type="text" id="pname" maxlength="16" placeholder="'+(ui.big&&role==='host'?'Navn (spiller uten telefon)':'Navn')+'" value="'+esc(ui.draft)+'" aria-label="Navn på ny spiller"><button class="btn ghost" data-a="addP">Legg til spiller</button></div>';
   else s+='<p class="small muted">Bordet er fullt: ti spillere.</p>';
+  if(h&&ui.big)s+='<button class="btn ghost wide" style="margin-top:16px" data-a="fs">Fullskjerm</button>';
   if(h)s+='<button class="btn wide" style="margin-top:16px" data-a="start" '+(S.players.length?'':'disabled')+'>Start spillet</button>';
   else s+='<p class="muted" style="margin-top:14px">Venter på at verten starter spillet.</p>';
   return s+'</div></div>';
@@ -464,13 +486,21 @@ function fuse(){const d=qDur(),el=Math.min(d,(Date.now()-ui.pnAt)/1000);return '
 function qHTML(){
   const t=S.turn,q=t.q,ph=S.phase,rev=ph==='reveal',steal=ph==='steal';
   const who=steal?PL(t.steal.pid):PL(t.pid),can=!rev&&mine(who.id)&&!ui.pending;
+  const at=PL(t.pid).team,tips=t.tips||{},net=S.mode==='net';
+  const elig=net?S.players.filter(pl=>pl.team!==at):[],myElig=elig.filter(pl=>pl.owner===CID);
+  const myTip=myElig.length?tips[myElig[0].id]:undefined,tipMode=ph==='q'&&!mine(t.pid)&&myElig.length>0;
   let s='<div class="slip"><div class="cat">'+esc(catName(t.cat))+' <span class="muted">innsats '+t.stake+'</span></div><div class="qt">'+esc(q.t)+'</div>';
-  q.o.forEach((o,i)=>{let cls='opt',dis=!can;
+  q.o.forEach((o,i)=>{let cls='opt',dis=!can,a='ans';
     if(rev){if(i===q.r)cls+=' right';else if(i===t.picked||i===t.steal.picked)cls+=' wrong';else cls+=' dim'}
     else if(steal&&i===t.picked){cls+=' wrong';dis=true}
-    s+='<button class="'+cls+'" data-a="ans" data-i="'+i+'" '+(dis?'disabled':'')+'><i>'+'ABCD'[i]+'</i><span>'+esc(o)+'</span></button>'});
+    else if(tipMode){a='tip';dis=myTip!=null||ui.pending}
+    if(myTip===i&&!(rev&&i===q.r))cls+=' mytip';
+    s+='<button class="'+cls+'" data-a="'+a+'" data-i="'+i+'" '+(dis?'disabled':'')+'><i>'+'ABCD'[i]+'</i><span>'+esc(o)+(myTip===i?' <small>(ditt tips)</small>':'')+'</span></button>'});
   if(!rev)s+=fuse();
+  if(elig.length&&ph==='q')s+='<div class="small muted">Tips inne: '+elig.filter(pl=>tips[pl.id]!=null).length+' av '+elig.length+'</div>';
   s+='</div>';
+  if(tipMode)s+='<div class="tipnote">'+(myTip==null?'Tipp svaret før '+esc(PL(t.pid).name)+' svarer. Riktig tips gir laget ditt 1 kr.':'Tipset er låst. Vent på svaret.')+'</div>';
+  if(rev&&myElig.length&&myTip!=null)s+='<div class="tipnote">'+(myTip===q.r?'Du tippet riktig.':'Du tippet feil denne gangen.')+'</div>';
   if(rev){if(q.ai)s+='<p class="small muted">Dette spørsmålet er skrevet av Claude og kan inneholde feil.</p>';
     const ok=mine(t.pid)||isHost();s+='<button class="btn wide" style="margin-top:12px" data-a="next" '+(ok&&!ui.pending?'':'disabled')+'>Videre</button>'+(ok?'':'<p class="small muted">'+esc(PL(t.pid).name)+' går videre.</p>')}
   else s+='<p style="margin-top:10px">'+(steal?'<b>Sjanse for '+tname(T(t.steal.team))+':</b> '+esc(who.name)+' kan snappe svaret for 2 kr.':'<b>'+esc(who.name)+'</b> svarer for '+tname(T(who.team))+'.')+'</p>';
@@ -555,14 +585,14 @@ function gameHTML(){
   const ph=S.phase,t=S.turn,act=ph==='act';
   const activeTeam=(ph==='steal')?t.steal.team:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
   const mt=missionTeam();
-  let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><span class="small muted">'+(ph==='final'?'Slutt':'Runde '+S.round+' av '+S.rounds)+(S.mode==='net'?', kode '+esc(S.code):'')+'</span></div>';
+  let s=banner()+'<div class="top"><span class="brand">Sotbyen</span><span class="small muted">'+(ph==='final'?'Slutt':'Runde '+S.round+' av '+S.rounds)+(S.mode==='net'&&!(ui.big&&role==='host')?', kode '+esc(S.code):'')+'</span>'+(ui.big&&role==='host'?'<span class="joincode">Kode '+esc(S.code)+'</span>':'')+'</div>';
   s+='<div class="scores">'+S.teams.map(x=>'<div class="sc'+(x.id===activeTeam&&ph!=='final'&&ph!=='mg'&&ph!=='mgres'?' on':'')+'"><span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <b>'+x.coins+' kr</b> <span class="muted">'+routePts(x)+' p</span></div>').join('')+'</div>';
   s+='<div class="game'+(act?' act':'')+'"><div class="panel">';
   if(S.msg)s+='<div class="msg" role="status">'+esc(S.msg)+'</div>';
   s+=ph==='cat'?catHTML():(ph==='q'||ph==='steal'||ph==='reveal')?qHTML():act?actHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
   if(mt&&ph!=='final'&&ph!=='mg'){s+='<div class="foot"><button class="btn ghost" data-a="showM">'+(ui.showM?'Skjul oppdrag':'Vis hemmelige oppdrag')+'</button></div>';if(ui.showM)s+=missionsHTML(mt)}
   s+='</div><div class="mapwrap">'+mapSVG(mt)+'</div></div>';
-  s+='<div class="foot"><button class="btn ghost" data-a="menu">Meny</button>';
+  s+='<div class="foot"><button class="btn ghost" data-a="menu">Meny</button>'+(ui.big&&role==='host'?'<button class="btn ghost" data-a="fs">Fullskjerm</button>':'');
   if(ui.menu){
     if(role==='host'&&(ph==='cat'||ph==='q'||ph==='steal'||ph==='reveal'||ph==='act'))s+='<button class="btn ghost" data-a="takeover">Styr denne turen herfra</button>';
     s+='<button class="btn ghost" data-a="quit">'+(role==='guest'?'Forlat spillet':'Avslutt spillet')+'</button>';
@@ -571,13 +601,20 @@ function gameHTML(){
 }
 
 /* ---------- hendelser ---------- */
+let wl=null,wlBusy=false;
+async function keepAwake(){if(!S||S.mode!=='net'||wl||wlBusy||!navigator.wakeLock||document.visibilityState!=='visible')return;wlBusy=true;
+  try{wl=await navigator.wakeLock.request('screen');wl.addEventListener('release',()=>{wl=null})}catch(e){}wlBusy=false}
+document.addEventListener('visibilitychange',keepAwake);
 const UIA={
-  newLocal(){stopNet();S=newState('local');role='local';ui.err='';onState()},
-  newHost(){if(NET_OK()){ui.err='';hostCreate()}},
+  newLocal(){stopNet();ui.big=false;S=newState('local');role='local';ui.err='';onState()},
+  newHost(){if(NET_OK()){ui.err='';ui.big=false;LS.set('sot.big',false);hostCreate()}},
+  newBig(){if(NET_OK()){ui.err='';ui.big=true;LS.set('sot.big',true);hostCreate()}},
+  fs(){const el=document.documentElement;try{if(!document.fullscreenElement&&el.requestFullscreen)el.requestFullscreen().catch(()=>{});else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(e){}},
+  tip(d){act('tip',{i:+d('i')})},
   join(){const el=$('#code');joinGame(el?el.value:ui.codeDraft)},
   resumeLocal(){const sl=LS.get('sot.local');if(sl){S=sl;S.host=CID;S.players.forEach(p=>p.owner=CID);role='local';ui.timerPn=-1;onState()}},
-  resumeNet(){const sn=LS.get('sot.net');if(!sn)return;const sh=LS.get('sot.host');if(sn.role==='host'&&sh&&sh.code===sn.code){S=sh;role='host';hostOpen(sn.code,true)}else joinGame(sn.code)},
-  quit(){if(role==='local'&&S.phase==='lobby')LS.del('sot.local');if(role!=='local')LS.del('sot.net');if(role==='host')LS.del('sot.host');stopNet();S=null;role=null;ui.menu=false;ui.net='';ui.err='';ui.pn=-1;render()},
+  resumeNet(){const sn=LS.get('sot.net');if(!sn)return;const sh=LS.get('sot.host');if(sn.role==='host'&&sh&&sh.code===sn.code){S=sh;role='host';ui.big=!!LS.get('sot.big');hostOpen(sn.code,true)}else joinGame(sn.code)},
+  quit(){if(role==='local'&&S.phase==='lobby')LS.del('sot.local');if(role!=='local')LS.del('sot.net');if(role==='host')LS.del('sot.host');stopNet();S=null;role=null;ui.big=false;ui.menu=false;ui.net='';ui.err='';ui.pn=-1;render()},
   cfg(d){act('cfg',{k:d('k'),v:d('v')})},
   addP(){const el=$('#pname');const name=(el?el.value:'').trim();if(!name)return;ui.draft='';if(el)el.value='';act('addP',{name})},
   delP(d){act('delP',{id:d('id')})},
