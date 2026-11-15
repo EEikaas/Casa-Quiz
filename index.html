@@ -86,8 +86,23 @@ li{margin-bottom:.5em}
 .sc.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass),0 0 18px rgba(200,135,58,.25)}
 .sc .pts{font-family:var(--display);font-size:1.15rem;letter-spacing:.04em;color:var(--brass2)}
 .game{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
-.game.act .mapwrap{order:-1}
-@media (min-width:900px){.game{grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);align-items:start}.game .mapwrap{order:-1}}
+.game.act .mapcol{order:-1}
+@media (min-width:900px){.game{grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr);align-items:start}.game .mapcol{order:-1}}
+.mapcol{min-width:0}
+.mis{margin-top:10px;background:linear-gradient(180deg,rgba(38,32,28,.92),rgba(22,19,17,.94));border:1px solid var(--line);border-left:3px solid var(--brass);border-radius:10px;padding:10px 14px}
+.mis h3{margin-bottom:.3em}
+.mis .mrow{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.mis .mrow:last-of-type{border-bottom:0}
+.mis .ok{color:var(--ok)}
+.wheels{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.wcard{text-align:center;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:10px;padding:10px}
+.wheel{display:block;width:100%;max-width:150px;margin:6px auto;height:auto;overflow:visible}
+.wheel.bigw{max-width:280px}
+.wheel .rot{transform-origin:100px 100px;transform:rotate(var(--to,0deg));animation:wspin 3.4s cubic-bezier(.12,.75,.18,1) both}
+@keyframes wspin{from{transform:rotate(0deg)}to{transform:rotate(var(--to,0deg))}}
+.prize{font-family:var(--display);font-size:1.4rem;letter-spacing:.05em;color:var(--brass2);animation:fadein .4s both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.wheel .rot,.prize{animation:none}}
 .mapwrap{background:radial-gradient(ellipse at 50% 40%,#211b17,#100d0b);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:inset 0 0 60px rgba(0,0,0,.7)}
 .mapwrap.mini{max-width:440px;margin-top:6px}
 .mapsvg{display:block;width:100%;height:auto}
@@ -325,10 +340,10 @@ function portrait(ci,px){const c=CHARS[ci];if(!c)return '';const id=uid(),sk=c.s
   return '<span class="pt" style="width:'+px+'px;height:'+px+'px">'+h+'</svg></span>';
 }
 const ITEMS={
-  pistol:{n:'Pistol',d:'Neste ran lykkes alltid, med mindre offeret har vest.',price:4},
-  vest:{n:'Skuddsikker vest',d:'Stopper ett ran mot laget.',price:4},
+  pistol:{n:'Pistol',d:'Neste ran lykkes alltid, med mindre offeret har vest.',price:8},
+  vest:{n:'Skuddsikker vest',d:'Stopper ett ran mot laget.',price:8},
   cop:{n:'Korrupt politi',d:'Fjerner automatisk én politibrikke i hver trekning. Beholdes hele spillet, og flere stables.',price:8},
-  dyn:{n:'Dynamitt',d:'Sprenger bort en rute som et annet lag eier.',price:12}};
+  dyn:{n:'Dynamitt',d:'Sprenger bort en rute som et annet lag eier.',price:30}};
 const CODE2={X:'pol',G:'pistol',V:'vest',D:'dyn',C:'cop',K:'kid'};
 function token(k,px,v){const id=uid();let h='<svg viewBox="0 0 100 100" aria-hidden="true"><defs>'
   +'<radialGradient id="'+id+'g" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".55" stop-color="#d4a23c"/><stop offset="1" stop-color="#6e4a12"/></radialGradient>'
@@ -520,7 +535,11 @@ const H={
     S.rounds=S.cfg.rounds;S.mgEvery=3;
     S.teams.forEach(t=>{for(let i=0;i<2;i++){const m=newMission(t);if(m)t.missions.push(m)}});
     S.own=EDGES.map(()=>0);S.round=1;S.mgN=0;S.fin=0;S.dice={r:{},tb:{},done:0};S.order=[];
+    if(LYN()){S.order=S.teams.map(t=>t.id);S.wheel={r:{},done:0};S.msg='Snurr lykkehjulet! Alle vinner noe.';S.phase='wheel';S.pn++;return}
     S.msg='Kast terningen. Høyest sum starter.';S.phase='dice';S.pn++},
+  spin(p,cid){if(S.phase!=='wheel'||S.wheel.done)return;const tid=+p.tid;if(!T(tid)||S.wheel.r[tid]!=null||!ownsTeam(cid,tid))return;spinTeam(T(tid));if(S.teams.every(t=>S.wheel.r[t.id]!=null)){S.wheel.done=1;S.pn++}},
+  spinAll(p,cid){if(S.phase!=='wheel'||S.wheel.done||cid!==S.host)return;S.teams.forEach(t=>{if(S.wheel.r[t.id]==null)spinTeam(t)});S.wheel.done=1;S.pn++},
+  wheelGo(p,cid){if(S.phase!=='wheel'||!S.wheel.done||cid!==S.host)return;S.msg='';startRound()},
   roll(p,cid){if(S.phase!=='dice'||S.dice.done)return;const tid=+p.tid;if(!T(tid)||S.dice.r[tid]||!ownsTeam(cid,tid))return;
     S.dice.r[tid]=[1+rnd(6),1+rnd(6)];S.dice.tb[tid]=Math.random();if(S.teams.every(t=>S.dice.r[t.id]))diceDone()},
   rollAll(p,cid){if(S.phase!=='dice'||S.dice.done||cid!==S.host)return;S.teams.forEach(t=>{if(!S.dice.r[t.id]){S.dice.r[t.id]=[1+rnd(6),1+rnd(6)];S.dice.tb[t.id]=Math.random()}});diceDone()},
@@ -554,7 +573,7 @@ const H={
     c.st.shady=1;const gun=!!p.gun&&tm.inv.pistol>0;if(gun)tm.inv.pistol--;
     if(vt.inv.vest>0){vt.inv.vest--;c.st.rob={tid:vt.id,ok:0,amt:0,vest:1,gun};S.msg=tm.name+' prøvde å rane '+vt.name+', men ble stoppet av en skuddsikker vest.';logE(S.msg);return}
     const chance=gun?1:(LYN()&&ab(c.pid,'bokser')?2/3:.5);
-    if(Math.random()<chance){const amt=Math.min(3,vt.coins);vt.coins-=amt;tm.coins+=amt;tm.heist=(tm.heist||0)+1;c.st.rob={tid:vt.id,ok:1,amt,gun};S.msg='Ranet lyktes! '+tm.name+' stakk av med '+amt+' kr fra '+vt.name+'.';logE(S.msg)}
+    if(Math.random()<chance){const amt=Math.max(1,Math.floor(vt.coins/2));vt.coins-=amt;tm.coins+=amt;tm.heist=(tm.heist||0)+1;c.st.rob={tid:vt.id,ok:1,amt,gun};S.msg='Ranet lyktes! '+tm.name+' stakk av med '+amt+' kr fra '+vt.name+'.';logE(S.msg)}
     else{const amt=Math.min(ab(c.pid,'smugler')?1:2,tm.coins);tm.coins-=amt;vt.coins+=amt;c.st.rob={tid:vt.id,ok:0,amt};S.msg='Tatt på fersk gjerning! '+tm.name+' betaler '+amt+' kr i bot til '+vt.name+'.';logE(S.msg)}},
   dyn(p,cid){const c=ctx(p,cid);if(!c)return;const e=+p.e,tm=c.tm;if(!(e>=0&&e<EDGES.length))return;const ow=S.own[e];if(!ow||ow===tm.id||tm.inv.dyn<1)return;
     const vt=T(ow);tm.inv.dyn--;S.own[e]=0;vt.routes=vt.routes.filter(x=>x!==e);tm.heist=(tm.heist||0)+1;S.msg='BOM! '+tm.name+' sprengte ruta '+rname(e)+' til '+vt.name+'.';logE(S.msg)},
@@ -593,6 +612,9 @@ const H={
   again(p,cid){if(S.phase!=='final'||cid!==S.host)return;S.phase='lobby';S.teams=[];S.turn={};S.duel={};S.mg={};S.lyn={};S.bags={};S.msg='';S.pn++},
   takeover(p,cid){if(cid!==S.host)return;const ids=S.phase==='duel'?[S.duel.a,S.duel.d]:[S.turn.pid];ids.forEach(id=>{const pl=PL(id);if(pl)pl.owner=S.host})}
 };
+const WHEEL=[{k:'coin',v:1},{k:'coin',v:2},{k:'pistol'},{k:'coin',v:3},{k:'coin',v:1},{k:'vest'},{k:'coin',v:5},{k:'coin',v:2},{k:'cop'},{k:'coin',v:8},{k:'coin',v:3},{k:'dyn'}];
+const prizeName=w=>w.k==='coin'?w.v+' kr':ITEMS[w.k].n;
+function spinTeam(t){const i=rnd(WHEEL.length),w=WHEEL[i];S.wheel.r[t.id]=i;if(w.k==='coin')t.coins+=w.v;else t.inv[w.k]++;logE(t.name+' vant '+prizeName(w)+' på lykkehjulet.')}
 function diceDone(){const D=S.dice;D.done=1;S.order=S.teams.map(t=>t.id).sort((a,b)=>(D.r[b][0]+D.r[b][1])-(D.r[a][0]+D.r[a][1])||D.tb[b]-D.tb[a]);
   S.msg=T(S.order[0]).name+' starter.';S.pn++}
 const BOT_NAMES=['Birger','Signe','Edvard','Ragna','Halvor','Dagny','Olaf','Gudrun','Knut','Hedvig'];
@@ -615,8 +637,8 @@ function botRoute(pid,tm,st,lv){const want=lv>=3?missionEdges(tm):new Set();cons
 function botAct(pid,tm,st){const lv=PL(pid).lv||3,mem=botMem(S.round+':'+S.ti+':'+pid+':'+(LYN()?'l':'n'));
   if(tm.inv.dyn>0&&lv>=2){const tg=EDGES.map((e,i)=>i).filter(i=>S.own[i]&&S.own[i]!==tm.id).sort((a,b)=>EDGES[b][2]-EDGES[a][2])[0];if(tg!=null)return {t:'dyn',p:{e:tg,pid}}}
   if(!st.bought&&!mem.nb){const e=botRoute(pid,tm,st,lv);if(e!=null)return {t:'buy',p:{e,pid}};mem.nb=1}
-  if(!mem.shop){mem.shop=1;const it=lv>=3&&tm.inv.vest===0&&tm.coins>=12?'vest':lv>=4&&tm.coins>=18&&tm.inv.cop<1?'cop':lv>=5&&tm.coins>=28&&!tm.inv.dyn?'dyn':null;if(it)return {t:'shop',p:{item:it,pid}}}
-  if(!st.shady&&!mem.rob&&S.teams.length>1){mem.rob=1;if(Math.random()<[0,.15,.25,.35,.4,.45][lv]){const v=S.teams.filter(x=>x!==tm&&x.coins>=2).sort((a,b)=>b.coins-a.coins)[0];if(v)return {t:'rob',p:{tid:v.id,pid,gun:tm.inv.pistol>0}}}}
+  if(!mem.shop){mem.shop=1;const it=lv>=3&&tm.inv.vest===0&&tm.coins>=14?'vest':lv>=4&&tm.coins>=18&&tm.inv.cop<1?'cop':lv>=5&&tm.coins>=40&&!tm.inv.dyn?'dyn':null;if(it)return {t:'shop',p:{item:it,pid}}}
+  if(!st.shady&&!mem.rob&&S.teams.length>1){mem.rob=1;if(Math.random()<[0,.15,.25,.35,.4,.45][lv]){const v=S.teams.filter(x=>x!==tm&&x.coins>=4).sort((a,b)=>b.coins-a.coins)[0];if(v)return {t:'rob',p:{tid:v.id,pid,gun:tm.inv.pistol>0}}}}
   if(!st.gotM&&!mem.mis&&lv>=3){mem.mis=1;if(tm.missions.length<4&&tm.missions.every(m=>mDone(tm,m))&&S.round<S.rounds-1&&tm.coins>=8)return {t:'mission',p:{pid}}}
   return null}
 function botBagStop(b,lv){if(!b.drawn.length)return false;const lim=S.cfg.level==='easy'?3:2;const pol=b.drawn.filter((x,k)=>x==='X'&&!b.xs.includes(k)).length;const risky=pol+(b.arm>0?0:1)>=lim;
@@ -627,6 +649,7 @@ function botMg(g,lv){const t=g.type;
   if(t==='odd')return Math.round(rr(15000,19000)-lv*2300);return 0}
 function botDecide(){const ph=S.phase;if(!S.players.some(p=>p.bot))return null;
   if(ph==='dice'&&!S.dice.done){const t=S.teams.find(t=>!S.dice.r[t.id]&&!humanIn(t.id));if(t)return {t:'roll',p:{tid:t.id},ms:rr(700,1500)}}
+  if(ph==='wheel'&&!S.wheel.done){const t=S.teams.find(t=>S.wheel.r[t.id]==null&&!humanIn(t.id));if(t)return {t:'spin',p:{tid:t.id},ms:rr(900,1800)}}
   const tp=S.turn&&S.turn.pid?PL(S.turn.pid):null;
   if(ph==='cat'&&tp&&tp.bot)return {t:'pickCat',p:{cat:pick(S.turn.cats)},ms:rr(900,1700)};
   if(ph==='q'&&tp){const t=S.turn;
@@ -732,6 +755,7 @@ function hostTimer(){
   else if(ph==='lqres'){ms=3500;t='lqNext'}
   else if(ph==='lbuy'){ms=120000+slack;t='timeout'}
   else if(ph==='dice'&&S.dice.done){ms=3500;t='diceGo'}
+  else if(ph==='wheel'&&S.wheel.done){ms=4800;t='wheelGo'}
   else if(ph==='bag'&&S.bagAll){ms=4000;t='bagGo'}
   if(t)timer=setTimeout(()=>{if(S&&S.pn===pn&&isHost()){apply({t,p:{pn}},CID);commit()}},ms*(window.__sotSpeed||1));
 }
@@ -764,7 +788,7 @@ function homeHTML(){
   +'<div class="card"><h3>Bli med i et spill</h3><div class="row"><input type="text" id="code" inputmode="text" autocapitalize="characters" autocomplete="off" maxlength="4" placeholder="Kode på fire bokstaver" value="'+esc(ui.codeDraft)+'" aria-label="Spillkode"><button class="btn" data-a="join" '+(netOk?'':'disabled')+'>Bli med</button></div>'
   +(netNote?'<p class="small muted">'+netNote+'</p>':'')+'</div>'
   +'</div><details><summary>Slik spiller dere</summary><ol>'
-  +'<li>Terningkast avgjør hvem som starter.</li>'
+  +'<li>I vanlig modus avgjør terningkast hvem som starter. I lynmodus snurrer alle lag lykkehjulet i stedet, og vinner kroner eller en gjenstand.</li>'
   +'<li><b>Vanlig modus:</b> hver tur har fem spørsmål. Du velger kategori før hvert, og de andre tipper for bonus. <b>Lynmodus:</b> alle lag svarer på de samme fem spørsmålene samtidig, og handler samtidig etterpå.</li>'
   +'<li>Hvert riktige svar gir 1 kr. En rute krever like mange riktige som lengden sin (1–5), og koster lengden pluss 1 kr.</li>'
   +'<li>I butikken kan du kjøpe pistol, skuddsikker vest, korrupt politi og dynamitt. Bare du ser butikken og det du eier.</li>'
@@ -808,7 +832,7 @@ function lobbyHTML(){
 }
 function mapSVG(mt,ctxTeam,canAct,stt){
   const own=S.own&&S.own.length===EDGES.length?S.own:EDGES.map(()=>0);
-  const goals={};if(ui.showM&&mt)mt.missions.forEach(m=>{goals[m.a]=1;goals[m.b]=1});
+  const goals={};if(mt&&misOpen())mt.missions.forEach(m=>{if(!mDone(mt,m)){goals[m.a]=1;goals[m.b]=1}});
   let s='<svg viewBox="0 0 840 790" class="mapsvg" role="img" aria-label="Kart over '+MAPINFO[MAPID].name+'"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".025"/></pattern></defs><rect width="840" height="790" fill="url(#grid)"/>'+MAPINFO[MAPID].deco;
   EDGES.forEach((e,i)=>{const g=GEO[i],len=e[2],pad=24,gap=7,tot=g.L-2*pad,sl=(tot-gap*(len-1))/len,ow=own[i],col=ow&&T(ow)?T(ow).color:null;
     let clickable=false;
@@ -824,6 +848,10 @@ function mapSVG(mt,ctxTeam,canAct,stt){
 }
 function missionTeam(){const t=S.turn;if(!LYN()&&t&&t.pid&&['count','cat','q','qres','act','duel','duelres'].includes(S.phase)&&mine(t.pid))return turnTeam();
   const mt=myTeams();if(mt.length===1)return mt[0];if(mt.length>1&&ui.lt&&T(ui.lt))return T(ui.lt);return null}
+const misOpen=()=>S.mode==='net'||ui.showM;
+function misBox(mt){if(!misOpen())return '<div class="mis"><button class="btn ghost sm" data-a="showM">Vis hemmelige oppdrag for '+tname(mt)+'</button></div>';
+  return '<div class="mis"><h3>Hemmelige oppdrag'+(S.mode==='net'?'':' for '+tname(mt))+'</h3>'+mt.missions.map(m=>{const d=mDone(mt,m);return '<div class="mrow"><span>'+(d?'<span class="ok">✓</span> ':'○ ')+NODES[m.a][0]+' – '+NODES[m.b][0]+'</span><span class="'+(d?'ok':'muted')+'">'+(d?'+':'±')+m.v+' p</span></div>'}).join('')
+   +'<div class="small muted" style="margin-top:4px">Uløste oppdrag trekker like mye som de gir. Endepunktene er markert på kartet.</div>'+(S.mode==='net'?'':'<button class="btn ghost sm" style="margin-top:6px" data-a="showM">Skjul</button>')+'</div>'}
 function missionsHTML(mt){if(!mt)return '';
   return '<div class="card" style="margin-top:10px"><h3>Hemmelige oppdrag for '+tname(mt)+'</h3>'+mt.missions.map(m=>'<div>'+(mDone(mt,m)?'✓ ':'○ ')+NODES[m.a][0]+' til '+NODES[m.b][0]+' <span class="muted">('+(mDone(mt,m)?'+':'±')+m.v+' poeng)</span></div>').join('')+'<p class="small muted">Uløste oppdrag trekker like mye som de gir.</p></div>'}
 function fuse(){const d=qDur(),el=Math.min(d,(Date.now()-ui.pnAt)/1000);return '<div class="fuse" aria-hidden="true"><i style="animation-duration:'+d+'s;animation-delay:-'+el.toFixed(1)+'s"></i></div>'}
@@ -880,7 +908,7 @@ function routeCard(c){const e=EDGES[ui.sel],len=e[2],ow=S.own[ui.sel],tm=c.tm,st
 function robHTML(c){const tm=c.tm,others=S.teams.filter(x=>x!==tm);
   let s='<div class="card" style="margin-top:12px">';
   if(!LYN())s+='<h3>Duell om kroner</h3><p class="small">Begge lag svarer på samme spørsmål. Vinneren tar opptil 3 kr.</p><div class="row">'+others.map(o=>'<button class="btn ghost sm" data-a="duel" data-t="'+o.id+'" '+(Math.min(3,tm.coins,o.coins)>=1&&!ui.pending?'':'disabled')+'>'+tname(o)+'</button>').join('')+'</div>';
-  s+='<h3 style="margin-top:10px">Ran</h3><p class="small">Halvparten av ranene lykkes og gir opptil 3 kr. Blir dere tatt, betaler dere '+(ab(c.pid,'smugler')?'1 kr':'2 kr')+' i bot. En skuddsikker vest stopper ranet.</p>';
+  s+='<h3 style="margin-top:10px">Ran</h3><p class="small">Halvparten av ranene lykkes og gir halvparten av kassa til offeret. Blir dere tatt, betaler dere '+(ab(c.pid,'smugler')?'1 kr':'2 kr')+' i bot. En skuddsikker vest stopper ranet.</p>';
   if(tm.inv.pistol>0)s+='<label class="row small" style="margin-bottom:8px"><input type="checkbox" data-ch="gun" '+(ui.gun?'checked':'')+'> '+token('pistol',26)+' Bruk pistol (ranet lykkes alltid, med mindre de har vest)</label>';
   s+='<div class="row">'+others.map(o=>'<button class="btn ghost sm" data-a="rob" data-t="'+o.id+'" data-p="'+c.pid+'" '+(o.coins>=1&&!ui.pending?'':'disabled')+'>'+tname(o)+' ('+o.coins+' kr)</button>').join('')+'</div>';
   if(!LYN())s+='<h3 style="margin-top:10px">Utfordre om en rute</h3><p class="small">'+(c.st.bought?'Dere har allerede tatt en rute denne turen.':'Trykk på en rute som et annet lag eier.')+'</p>';
@@ -972,6 +1000,23 @@ function bagHTML(){
   if(S.bagAll)s+='<p class="muted" style="margin-top:12px">Alle er ferdige. Spillet går videre …</p>';
   return s;
 }
+function wheelSVG(idx,cls,key){const n=WHEEL.length,a=360/n,cx=100,cy=100,R=92,cols=['#7a4a1c','#1d1714','#8e2a22','#1d1714'];
+  const pt=(deg,r)=>{const t=(deg-90)*Math.PI/180;return [cx+r*Math.cos(t),cy+r*Math.sin(t)]};
+  let g='';WHEEL.forEach((w,i)=>{const p1=pt(i*a,R),p2=pt((i+1)*a,R);g+='<path d="M100 100 L'+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+' A'+R+' '+R+' 0 0 1 '+p2[0].toFixed(1)+' '+p2[1].toFixed(1)+' Z" fill="'+(w.k==='dyn'?'#c8873a':cols[i%4])+'" stroke="#0e0c0b" stroke-width="1.5"/>';
+    const m=pt(i*a+a/2,R*.68);
+    if(w.k==='coin'){const q=pt(i*a+a/2,R*.62);g+='<text x="'+q[0].toFixed(1)+'" y="'+(q[1]+4.5).toFixed(1)+'" text-anchor="middle" transform="rotate('+(i*a+a/2-90)+' '+q[0].toFixed(1)+' '+q[1].toFixed(1)+')" font-family="Bebas Neue,Impact,sans-serif" font-size="14" letter-spacing=".5" fill="#f1d3a0">'+w.v+' kr</text>'}
+    else g+=token(w.k,22).replace(/^<span[^>]*>/,'').replace(/<\/span>$/,'').replace('<svg ','<svg x="'+(m[0]-11).toFixed(1)+'" y="'+(m[1]-11).toFixed(1)+'" width="22" height="22" ')});
+  let style='';if(idx!=null){const deg=360*5-(idx*a+a/2);const k='w'+S.gid+key;ui.spinAt=ui.spinAt||{};if(!ui.spinAt[k])ui.spinAt[k]=Date.now();const el=(Date.now()-ui.spinAt[k])/1000;style=' style="--to:'+deg+'deg;animation-delay:-'+el.toFixed(2)+'s"'}
+  return '<svg class="wheel '+(cls||'')+'" viewBox="-6 -14 212 220" aria-hidden="true"><circle cx="100" cy="100" r="98" fill="#2a231e" stroke="#c8873a" stroke-width="4"/><g class="rot"'+style+'>'+g+'</g><circle cx="100" cy="100" r="13" fill="#c8873a" stroke="#0e0c0b" stroke-width="3"/><path d="M100 18 L90 -8 L110 -8 Z" fill="#f1d3a0" stroke="#0e0c0b" stroke-width="2"/></svg>'}
+function prizeHTML(t){const i=S.wheel.r[t.id];if(i==null)return '';const k='w'+S.gid+t.id,el=ui.spinAt&&ui.spinAt[k]?(Date.now()-ui.spinAt[k])/1000:9;return '<div class="prize" style="animation-delay:'+(3.4-el).toFixed(2)+'s">'+prizeName(WHEEL[i])+'</div>'}
+function wheelHTML(){const W=S.wheel,mt=myTeams();
+  let s='<h2>Lykkehjulet</h2><p class="small muted">Hvert lag snurrer én gang før første lynrunde. Alle felt gir kroner eller en gjenstand.</p>';
+  const mine2=mt.find(t=>W.r[t.id]==null)||mt[0];
+  if(mine2){s+='<div class="card" style="text-align:center;margin-bottom:12px"><h3>'+tname(mine2)+'</h3>'+wheelSVG(W.r[mine2.id],'bigw',mine2.id)+(W.r[mine2.id]==null?'<button class="btn" data-a="spin" data-t="'+mine2.id+'" '+(ui.pending?'disabled':'')+'>Snurr hjulet</button>':prizeHTML(mine2))+'</div>'}
+  s+='<div class="wheels">'+S.teams.filter(t=>t!==mine2).map(t=>'<div class="wcard"><b>'+tname(t)+'</b>'+wheelSVG(W.r[t.id],'',t.id)+(W.r[t.id]==null?'<span class="small muted">venter …</span>':prizeHTML(t))+'</div>').join('')+'</div>';
+  if(!W.done&&isHost())s+='<button class="btn ghost sm" style="margin-top:12px" data-a="spinAll">Snurr for alle som mangler</button>';
+  if(W.done)s+='<p class="muted" style="margin-top:12px">Lynrunden starter straks …</p>';
+  return s}
 function diceHTML(){const D=S.dice;const mt=myTeams();
   let s='<h2>Hvem starter?</h2><p class="small muted">Kast to terninger. Høyest sum begynner.</p><div class="dice">'+S.teams.map(t=>{const r=D.r[t.id];const solo=!S.cfg.teams?members(t.id)[0]:null;
     return '<div class="diec">'+(solo?portrait(solo.ch,40):'<span class="dot" style="background:'+t.color+'"></span>')+'<div><b>'+tname(t)+'</b></div><div class="dd">'+(r?dieSVG(r[0],1)+dieSVG(r[1],1):dieSVG(0)+dieSVG(0))+'</div>'
@@ -1027,22 +1072,22 @@ function finalHTML(){
 }
 function gameHTML(){
   const ph=S.phase,t=S.turn;
-  const activeTeam=LYN()||['duel','duelres','dice','bag'].includes(ph)?0:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
+  const activeTeam=LYN()||['duel','duelres','dice','bag','wheel'].includes(ph)?0:(t.pid&&PL(t.pid)?PL(t.pid).team:0);
   const mt=missionTeam(),big=ui.big&&role==='host';
   let mapCtx=null,mapCan=false,mapSt=null;
   if(ph==='act'&&mine(t.pid)){mapCtx=turnTeam();mapCan=true;mapSt=t}
   if(ph==='lbuy')ensureLt();
   if(ph==='lbuy'&&ui.lt&&T(ui.lt)&&!S.lyn.tt[ui.lt].done){mapCtx=T(ui.lt);mapCan=true;mapSt=S.lyn.tt[ui.lt]}
-  let s=banner()+'<div class="top"><span class="brand">'+MAPINFO[MAPID].name+'</span><span class="small muted">'+(ph==='final'?'Slutt':ph==='dice'?'Terningkast':'Runde '+S.round+' av '+S.rounds)+(LYN()?' · lyn':'')+(S.mode==='net'&&!big?' · kode '+esc(S.code):'')+'</span>'+(big?'<span class="joincode">KODE '+esc(S.code)+'</span>':'')+'</div>';
+  let s=banner()+'<div class="top"><span class="brand">'+MAPINFO[MAPID].name+'</span><span class="small muted">'+(ph==='final'?'Slutt':ph==='dice'?'Terningkast':ph==='wheel'?'Lykkehjul':'Runde '+S.round+' av '+S.rounds)+(LYN()?' · lyn':'')+(S.mode==='net'&&!big?' · kode '+esc(S.code):'')+'</span>'+(big?'<span class="joincode">KODE '+esc(S.code)+'</span>':'')+'</div>';
   s+='<div class="scores">'+S.teams.map(x=>{const solo=!S.cfg.teams?members(x.id)[0]:null;const showC=myTeams().includes(x)||role==='local';
     return '<div class="sc'+(x.id===activeTeam&&!['final','mg','mgres'].includes(ph)?' on':'')+'">'+(solo?portrait(solo.ch,26):'')+'<span class="dot" style="background:'+x.color+'"></span> '+tname(x)+' <span class="pts">'+routePts(x)+' p</span>'+' <span class="muted">'+x.coins+' kr</span>'+'</div>'}).join('')+'</div>';
   s+='<div class="game'+(mapCan?' act':'')+'"><div class="panel">';
   if(S.msg)s+='<div class="msg" role="status">'+esc(S.msg)+'</div>';
-  s+=ph==='count'?(LYN()?'<h2>Lynrunde '+S.round+'</h2>':(S.turn.pid?whoHTML(S.turn.pid):'')):ph==='dice'?diceHTML():ph==='cat'?catHTML():(ph==='q'||ph==='qres')?qHTML():ph==='act'?actHTML():ph==='duel'?duelHTML():ph==='duelres'?duelresHTML()
+  s+=ph==='count'?(LYN()?'<h2>Lynrunde '+S.round+'</h2>':(S.turn.pid?whoHTML(S.turn.pid):'')):ph==='dice'?diceHTML():ph==='wheel'?wheelHTML():ph==='cat'?catHTML():(ph==='q'||ph==='qres')?qHTML():ph==='act'?actHTML():ph==='duel'?duelHTML():ph==='duelres'?duelresHTML()
     :(ph==='lq'||ph==='lqres')?lqHTML():ph==='lbuy'?lbuyHTML():ph==='bag'?bagHTML():ph==='mg'?mgHTML():ph==='mgres'?mgresHTML():finalHTML();
-  if(S.log&&S.log.length&&!['final','dice'].includes(ph))s+='<div class="log" aria-label="Siste hendelser"><b>Siste hendelser</b>'+S.log.slice(big?-5:-3).reverse().map(x=>'<div>Runde '+x.r+': '+esc(x.m)+'</div>').join('')+'</div>';
-  if(mt&&!['final','mg','dice'].includes(ph)){s+='<div class="foot"><button class="btn ghost sm" data-a="showM">'+(ui.showM?'Skjul oppdrag':'Hemmelige oppdrag')+'</button><button class="btn ghost sm" data-a="invT">Gjenstander</button></div>';if(ui.showM)s+=missionsHTML(mt);if(ui.inv)s+='<div class="card" style="margin-top:10px"><h3>'+tname(mt)+' eier</h3>'+invHTML(mt)+'</div>'}
-  s+='</div><div class="mapwrap">'+mapSVG(mt,mapCtx,mapCan,mapSt)+'</div></div>';
+  if(S.log&&S.log.length&&!['final','dice','wheel'].includes(ph))s+='<div class="log" aria-label="Siste hendelser"><b>Siste hendelser</b>'+S.log.slice(big?-5:-3).reverse().map(x=>'<div>Runde '+x.r+': '+esc(x.m)+'</div>').join('')+'</div>';
+  if(mt&&!['final','mg','dice','wheel'].includes(ph)){s+='<div class="foot"><button class="btn ghost sm" data-a="invT">Gjenstander</button></div>';if(ui.inv)s+='<div class="card" style="margin-top:10px"><h3>'+tname(mt)+' eier</h3>'+invHTML(mt)+'</div>'}
+  s+='</div><div class="mapcol"><div class="mapwrap">'+mapSVG(mt,mapCtx,mapCan,mapSt)+'</div>'+(mt&&ph!=='final'?misBox(mt):'')+'</div></div>';
   s+='<div class="foot"><button class="btn ghost sm" data-a="menu">Meny</button>'+(big?'<button class="btn ghost sm" data-a="fs">Fullskjerm</button>':'');
   if(ui.menu){
     if(role==='host'&&!LYN()&&['cat','q','qres','act','duel','duelres'].includes(ph))s+='<button class="btn ghost sm" data-a="takeover">Styr denne turen herfra</button>';
@@ -1075,7 +1120,7 @@ const UIA={
   addP(){const el=$('#pname');const name=(el?el.value:'').trim();if(!name)return;const free=freeChars(null);const ch=ui.char!=null&&free.includes(ui.char)?ui.char:free[0];ui.draft='';ui.char=null;if(el)el.value='';act('addP',{name,ch})},
   delP(d){if(ui.chFor===d('id'))ui.chFor=null;act('delP',{id:d('id')})},
   start(){ui.chFor=null;act('start')},
-  roll(d){act('roll',{tid:+d('t')})},
+  roll(d){act('roll',{tid:+d('t')})},spin(d){act('spin',{tid:+d('t')})},spinAll(){act('spinAll')},
   botLv(d){ui.botLv=+d('v');render()},addBot(){act('addBot',{lv:ui.botLv||3})},rollAll(){act('rollAll')},
   cat(d){act('pickCat',{cat:+d('c')})},
   ans(d){act('answer',{i:+d('i')})},
